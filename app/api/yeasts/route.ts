@@ -4,7 +4,9 @@ import {
   getYeastByBrand,
   getYeastByName,
   getYeastById,
+  createYeast,
 } from "@/lib/db/yeasts";
+import { verifyAdmin } from "@/app/middleware";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -41,4 +43,21 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// TODO: Implement POST, PATCH, and DELETE routes for admin actions.
+export async function POST(req: NextRequest) {
+  const adminOrResponse = await verifyAdmin(req);
+  if (adminOrResponse instanceof NextResponse) {
+    return adminOrResponse;
+  }
+
+  try {
+    const yeastData = await req.json();
+    const newYeast = await createYeast(yeastData);
+    return NextResponse.json(newYeast);
+  } catch (error: any) {
+    console.error("Error creating yeast:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to create yeast" },
+      { status: 500 }
+    );
+  }
+}

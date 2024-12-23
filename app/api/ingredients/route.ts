@@ -3,7 +3,9 @@ import {
   getAllIngredients,
   getIngredientsByCategory,
   getIngredientByName,
+  createIngredient,
 } from "@/lib/db/ingredients"; // Adjust path based on your project structure
+import { verifyAdmin } from "@/app/middleware";
 
 // GET /api/ingredients
 export async function GET(req: NextRequest) {
@@ -36,6 +38,23 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// TODO: POST /api/ingredients - Admin route
-// TODO: PATCH /api/ingredients/:ingredientId - Admin route
-// TODO: DELETE /api/ingredients/:ingredientId - Admin route
+// POST /api/ingredients
+export async function POST(req: NextRequest) {
+  // Check for admin privileges
+  const adminOrResponse = await verifyAdmin(req);
+  if (adminOrResponse instanceof NextResponse) {
+    return adminOrResponse;
+  }
+
+  try {
+    const body = await req.json();
+    const newIngredient = await createIngredient(body);
+
+    return NextResponse.json(newIngredient, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json(
+      { error: error.message || "Failed to create ingredient" },
+      { status: 500 }
+    );
+  }
+}

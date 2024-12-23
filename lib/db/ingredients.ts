@@ -43,3 +43,34 @@ export async function getIngredientByName(name: string) {
     throw new Error("Could not fetch ingredient by name");
   }
 }
+export async function createIngredient(data: {
+  name: string;
+  sugar_content: number;
+  water_content: number;
+  category: string;
+}) {
+  return prisma.ingredients.create({
+    data,
+  });
+}
+
+export async function updateIngredient(
+  id: string,
+  fields: Partial<{
+    name: string;
+    sugar_content: number;
+    water_content: number;
+    category: string;
+  }>
+) {
+  return prisma.ingredients.update({
+    where: { id: parseInt(id, 10) }, // Ensure id is converted to an integer
+    data: fields,
+  });
+}
+
+export async function deleteIngredient(id: string) {
+  return prisma.ingredients.delete({
+    where: { id: Number(id) },
+  });
+}

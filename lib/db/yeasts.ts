@@ -56,4 +56,36 @@ export async function getYeastById(id: number) {
   }
 }
 
-// TODO: Implement createYeast, updateYeast, and deleteYeast for admin routes.
+export async function createYeast(data: {
+  brand: string;
+  name: string;
+  nitrogen_requirement: string;
+  tolerance: number;
+  low_temp: number;
+  high_temp: number;
+}) {
+  return prisma.yeasts.create({ data });
+}
+
+export async function updateYeast(
+  id: string,
+  fields: Partial<{
+    brand: string;
+    name: string;
+    nitrogenRequirement: string;
+    tolerance: number;
+    lowTemp: number;
+    highTemp: number;
+  }>
+) {
+  return prisma.yeasts.update({
+    where: { id: parseInt(id, 10) },
+    data: fields,
+  });
+}
+
+export async function deleteYeast(id: string) {
+  return prisma.yeasts.delete({
+    where: { id: parseInt(id, 10) },
+  });
+}
