@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model brews {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  start_date     DateTime  @default(now()) @db.Timestamptz(6)
+  end_date       DateTime? @db.Timestamptz(6)
+  user_id        Int?
+  latest_gravity Float?    @db.Real
+  recipe_id      Int?
+  name           String?
+  recipes        recipes?  @relation(fields: [recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users          users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  devices        devices[]
+  logs           logs[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model devices {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  device_name  String?
+  recipe_id    Int?
+  user_id      Int
+  coefficients Float[]  @default([]) @db.Real
+  brew_id      String?  @db.Uuid
+  brews        brews?   @relation(fields: [brew_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  recipes      recipes? @relation(fields: [recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  logs         logs[]
+}
+
+model ingredients {
+  id            Int     @id @default(autoincrement())
+  name          String  @db.VarChar(255)
+  sugar_content Decimal @db.Decimal
+  water_content Decimal @db.Decimal
+  category      String  @db.VarChar(255)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model logs {
+  id                 String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  datetime           DateTime   @default(now()) @db.Timestamptz(6)
+  angle              Float      @db.Real
+  temperature        Float      @db.Real
+  temp_units         temp_units
+  battery            Float      @db.Real
+  gravity            Float      @db.Real
+  interval           Int
+  calculated_gravity Float?     @db.Real
+  device_id          String?    @db.Uuid
+  brew_id            String?    @db.Uuid
+  brews              brews?     @relation(fields: [brew_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  devices            devices?   @relation(fields: [device_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model recipes {
+  id              Int       @id @default(autoincrement())
+  user_id         Int?
+  name            String    @db.VarChar(255)
+  recipeData      String
+  yanFromSource   String?   @db.VarChar(255)
+  yanContribution String    @db.VarChar(255)
+  nutrientData    String
+  advanced        Boolean
+  nuteInfo        String?
+  primaryNotes    String[]
+  secondaryNotes  String[]
+  private         Boolean   @default(false)
+  brews           brews[]
+  devices         devices[]
+  users           users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  id          Int       @id @default(autoincrement())
+  email       String    @unique @db.VarChar(255)
+  password    String?   @db.VarChar(255)
+  google_id   String?   @db.VarChar(255)
+  role        String?   @default("user") @db.VarChar(255)
+  hydro_token String?   @unique
+  brews       brews[]
+  devices     devices[]
+  recipes     recipes[]
+}
+
+model yeasts {
+  id                   Int     @id @default(autoincrement())
+  brand                String  @db.VarChar(255)
+  name                 String  @db.VarChar(255)
+  nitrogen_requirement String  @db.VarChar(255)
+  tolerance            Decimal @db.Decimal
+  low_temp             Decimal @db.Decimal
+  high_temp            Decimal @db.Decimal
+}
+
+enum temp_units {
+  F
+  C
+  K
+}
