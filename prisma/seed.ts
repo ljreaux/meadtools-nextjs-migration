@@ -1,3 +1,5 @@
+import INGREDIENTS from "@/lib/db/initialIngredientData";
+import YEASTS, { Yeast } from "@/lib/db/initialYeastData";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcrypt";
 
@@ -34,32 +36,27 @@ async function main() {
   console.log("Users seeded");
 
   // Seed ingredients
-  const ingredients = [
-    { name: "Water", sugar_content: 0, water_content: 100, category: "water" },
-    {
-      name: "Honey",
-      sugar_content: 79.6,
-      water_content: 20.4,
-      category: "sugar",
-    },
-    // Add more ingredients as needed
-  ];
+  const ingredients = INGREDIENTS.map((ing) => ({
+    name: ing.name,
+    category: ing.category,
+    sugar_content: ing.sugarContent,
+    water_content: ing.waterContent,
+  }));
 
   await prisma.ingredients.createMany({ data: ingredients });
   console.log("Ingredients seeded");
 
   // Seed yeasts
-  const yeasts = [
-    {
-      brand: "Lalvin",
-      name: "D47",
-      nitrogen_requirement: "Low",
-      tolerance: 17,
-      low_temp: 50,
-      high_temp: 86,
-    },
-    // Add more yeasts as needed
-  ];
+  const yeasts = Object.entries(YEASTS).flatMap(([brand, yeasts]) =>
+    yeasts.map((yeast: Yeast) => ({
+      brand,
+      name: yeast.name,
+      nitrogen_requirement: yeast.nitrogenRequirement,
+      tolerance: parseFloat(String(yeast.tolerance)), // Ensure tolerance is a number
+      low_temp: yeast.lowTemp,
+      high_temp: yeast.highTemp,
+    }))
+  );
 
   await prisma.yeasts.createMany({ data: yeasts });
   console.log("Yeasts seeded");
