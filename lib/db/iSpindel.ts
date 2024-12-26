@@ -233,3 +233,189 @@ export async function createHydrometerToken(userId: number) {
     throw new Error("Failed to create hydrometer token.");
   }
 }
+
+export async function getBrews(user_id: number) {
+  try {
+    const brews = await prisma.brews.findMany({
+      where: { user_id },
+    });
+
+    return brews.sort((a, b) => {
+      const endDateA = a.end_date || new Date();
+      const endDateB = b.end_date || new Date();
+
+      if (endDateA < endDateB) return 1;
+      if (endDateA > endDateB) return -1;
+
+      // If end dates are the same, sort by start date
+      return a.start_date < b.start_date ? -1 : 1;
+    });
+  } catch (error) {
+    throw new Error("Error fetching brews.");
+  }
+}
+
+export async function startBrew(
+  device_id: string,
+  user_id: number,
+  brew_name: string
+) {
+  try {
+    const brew = await prisma.brews.create({
+      data: {
+        user_id,
+        name: brew_name,
+        start_date: new Date(),
+      },
+    });
+
+    const device = await prisma.devices.update({
+      where: { id: device_id },
+      data: { brew_id: brew.id },
+    });
+
+    return [brew, device];
+  } catch (error) {
+    throw new Error("Error starting brew.");
+  }
+}
+
+export async function endBrew(id: string, brew_id: string, user_id: number) {
+  try {
+    const brew = await prisma.brews.update({
+      where: { user_id, id: brew_id },
+      data: { end_date: new Date() },
+    });
+
+    const device = await prisma.devices.update({
+      where: { id },
+      data: { brew_id: null },
+    });
+
+    return [brew, device];
+  } catch (error) {
+    throw new Error("Error ending brew.");
+  }
+}
+
+export async function setBrewName(id: string, name: string, user_id: number) {
+  try {
+    return await prisma.brews.update({
+      where: { user_id, id },
+      data: { name },
+    });
+  } catch (error) {
+    throw new Error("Error setting brew name.");
+  }
+}
+
+export async function addRecipeToBrew(
+  recipe_id: number,
+  id: string,
+  user_id: number
+) {
+  try {
+    return await prisma.brews.update({
+      where: { user_id, id },
+      data: { recipe_id },
+    });
+  } catch (error) {
+    throw new Error("Error adding recipe to brew.");
+  }
+}
+
+export async function deleteBrew(brew_id: string, user_id: number) {
+  try {
+    // Check if a device is associated with the brew and the user
+    const device = await prisma.devices.findFirst({
+      where: {
+        user_id,
+        brew_id,
+      },
+    });
+
+    if (device) {
+      // Detach the device from the brew
+      await prisma.devices.update({
+        where: { id: device.id, user_id },
+        data: { brew_id: null },
+      });
+
+      // Delete logs associated with this brew and device
+      await prisma.logs.deleteMany({
+        where: {
+          brew_id,
+          device_id: device.id,
+        },
+      });
+    } else {
+      // Delete logs associated with this brew only
+      await prisma.logs.deleteMany({
+        where: { brew_id },
+      });
+    }
+
+    // Delete the brew
+    const deleted_brew = await prisma.brews.delete({
+      where: { id: brew_id, user_id },
+    });
+
+    return {
+      message: `Your brew "${
+        deleted_brew.name || deleted_brew.id
+      }" has been successfully deleted along with all of its logs.`,
+    };
+  } catch (error) {
+    console.error("Error deleting brew:", error);
+    throw new Error("Failed to delete brew.");
+  }
+}
+
+export async function updateCoefficients(
+  user_id: number,
+  id: string,
+  coefficients?: number[]
+) {
+  try {
+    if (!coefficients) throw new Error("No coefficients provided");
+
+    return await prisma.devices.update({
+      where: { id, user_id },
+      data: { coefficients },
+    });
+  } catch (error) {
+    console.error("Error updating coefficients:", error);
+    throw new Error("Error updating coefficients.");
+  }
+}
+
+export async function deleteDevice(device_id: string, user_id: number) {
+  try {
+    // Delete logs associated with the device where the brew_id is null
+    await prisma.logs.deleteMany({
+      where: {
+        device_id,
+        brew_id: null,
+      },
+    });
+
+    // Set device_id to null for logs associated with the device
+    await prisma.logs.updateMany({
+      where: { device_id },
+      data: { device_id: null },
+    });
+
+    // Delete the device belonging to the user
+    await prisma.devices.deleteMany({
+      where: {
+        id: device_id,
+        user_id,
+      },
+    });
+
+    return { message: `Device ${device_id} deleted successfully.` };
+  } catch (error) {
+    console.error("Error deleting device:", error);
+    throw new Error("Failed to delete device.");
+  }
+}
