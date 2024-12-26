@@ -2,20 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 38, 54%, 56%;
+    --foreground: 0, 0%, 14%;
+    --card: 38, 54%, 56%;
+    --card-foreground: 0, 0%, 14%;
+    --popover: 38, 54%, 56%;
+    --popover-foreground: 0, 0%, 14%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 36, 16%, 82%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 36, 16%, 82%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 0, 0%, 14%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+  }
+
+  .dark {
+    --background: 0, 0%, 14%;
+    --foreground: 36, 16%, 82%;
+    --card: 0, 0%, 14%;
+    --card-foreground: 36, 16%, 82%;
+    --popover: 0, 0%, 14%;
+    --popover-foreground: 36, 16%, 82%;
+    --primary: 36, 16%, 82%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210, 13%, 35%;
+    --secondary-foreground: 36, 16%, 82%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 210, 13%, 35%;
+    --accent-foreground: 36, 16%, 82%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 36, 16%, 82%;
+    --border: 210, 13%, 35%;
+    --input: 210, 13%, 35%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Libre Baskerville", serif;
+  }
+}
+
+/* .floatingchat-container-wrap {
+  left: unset !important;
+  right: 2rem !important;
+  bottom: 0.5rem !important;
+}
+.floating-chat-kofi-popup-iframe {
+  left: unset !important;
+  right: 2rem !important;
+} */
+
+.floatingchat-container-wrap-mobi {
+  display: none !important;
+}
+.floating-chat-kofi-popup-iframe-mobi {
+  display: none !important;
+}
+ul.react-paginate {
+  display: flex;
+  justify-content: space-between;
+  list-style-type: none;
+  padding: 0 1rem;
+  max-width: max-content;
+  gap: 0.5rem;
+}
+
+ul.react-paginate li a {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-lg text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 dark:ring-offset-foreground dark:focus-visible:ring-foreground border bg-background text-foreground hover:bg-foreground hover:border-background hover:text-background h-10 px-4 py-2;
+}
+ul.react-paginate li.previous a,
+ul.react-paginate li.next a,
+ul.react-paginate li.break a {
+  border-color: transparent;
+}
+ul.react-paginate li.selected a {
+  @apply bg-slate-900 text-slate-50 hover:bg-slate-900/90 dark:bg-slate-50 dark:text-slate-900 dark:hover:bg-slate-50/90;
+}
+ul.react-paginate li.disabled a {
+  @apply opacity-50 cursor-not-allowed;
+}
+ul.react-paginate li.disable,
+ul.react-paginate li.disabled a {
+  cursor: not-allowed;
 }
