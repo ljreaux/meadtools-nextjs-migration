@@ -31,11 +31,29 @@ export async function getUserByEmail(email: string) {
   }
 }
 
+export async function getUserByGoogleId(google_id?: string) {
+  if (!google_id) {
+    throw new Error("Google ID is required.");
+  }
+
+  try {
+    const user = await prisma.users.findFirst({
+      where: { google_id },
+    });
+
+    return user;
+  } catch (error) {
+    console.error("Error fetching user by Google ID:", error);
+    throw new Error("Failed to fetch user by Google ID.");
+  }
+}
+
 // Create a user
 export async function createUser(data: {
   email: string;
-  password: string;
+  password?: string;
   role?: string;
+  google_id?: string;
 }) {
   return await prisma.users.create({
     data,

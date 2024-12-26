@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { getUserById } from "@/lib/db/users";
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
 
 const { ACCESS_TOKEN_SECRET = "" } = process.env;
 
@@ -8,10 +11,10 @@ export async function requireAdmin(userId: number): Promise<boolean> {
   const user = await getUserById(userId);
   return user?.role === "admin";
 }
-
 export async function verifyUser(req: NextRequest) {
   try {
     const authHeader = req.headers.get("Authorization");
+
     if (!authHeader) {
       return NextResponse.json(
         { error: "Authorization header missing" },
@@ -20,15 +23,68 @@ export async function verifyUser(req: NextRequest) {
     }
 
     const token = authHeader.split(" ")[1];
+
     if (!token) {
-      throw new Error("Token missing");
+      return NextResponse.json({ error: "Token missing" }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as { id: number };
-    return decoded.id;
+    let userId: number | string | null = null;
+
+    // Try verifying as a custom token
+    try {
+      const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as { id: number };
+      userId = decoded?.id;
+
+      // Fetch the user by custom ID
+      const user = await prisma.users.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
+      return user.id;
+    } catch (err) {
+      console.warn("Failed to verify custom token, trying Google OAuth...");
+    }
+
+    // If not a custom token, try getting the user from the session
+    if (!userId) {
+      const session = await getServerSession(authOptions);
+      if (session?.user?.email) {
+        const user = await prisma.users.findUnique({
+          where: { email: session.user.email },
+        });
+
+        if (user) {
+          return user.id;
+        }
+      }
+
+      // If Google profile.sub is stored as google_id
+      if (session?.user?.id) {
+        const user = await prisma.users.findUnique({
+          where: { google_id: session.user.id }, // Assuming profile.sub is mapped to google_id
+        });
+
+        if (user) {
+          return user.id;
+        }
+      }
+    }
+
+    // If no valid userId, return an error
+    return NextResponse.json(
+      { error: "Invalid token or unauthorized access" },
+      { status: 401 }
+    );
   } catch (error) {
-    console.error("Error verifying token:", error);
-    throw new Error("Invalid token");
+    console.error("Error verifying user:", error);
+    return NextResponse.json(
+      { error: "Invalid or expired token" },
+      { status: 401 }
+    );
   }
 }
 
