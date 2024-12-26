@@ -1,4 +1,4 @@
-import { verifyUser } from "@/app/middleware";
+import { verifyUser } from "@/lib/middleware";
 import { deleteDevice, updateCoefficients } from "@/lib/db/iSpindel";
 import { NextRequest, NextResponse } from "next/server";
 

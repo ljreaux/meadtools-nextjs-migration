@@ -84,7 +84,7 @@ model users {
   id          Int       @id @default(autoincrement())
   email       String    @unique @db.VarChar(255)
   password    String?   @db.VarChar(255)
-  google_id   String?   @db.VarChar(255)
+  google_id   String?   @unique @db.VarChar(255)
   role        String?   @default("user") @db.VarChar(255)
   hydro_token String?   @unique
   brews       brews[]

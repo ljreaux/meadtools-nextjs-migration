@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { getUserById } from "@/lib/db/users";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "../app/api/auth/[...nextauth]/route";
 
 const { ACCESS_TOKEN_SECRET = "" } = process.env;
 
@@ -65,7 +65,8 @@ export async function verifyUser(req: NextRequest) {
       // If Google profile.sub is stored as google_id
       if (session?.user?.id) {
         const user = await prisma.users.findUnique({
-          where: { google_id: session.user.id }, // Assuming profile.sub is mapped to google_id
+          // @ts-expect-error
+          where: { google_id: session.user.id as string }, // Assuming profile.sub is mapped to google_id
         });
 
         if (user) {

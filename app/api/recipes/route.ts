@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRecipe, getAllRecipes } from "@/lib/db/recipes";
 
-import { requireAdmin, verifyUser } from "@/app/middleware";
+import { requireAdmin, verifyUser } from "@/lib/middleware";
 
 export async function GET(req: NextRequest) {
   // Verify user authentication

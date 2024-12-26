@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyUser } from "@/app/middleware";
+import { verifyUser } from "@/lib/middleware";
 import { getUserById, updateUser } from "@/lib/db/users";
 import { getAllRecipesForUser } from "@/lib/db/recipes";
 import bcrypt from "bcrypt";

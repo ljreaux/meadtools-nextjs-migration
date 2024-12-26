@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllUsers } from "@/lib/db/users";
-import { requireAdmin, verifyUser } from "@/app/middleware";
+import { requireAdmin, verifyUser } from "@/lib/middleware";
 
 export async function GET(req: NextRequest) {
   const userId = await verifyUser(req);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin, verifyUser } from "@/app/middleware";
+import { requireAdmin, verifyUser } from "@/lib/middleware";
 import { deleteRecipe, getRecipeInfo, updateRecipe } from "@/lib/db/recipes";
 
 // GET /api/recipes/:id

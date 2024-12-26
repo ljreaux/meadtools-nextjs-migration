@@ -5,7 +5,7 @@ import {
   getIngredientByName,
   createIngredient,
 } from "@/lib/db/ingredients"; // Adjust path based on your project structure
-import { verifyAdmin } from "@/app/middleware";
+import { verifyAdmin } from "@/lib/middleware";
 
 // GET /api/ingredients
 export async function GET(req: NextRequest) {

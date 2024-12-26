@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deleteUser, getUserById, updateUser } from "@/lib/db/users";
-import { requireAdmin, verifyUser } from "@/app/middleware";
+import { requireAdmin, verifyUser } from "@/lib/middleware";
 
 export async function GET(
   req: NextRequest,

@@ -1,4 +1,4 @@
-import { verifyUser } from "@/app/middleware";
+import { verifyUser } from "@/lib/middleware";
 import { deleteLog, getLogsForBrew, updateLog } from "@/lib/db/iSpindel";
 import { NextRequest, NextResponse } from "next/server";
 
