@@ -1,15 +1,16 @@
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import Providers from "@/components/providers/Providers";
 import TranslationsProvider from "@/components/providers/TranslationsProvider";
 import initTranslations from "@/lib/i18n";
 
 export default async function Layout({
   children,
-  params: { locale },
+  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }>) {
+  const { locale } = await params;
   const i18nNamespaces = ["default", "YeastTable"];
   const { t, resources } = await initTranslations(locale, i18nNamespaces);
   return (
@@ -19,7 +20,7 @@ export default async function Layout({
       resources={resources}
     >
       <Providers>
-        <Navbar />
+        <Navbar t={t} />
         {children}
       </Providers>
     </TranslationsProvider>

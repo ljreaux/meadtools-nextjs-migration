@@ -62,15 +62,15 @@ export const extraLinks = [
     label: "additionalLinks.contact",
   },
   {
-    path: "/juice",
-    label: "additionalLinks.juice",
-  },
-  {
     path: "/desktop",
     label: "additionalLinks.desktop",
   },
   {
     path: "https://yeasts.meadtools.com",
     label: "yeasts",
+  },
+  {
+    path: "/juice",
+    label: "additionalLinks.juice",
   },
 ];

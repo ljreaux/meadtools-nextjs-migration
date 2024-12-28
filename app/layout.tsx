@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Libre_Baskerville } from "next/font/google";
 import "./globals.css";
-import Providers from "../components/providers/Providers";
-import { ModeToggle } from "@/components/ui/mode-toggle";
-import Navbar from "@/components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 const libre = Libre_Baskerville({
   weight: ["400", "700"],
@@ -21,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={libre.className}>{children}</body>
+      <body className={`${libre.className} bg-secondary h-screen`}>
+        <Toaster />
+        {children}
+      </body>
     </html>
   );
 }

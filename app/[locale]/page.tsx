@@ -1,11 +1,12 @@
 import initTranslations from "@/lib/i18n";
 
 export default async function Home({
-  params: { locale },
+  params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const { t } = await initTranslations(locale, ["default"]);
+  const { locale } = await params;
+  const { t } = await initTranslations(locale, ["default", "YeastTable"]);
 
   return <main></main>;
 }
