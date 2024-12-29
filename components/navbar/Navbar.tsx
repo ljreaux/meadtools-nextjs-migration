@@ -20,8 +20,8 @@ export default async function Navbar({
   t: TFunctionNonStrict<"translation", undefined>;
 }) {
   return (
-    <nav className="sm:h-20 h-28 fixed top-0 z-[51] flex items-center justify-between mb-[1rem] border-b-2 border-background">
-      <div className="relative grid items-center justify-center w-screen h-full gap-2 text-xl text-center sm:justify-between sm:flex bg-background text-foreground">
+    <nav className="sm:h-20 h-28 fixed top-0 z-[51] flex items-center justify-between border-b-2 border-background bg-background">
+      <div className="relative grid items-center justify-center w-screen h-full gap-2 text-xl text-center sm:justify-between sm:flex text-foreground">
         <NavigationMenu>
           <NavigationMenuList>
             <NavigationMenuItem>
@@ -29,32 +29,38 @@ export default async function Navbar({
                 {t("calculators.label")}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
-                <ul className="grid sm:gap-3 gap-2 sm:p-4 sm:min-w-[400px] min-w-[300px] lg:grid-cols-[1fr_1fr] text-start">
-                  <li className="col-span-full">{t("calculators.main")}</li>
-                  {mainCalcs.map((link) => {
-                    return (
-                      <ListItem
-                        key={link.path}
-                        title={t(link.label)}
-                        href={link.path}
-                      />
-                    );
-                  })}
-                </ul>
-                <ul className="grid sm:gap-3 gap-2 sm:p-4 p-2 sm:min-w-[400px] min-w-[300px] lg:grid-cols-[1fr_1fr] text-start">
-                  <li className="col-span-full">
-                    {t("calculators.extraCalcs.label")}
-                  </li>
-                  {extraCalculatorLinks.map((link) => {
-                    return (
-                      <ListItem
-                        key={link.path}
-                        title={t(link.label)}
-                        href={link.path}
-                      />
-                    );
-                  })}
-                </ul>
+                <div className="sm:p-4 p-2 sm:min-w-[400px] min-w-[300px]">
+                  <div className="border-b border-muted-foreground pb-2 mb-2">
+                    <p className="font-bold text-left mb-2">
+                      {t("calculators.main")}
+                    </p>
+                    <ul className="grid grid-cols-2 gap-3 text-start">
+                      {mainCalcs.map((link) => (
+                        <ListItem
+                          key={link.path}
+                          title={t(link.label)}
+                          href={link.path}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="mt-4">
+                    <p className="font-bold text-left mb-2">
+                      {t("calculators.extraCalcs.label")}
+                    </p>
+                    <div className="max-h-[240px] overflow-y-auto scrollbar-thin scrollbar-thumb-rounded scrollbar-thumb-muted-foreground">
+                      <ul className="grid grid-cols-2 gap-3 text-start">
+                        {extraCalculatorLinks.map((link) => (
+                          <ListItem
+                            key={link.path}
+                            title={t(link.label)}
+                            href={link.path}
+                          />
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
               </NavigationMenuContent>
             </NavigationMenuItem>
 
@@ -64,15 +70,13 @@ export default async function Navbar({
               </NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="grid grid-cols-2 gap-3 p-4 sm:min-w-[400px] min-w-[300px] text-left">
-                  {extraLinks.map((link) => {
-                    return (
-                      <ListItem
-                        key={link.path}
-                        title={t(link.label)}
-                        href={link.path}
-                      />
-                    );
-                  })}
+                  {extraLinks.map((link) => (
+                    <ListItem
+                      key={link.path}
+                      title={t(link.label)}
+                      href={link.path}
+                    />
+                  ))}
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>

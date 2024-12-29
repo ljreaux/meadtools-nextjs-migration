@@ -27,13 +27,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("accessToken");
+    const googleToastShown = !!JSON.parse(
+      JSON.stringify(localStorage.getItem("googleToastShown"))
+    );
 
     if (status === "authenticated" && session?.user) {
-      toast({
-        title: t("auth.googleLogin.success.title", "Logged in with Google!"),
-        description: t("auth.googleLogin.success.description", "Welcome back!"),
-        variant: "default",
-      });
+      if (googleToastShown) {
+        toast({
+          title: t("auth.googleLogin.success.title", "Logged in with Google!"),
+          description: t(
+            "auth.googleLogin.success.description",
+            "Welcome back!"
+          ),
+          variant: "default",
+        });
+        localStorage.removeItem("googleToastShown");
+      }
       setUser({
         id: session.user.id,
         email: session.user.email!,
@@ -67,6 +76,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const loginWithGoogle = async () => {
     try {
+      localStorage.setItem("googleToastShown", "true");
       await signIn("google");
     } catch (error) {
       toast({
