@@ -20,39 +20,33 @@ import {
 import { FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-function Sulfite() {
+function Sorbate() {
   const { t } = useTranslation();
-
-  const [sulfite, setSulfite] = useState({
+  const [sorbate, setSorbate] = useState({
     batchSize: 1,
     units: "gallons",
-    ppm: 50,
+    abv: 12,
   });
+
+  const sorbateAmount =
+    sorbate.units === "gallons"
+      ? ((-sorbate.abv * 25 + 400) / 0.75) * sorbate.batchSize * 0.003785411784
+      : (((-sorbate.abv * 25 + 400) / 0.75) * sorbate.batchSize) / 1000;
+
   const handleChange = (e: FormEvent<EventTarget>) => {
     const target = e.target as HTMLInputElement;
-    setSulfite((prev) => ({
+    setSorbate((prev) => ({
       ...prev,
       [target.id]: target.value,
     }));
   };
-
-  const sulfiteAmount =
-    sulfite.units === "gallons"
-      ? (sulfite.batchSize * 3.785 * sulfite.ppm) / 570
-      : (sulfite.batchSize * sulfite.ppm) / 570;
-
-  const campden =
-    sulfite.units !== "gallons"
-      ? (sulfite.ppm / 75) * (sulfite.batchSize / 3.785)
-      : (sulfite.ppm / 75) * sulfite.batchSize;
   return (
     <Table>
       <TableHeader>
         <TableRow className="border-none">
           <TableHead colSpan={3}>
             <h1 className="sm:text-3xl text-xl text-center text-foreground">
-              {" "}
-              {t("sulfiteHeading")}{" "}
+              {t("sorbateHeading")}
             </h1>
           </TableHead>
         </TableRow>
@@ -66,52 +60,43 @@ function Sulfite() {
               id="batchSize"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
-              value={sulfite.batchSize}
             />
           </TableCell>
           <TableCell>
             <Select
               name="units"
+              value={sorbate.units}
               onValueChange={(val) => {
-                setSulfite((prev) => ({ ...prev, units: val }));
+                setSorbate((prev) => ({ ...prev, units: val }));
               }}
-              value={sulfite.units}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gallons">{t("GAL")}</SelectItem>
-                <SelectItem value="liter">{t("LIT")}</SelectItem>
+                <SelectItem value="liters">{t("LIT")}</SelectItem>
               </SelectContent>
             </Select>
           </TableCell>
         </TableRow>
+
         <TableRow>
-          <TableHead>{t("desiredPpm")} </TableHead>
+          <TableHead>{t("ABV")}: </TableHead>
           <TableCell colSpan={2}>
             <Input
+              id="abv"
               type="number"
-              name="ppm"
-              id="ppm"
+              onFocus={(e) => e.target.select()}
               onChange={handleChange}
-              value={sulfite.ppm}
+              value={sorbate.abv}
             />
           </TableCell>
         </TableRow>
 
         <TableRow>
-          <TableCell colSpan={3}>
-            <span className="grid items-center justify-center gap-2 sm:text-2xl text-center">
-              <p>
-                {Math.round(sulfiteAmount * 10000) / 10000}g {t("kMeta")}
-              </p>{" "}
-              <p>{t("accountPage.or")}</p>{" "}
-              <p className="flex item-center justify-center gap-2">
-                {Math.round(campden * 10) / 10} {t("list.campden")}
-                <Tooltip body={t("tipText.campden")} />
-              </p>
-            </span>
+          <TableCell className="my-4 text-lg text-center" colSpan={3}>
+            {Math.round(sorbateAmount * 1000) / 1000}g {t("kSorb")}
           </TableCell>
         </TableRow>
       </TableBody>
@@ -119,4 +104,4 @@ function Sulfite() {
   );
 }
 
-export default Sulfite;
+export default Sorbate;

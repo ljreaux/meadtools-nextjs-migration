@@ -17,7 +17,7 @@ export default function AbvCalculator() {
   return (
     <>
       <h1 className="sm:text-3xl text-xl text-center">{t("abvHeading")}</h1>
-      <div className="flex flex-col justify-evenly h-full">
+      <div className="flex flex-col gap-6">
         {inputArr.map((label, index) => {
           const brix = toBrix(inputValues[index]);
           return (

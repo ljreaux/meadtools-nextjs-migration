@@ -47,13 +47,15 @@ function EstimatedOG() {
         type="number"
         id="refractometerFG"
         onFocus={(e) => e.target.select()}
-      />
-      <h2 className="sm:text-2xl text-xl text-center">{t("estimatedOG")} </h2>
+      />{" "}
       <span className="grid grid-cols-2 text-center gap-2 text-lg">
-        <p>{estOG}</p>
-        <p>
-          {Math.round(toBrix(estOG) * 100) / 100} {t("BRIX")}
-        </p>
+        <h2 className="sm:text-2xl text-xl text-center">{t("estimatedOG")} </h2>
+        <span className="flex gap-2 text-center justify-center items-center">
+          <p>{estOG},</p>
+          <p>
+            {Math.round(toBrix(estOG) * 100) / 100} {t("BRIX")}
+          </p>
+        </span>
       </span>
       <AbvLine {...abv} textSize="text-lg" />
     </>
