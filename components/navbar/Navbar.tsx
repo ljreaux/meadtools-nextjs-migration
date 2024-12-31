@@ -3,7 +3,6 @@ import {
   NavigationMenuContent,
   NavigationMenuItem,
   NavigationMenuList,
-  NavigationMenuTrigger,
 } from "../ui/navigation-menu";
 import Link from "next/link";
 import { ModeToggle } from "../ui/mode-toggle";
@@ -146,21 +145,21 @@ export default async function Navbar({
             <AccountLinks />
           </div>
           <Link
-            className="bg-background w-[3rem] sm:flex sm:w-24 lg:w-52 h-full left-0 border-[1px] border-sidebar hover:opacity-80 transition-all"
+            className="bg-background w-[3rem] sm:flex sm:w-24 md:w-52 h-full left-0 border-[1px] border-sidebar hover:opacity-80 transition-all"
             href="/"
           >
             <span className="flex flex-col items-center justify-center w-full h-full bg-secondary">
               <Image
                 src={"/assets/full-logo.png"}
                 alt="MeadTools logo"
-                className="hidden lg:flex"
+                className="hidden md:flex"
                 width="300"
                 height="50"
               />
               <Image
                 src={"/assets/logoOnly.png"}
                 alt="MeadTools logo"
-                className="lg:hidden"
+                className="md:hidden"
                 width="50"
                 height="50"
               />

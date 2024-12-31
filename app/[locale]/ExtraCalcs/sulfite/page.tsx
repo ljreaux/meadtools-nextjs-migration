@@ -51,8 +51,7 @@ function Sulfite() {
         <TableRow className="border-none">
           <TableHead colSpan={3}>
             <h1 className="sm:text-3xl text-xl text-center text-foreground">
-              {" "}
-              {t("sulfiteHeading")}{" "}
+              {t("sulfiteHeading")}
             </h1>
           </TableHead>
         </TableRow>
