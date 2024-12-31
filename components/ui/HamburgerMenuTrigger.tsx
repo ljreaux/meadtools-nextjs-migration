@@ -10,13 +10,13 @@ const HoverHamburgerMenuTrigger = React.forwardRef<
   <NavigationMenuPrimitive.Trigger
     ref={ref}
     className={cn(
-      "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50",
-      className // Removed hover and focus background color styles
+      "group inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50",
+      className
     )}
     {...props}
   >
     {/* Icon transitions based on `group-data-[state=open]` */}
-    <span className="relative flex items-center">
+    <span className="relative flex items-center justify-center w-full h-full">
       <p className="sr-only">Navigation Menu</p>
       {/* Hamburger Icon */}
       <Text
