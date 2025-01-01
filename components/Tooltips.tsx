@@ -14,7 +14,7 @@ export default function Tooltip({
   const { t } = useTranslation();
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger className="hover:text-background hover:bg-foreground transition-colors data-[state=open]:text-background data-[state=open]:bg-foreground p-1 rounded-md">
         <Info />
       </PopoverTrigger>
 
@@ -27,7 +27,12 @@ export default function Tooltip({
         )}
         {links &&
           links.map((linkArr) => (
-            <a href={linkArr[0]} className="underline" key={linkArr[0]}>
+            <a
+              href={linkArr[0]}
+              className="underline"
+              target="_blank"
+              key={linkArr[0]}
+            >
               {linkArr[1]}
             </a>
           ))}

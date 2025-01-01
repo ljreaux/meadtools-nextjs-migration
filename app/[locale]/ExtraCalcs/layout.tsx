@@ -1,8 +1,8 @@
-import React from "react";
+import ExtraCalcsSideBar from "@/components/extraCalcs/Sidebar";
 
 function ExtraCalcsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full flex justify-center sm:pt-24 sm:items-baseline items-center h-full">
+    <div className="w-full flex justify-center items-center sm:pt-24 pt-[6rem] relative">
       <ExtraCalcsCard>{children}</ExtraCalcsCard>
     </div>
   );
@@ -11,7 +11,8 @@ function ExtraCalcsLayout({ children }: { children: React.ReactNode }) {
 export default ExtraCalcsLayout;
 
 const ExtraCalcsCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="flex flex-col md:p-12 p-8 rounded-xl bg-background gap-4 w-11/12 max-w-[650px] ">
+  <div className="flex flex-col md:p-12 p-8 rounded-xl bg-background gap-4 w-11/12 max-w-[650px]">
+    <ExtraCalcsSideBar />
     {children}
   </div>
 );
