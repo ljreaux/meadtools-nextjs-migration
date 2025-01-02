@@ -59,6 +59,7 @@ function StockVolumeRow({
   const { adjunctAmount, adjunctConcentration, scaledAdjunct, scaledBatch } =
     calculateAdjunctValues(volume, batchDetails);
 
+  const { t } = useTranslation();
   return (
     <>
       {/* Full-width row for Solution Volume */}
@@ -66,7 +67,7 @@ function StockVolumeRow({
         <TableCell colSpan={4} className="font-bold text-center">
           <div className="flex flex-col items-center">
             <label htmlFor={`stockVolume-${index}`} className="mb-2">
-              {`Solution Volume ${index + 1}`}
+              {t("solutionVolume")}
             </label>
             <Input
               id={`stockVolume-${index}`}
@@ -85,25 +86,25 @@ function StockVolumeRow({
       <TableRow className="sm:table-row grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
-            <label>{`Adjunct Amount`}</label>
+            <label>{t("adjunctAmount")}</label>
             <span>{adjunctAmount}</span>
           </div>
         </TableCell>
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
-            <label>{`Adjunct Concentration (PPM)`}</label>
+            <label>{t("adjunctConcentration")}</label>
           </div>{" "}
           <span>{adjunctConcentration}</span>
         </TableCell>
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
-            <label>{`Scaled Adjunct`}</label>
+            <label>{t(`${batchDetails.units}ScaledAdjunct`)}</label>
             <span>{scaledAdjunct}</span>
           </div>
         </TableCell>
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
-            <label>{`Scaled Batch`}</label>
+            <label>{t("scaledBatch")}</label>
             <span>{scaledBatch}</span>
           </div>{" "}
         </TableCell>
