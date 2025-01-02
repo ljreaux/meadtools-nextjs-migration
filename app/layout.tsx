@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 const libre = Libre_Baskerville({
   weight: ["400", "700"],
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
