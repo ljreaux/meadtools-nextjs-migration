@@ -12,8 +12,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
-  TableHead,
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
@@ -49,16 +47,16 @@ function Sulfite() {
     <Table>
       <TableHeader>
         <TableRow className="border-none">
-          <TableHead colSpan={3}>
+          <TableCell colSpan={3}>
             <h1 className="sm:text-3xl text-xl text-center text-foreground">
               {t("sulfiteHeading")}
             </h1>
-          </TableHead>
+          </TableCell>
         </TableRow>
       </TableHeader>
       <TableBody>
         <TableRow>
-          <TableHead>{t("batchSize")} </TableHead>
+          <TableCell>{t("batchSize")} </TableCell>
           <TableCell>
             <Input
               type="number"
@@ -87,7 +85,7 @@ function Sulfite() {
           </TableCell>
         </TableRow>
         <TableRow>
-          <TableHead>{t("desiredPpm")} </TableHead>
+          <TableCell>{t("desiredPpm")} </TableCell>
           <TableCell colSpan={2}>
             <Input
               type="number"
