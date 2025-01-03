@@ -22,6 +22,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${libre.className} bg-secondary h-screen`}>
         <Toaster />
+
         {children}
       </body>
     </html>
