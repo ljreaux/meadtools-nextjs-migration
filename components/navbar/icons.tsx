@@ -1,7 +1,6 @@
 import React, { JSX } from "react";
-import { Mail } from "lucide-react";
 
-const IconWrapper = ({ children }: { children: JSX.Element }) => (
+export const IconWrapper = ({ children }: { children: JSX.Element }) => (
   <div className="transition-all w-6 h-6 text-primary hover:text-secondary md:hover:scale-105 flex items-center justify-center">
     {children}
   </div>
