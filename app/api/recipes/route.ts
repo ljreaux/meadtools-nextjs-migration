@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   } catch (error: any) {
     console.error("Error fetching recipes:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to fetch recipes" },
+      { error: "Failed to fetch recipes" }, // Override with consistent error message
       { status: 500 }
     );
   }
@@ -36,15 +36,11 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    // Verify user authentication
     const userOrResponse = await verifyUser(req);
     if (userOrResponse instanceof NextResponse) {
-      return userOrResponse; // Return error response if the user is not verified
+      return userOrResponse;
     }
 
-    const userId = userOrResponse;
-
-    // Parse the request body
     const body = await req.json();
     const {
       name,
@@ -59,7 +55,6 @@ export async function POST(req: NextRequest) {
       privateRecipe,
     } = body;
 
-    // Validate required fields
     if (!name || !recipeData) {
       return NextResponse.json(
         { error: "Name and recipe data are required." },
@@ -67,9 +62,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create a new recipe
     const recipe = await createRecipe({
-      userId: userId,
+      userId: userOrResponse,
       name,
       recipeData,
       yanFromSource,
@@ -84,9 +78,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ recipe }, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating recipe:", error);
+    console.error("Error creating recipe:", error.message);
     return NextResponse.json(
-      { error: error.message || "Failed to create recipe" },
+      { error: "Failed to create recipe" }, // Correct error message
       { status: 500 }
     );
   }

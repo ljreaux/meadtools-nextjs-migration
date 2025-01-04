@@ -21,8 +21,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const body = await req.json(); // Expecting the request body to be parsed correctly
   const { device_id, brew_name } = body;
+
   if (!device_id || !brew_name) {
     return NextResponse.json(
       { error: "Missing device_id or brew_name" },
@@ -54,8 +55,9 @@ export async function PATCH(req: NextRequest) {
     return userOrResponse; // Return error response if the user is not verified
   }
   const userId = userOrResponse;
-  const body = await req.json();
+  const body = await req.json(); // Expecting the request body to be parsed correctly
   const { device_id, brew_id, brew_name } = body;
+
   if (!device_id || !brew_id) {
     return NextResponse.json(
       { error: "Missing device_id, brew_id, or brew_name" },

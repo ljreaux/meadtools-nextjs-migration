@@ -12,7 +12,7 @@ export async function PATCH(
   }
   const userId = userOrResponse;
 
-  const { brew_id } = await params;
+  const { brew_id } = await params; // Resolve params as Promise
   const body = await req.json();
   const { recipe_id } = body;
 
@@ -24,6 +24,9 @@ export async function PATCH(
   }
   try {
     const updatedBrew = await addRecipeToBrew(recipe_id, brew_id, userId);
+    if (!updatedBrew) {
+      throw new Error("Failed to update brew.");
+    }
     return NextResponse.json(updatedBrew, { status: 200 });
   } catch (err) {
     console.error("Error updating brew:", err);
@@ -44,7 +47,7 @@ export async function DELETE(
   }
   const userId = userOrResponse;
 
-  const { brew_id } = await params;
+  const { brew_id } = await params; // Resolve params as Promise
 
   if (!brew_id) {
     return NextResponse.json({ error: "Missing brew_id" }, { status: 400 });

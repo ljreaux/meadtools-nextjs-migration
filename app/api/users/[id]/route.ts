@@ -55,8 +55,9 @@ export async function PATCH(
     const updatedUser = await updateUser(Number(id), updates);
     return NextResponse.json(updatedUser);
   } catch (error: any) {
+    console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: error.message || "Server error" },
+      { error: "Failed to update user" },
       { status: 500 }
     );
   }
@@ -66,8 +67,6 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
-
   try {
     const userId = await verifyUser(req);
     if (userId instanceof NextResponse) return userId;
@@ -79,9 +78,10 @@ export async function DELETE(
         { status: 403 }
       );
     }
-    await deleteUser(parseInt(id, 10));
+
+    await deleteUser(Number(params.id));
     return NextResponse.json({ message: "User deleted successfully" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error deleting user:", error);
     return NextResponse.json(
       { error: "Failed to delete user" },

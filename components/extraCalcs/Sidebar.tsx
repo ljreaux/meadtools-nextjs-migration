@@ -19,7 +19,7 @@ import {
 
 function ExtraCalcsSideBar() {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 

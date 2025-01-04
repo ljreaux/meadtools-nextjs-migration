@@ -64,11 +64,20 @@ export async function DELETE(
   if (userOrResponse instanceof NextResponse) {
     return userOrResponse; // Return error response if the user is not verified
   }
+
   const { id: logId } = await params;
   const { searchParams } = new URL(req.url);
   const device_id = searchParams.get("device_id");
+
   try {
-    if (!device_id) throw new Error("Must provide a device id.");
+    if (!device_id) {
+      // If the device_id is missing, throw a specific error
+      return NextResponse.json(
+        { error: "Must provide a device id." },
+        { status: 400 }
+      );
+    }
+
     const log = await deleteLog(logId, device_id);
     return NextResponse.json(log, { status: 200 });
   } catch (error) {

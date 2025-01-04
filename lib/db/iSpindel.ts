@@ -240,21 +240,16 @@ export async function getBrews(user_id: number) {
       where: { user_id },
     });
 
-    return brews.sort(
-      (
-        a: { start_date: Date; end_date: Date },
-        b: { start_date: Date; end_date: Date }
-      ) => {
-        const endDateA = a.end_date || new Date();
-        const endDateB = b.end_date || new Date();
+    return brews.sort((a, b) => {
+      const endDateA = a.end_date || new Date();
+      const endDateB = b.end_date || new Date();
 
-        if (endDateA < endDateB) return 1;
-        if (endDateA > endDateB) return -1;
+      if (endDateA < endDateB) return 1;
+      if (endDateA > endDateB) return -1;
 
-        // If end dates are the same, sort by start date
-        return a.start_date < b.start_date ? -1 : 1;
-      }
-    );
+      // If end dates are the same, sort by start date
+      return a.start_date < b.start_date ? -1 : 1;
+    });
   } catch (error) {
     throw new Error("Error fetching brews.");
   }

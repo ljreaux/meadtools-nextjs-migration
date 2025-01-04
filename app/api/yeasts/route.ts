@@ -18,24 +18,40 @@ export async function GET(req: NextRequest) {
 
   try {
     if (brand) {
+      console.log("Fetching yeasts by brand:", brand);
       const yeasts = await getYeastByBrand(brand);
       return NextResponse.json(yeasts);
     }
 
     if (name) {
+      console.log("Fetching yeast by name:", name);
       const yeast = await getYeastByName(name);
+      if (!yeast) {
+        return NextResponse.json(
+          { error: `Yeast with name "${name}" not found` },
+          { status: 404 }
+        );
+      }
       return NextResponse.json(yeast);
     }
 
     if (id) {
+      console.log("Fetching yeast by ID:", id);
       const yeast = await getYeastById(parseInt(id, 10));
+      if (!yeast) {
+        return NextResponse.json(
+          { error: `Yeast with ID "${id}" not found` },
+          { status: 404 }
+        );
+      }
       return NextResponse.json(yeast);
     }
 
+    console.log("Fetching all yeasts");
     const yeasts = await getAllYeasts();
     return NextResponse.json(yeasts);
   } catch (error) {
-    console.error("Error in yeasts API:", error);
+    console.error("Error in yeasts API (GET):", error);
     return NextResponse.json(
       { error: "Failed to fetch yeasts" },
       { status: 500 }
@@ -51,12 +67,21 @@ export async function POST(req: NextRequest) {
 
   try {
     const yeastData = await req.json();
+
+    // Validate the yeast data
+    if (!yeastData.name) {
+      return NextResponse.json(
+        { error: "Yeast name is required" },
+        { status: 400 }
+      );
+    }
+
     const newYeast = await createYeast(yeastData);
     return NextResponse.json(newYeast);
   } catch (error: any) {
-    console.error("Error creating yeast:", error);
+    console.error("Error creating yeast (POST):", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create yeast" },
+      { error: "Failed to create yeast" },
       { status: 500 }
     );
   }
