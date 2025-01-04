@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(null); // Clear custom token
     } else if (storedToken) {
       setToken(storedToken);
-      fetch("/api/auth/accountInfo", {
+      fetch("/api/auth/account-info", {
         headers: {
           Authorization: `Bearer ${storedToken}`,
         },

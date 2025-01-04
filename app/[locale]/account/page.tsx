@@ -1,25 +1,20 @@
-import YeastTable from "@/components/yeastTable/YeastTable";
+"use client";
 
-async function fetchYeasts() {
-  const baseUrl =
-    typeof window !== "undefined"
-      ? ""
-      : process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-  const res = await fetch(`${baseUrl}/api/yeasts`);
-  if (!res.ok) {
-    throw new Error("Failed to fetch yeasts data");
-  }
-  return res.json();
+function Account() {
+  const { user } = useAuth();
+  const router = useRouter();
+  useEffect(() => {
+    // Fetch and display user data here
+    if (!user) {
+      // Redirect to login if user is not authenticated
+      router.push("/login");
+    }
+  });
+  return <div>This is the account page.</div>;
 }
 
-export default async function YeastsPage() {
-  const yeasts = await fetchYeasts();
-
-  return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Yeasts Table</h1>
-      <YeastTable data={yeasts} />
-    </div>
-  );
-}
+export default Account;

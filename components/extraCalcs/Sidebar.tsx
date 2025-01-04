@@ -24,40 +24,44 @@ function ExtraCalcsSideBar() {
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
   const links = [
-    { path: "/ExtraCalcs/", icon: <Beer />, label: t("sideNav.abv") },
+    { path: "/extra-calcs/", icon: <Beer />, label: t("sideNav.abv") },
     {
-      path: "/ExtraCalcs/brixCalc",
+      path: "/extra-calcs/brix",
       icon: <Percent />,
       label: t("sideNav.brix"),
     },
-    { path: "/ExtraCalcs/estOG", icon: <Scale />, label: t("sideNav.estOG") },
     {
-      path: "/ExtraCalcs/benchTrials",
+      path: "/extra-calcs/estimated-og",
+      icon: <Scale />,
+      label: t("sideNav.estOG"),
+    },
+    {
+      path: "/extra-calcs/bench-trials",
       icon: <FlaskConical />,
       label: t("sideNav.benchTrials"),
     },
     {
-      path: "/ExtraCalcs/sulfite",
+      path: "/extra-calcs/sulfite",
       icon: <Atom />,
       label: t("sulfiteHeading"),
     },
     {
-      path: "/ExtraCalcs/sorbate",
+      path: "/extra-calcs/sorbate",
       icon: <Pipette />,
       label: t("sorbateHeading"),
     },
     {
-      path: "/ExtraCalcs/RefractometerCorrection",
+      path: "/extra-calcs/refractometer-correction",
       icon: <Rainbow />,
       label: t("sideNav.refractometer"),
     },
     {
-      path: "/ExtraCalcs/tempCorrection",
+      path: "/extra-calcs/temperature-correction",
       icon: <Thermometer />,
       label: t("sideNav.tempCorrection"),
     },
     {
-      path: "/ExtraCalcs/blending",
+      path: "/extra-calcs/blending",
       icon: <Blend />,
       label: t("sideNav.blending"),
     },

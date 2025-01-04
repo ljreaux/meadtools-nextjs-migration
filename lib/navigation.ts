@@ -15,39 +15,39 @@ export const mainCalcs = [
 
 export const extraCalculatorLinks = [
   {
-    path: "/ExtraCalcs/",
+    path: "/extra-calcs/",
     label: "calculators.extraCalcs.abv",
   },
   {
-    path: "/ExtraCalcs/brixCalc",
+    path: "/extra-calcs/brix",
     label: "calculators.extraCalcs.brix",
   },
   {
-    path: "/ExtraCalcs/estOG",
+    path: "/extra-calcs/estimated-og",
     label: "calculators.extraCalcs.estOG",
   },
   {
-    path: "/ExtraCalcs/benchTrials",
+    path: "/extra-calcs/bench-trials",
     label: "calculators.extraCalcs.benchTrials",
   },
   {
-    path: "/ExtraCalcs/sulfite",
+    path: "/extra-calcs/sulfite",
     label: "sulfiteHeading",
   },
   {
-    path: "/ExtraCalcs/sorbate",
+    path: "/extra-calcs/sorbate",
     label: "sorbateHeading",
   },
   {
-    path: "/ExtraCalcs/RefractometerCorrection",
+    path: "/extra-calcs/refractometer-correction",
     label: "calculators.extraCalcs.refractometer",
   },
   {
-    path: "/ExtraCalcs/tempCorrection",
+    path: "/extra-calcs/temperature-correction",
     label: "calculators.extraCalcs.tempCorrection",
   },
   {
-    path: "/ExtraCalcs/blending",
+    path: "/extra-calcs/blending",
     label: "calculators.extraCalcs.blending",
   },
 ];
