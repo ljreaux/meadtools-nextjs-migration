@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 
+// Ensure the typing for the callbacks is clear
 declare module "next-auth" {
   interface Session {
     user: {
@@ -11,6 +12,7 @@ declare module "next-auth" {
       role: string;
     };
   }
+
   interface User {
     id: string;
     email: string;
@@ -41,14 +43,17 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Check if the user already exists in the database
+      console.log("signIn callback:", { user, account, profile });
+
       const existingUser = await prisma.users.findUnique({
         where: { email: user.email },
       });
 
+      console.log("Existing user from DB:", existingUser); // Log the fetched user
+
       if (existingUser) {
-        // If Google login, ensure google_id is updated
         if (account?.provider === "google" && !existingUser.google_id) {
+          console.log("Updating google_id...");
           await prisma.users.update({
             where: { email: user.email },
             data: { google_id: profile?.sub },
@@ -56,27 +61,23 @@ export const authOptions: NextAuthOptions = {
         }
         return true; // Allow sign-in
       }
-
-      // Optionally: Reject users not in the database
-      return false; // Prevent sign-in if the user doesn't exist
+      return false; // Reject sign-in if user does not exist
     },
     async session({ session, token }) {
-      // Include additional user fields in the session
       if (token) {
         session.user = {
           id: token.id,
           email: token.email,
-          role: token.role,
+          role: token.role || "user", // Default to "user" if role is not set
         };
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
-        // Add user details to the token
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role || "user";
+        token.role = user.role || "user"; // Ensure role is set
       }
       return token;
     },

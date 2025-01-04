@@ -8,6 +8,14 @@ const { ACCESS_TOKEN_SECRET = "", REFRESH_TOKEN_SECRET = "" } = process.env;
 export async function POST(req: NextRequest) {
   const { email, password: unhashed } = await req.json();
 
+  // Check if email or password is missing
+  if (!email || !unhashed) {
+    return NextResponse.json(
+      { error: "Email and password are required." },
+      { status: 400 }
+    );
+  }
+
   try {
     const existingUser = await getUserByEmail(email);
     if (existingUser) {

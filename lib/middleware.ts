@@ -65,7 +65,6 @@ export async function verifyUser(req: NextRequest) {
       // If Google profile.sub is stored as google_id
       if (session?.user?.id) {
         const user = await prisma.users.findUnique({
-          // @ts-expect-error
           where: { google_id: session.user.id as string }, // Assuming profile.sub is mapped to google_id
         });
 
