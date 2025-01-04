@@ -12,7 +12,6 @@ import { extraCalculatorLinks, extraLinks, mainCalcs } from "@/lib/navigation";
 import { ListItem } from "./ListItem";
 import AccountLinks from "./AccountLinks";
 import { TFunctionNonStrict } from "i18next";
-import { Menu } from "lucide-react";
 import { HoverHamburgerMenuTrigger } from "../ui/HamburgerMenuTrigger";
 
 export default async function Navbar({

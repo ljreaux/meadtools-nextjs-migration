@@ -66,7 +66,7 @@ export const extraLinks = [
     label: "additionalLinks.desktop",
   },
   {
-    path: "https://yeasts.meadtools.com",
+    path: "/yeasts",
     label: "yeasts",
   },
   {

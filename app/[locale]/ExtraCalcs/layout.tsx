@@ -2,7 +2,7 @@ import ExtraCalcsSideBar from "@/components/extraCalcs/Sidebar";
 
 function ExtraCalcsLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="w-full flex justify-center items-center sm:pt-24 pt-[6rem] relative">
+    <div className="w-full flex justify-center items-center sm:pt-24 py-[6rem] relative">
       <ExtraCalcsCard>{children}</ExtraCalcsCard>
     </div>
   );

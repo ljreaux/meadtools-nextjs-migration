@@ -17,8 +17,7 @@ export default async function YeastsPage() {
   const yeasts = await fetchYeasts();
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Yeasts Table</h1>
+    <div className="w-full flex justify-center items-center sm:py-24 py-[6rem] relative">
       <YeastTable data={yeasts} />
     </div>
   );
