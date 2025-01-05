@@ -4,7 +4,7 @@ export const mainCalcs = [
     label: "calculators.recipes",
   },
   {
-    path: "/NuteCalc/",
+    path: "/nute-calc/",
     label: "calculators.nutes",
   },
   {
