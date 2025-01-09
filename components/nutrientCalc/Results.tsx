@@ -33,16 +33,8 @@ function Results() {
           return (
             <label key={labels[i]} className="space-y-2">
               {t(labels[i])}
-              <InputWithUnits
-                value={Math.round(add * 1000) / 1000}
-                text="g total"
-                disabled
-              />
-              <InputWithUnits
-                value={Math.round(perAdd * 1000) / 1000}
-                text="g"
-                disabled
-              />
+              <InputWithUnits value={add.toFixed(3)} text="g total" disabled />
+              <InputWithUnits value={perAdd.toFixed(3)} text="g" disabled />
             </label>
           );
         })}

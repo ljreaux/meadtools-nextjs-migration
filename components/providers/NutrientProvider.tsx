@@ -22,15 +22,23 @@ import {
 
 const NutrientContext = createContext<NutrientType | undefined>(undefined);
 
-export const NutrientProvider = ({ children }: { children: ReactNode }) => {
+export const NutrientProvider = ({
+  children,
+  initialData,
+}: {
+  children: ReactNode;
+  initialData?: FullNutrientData;
+}) => {
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
   const [loadingYeasts, setLoadingYeasts] = useState(true);
 
-  const [fullData, setFullData] = useState<FullNutrientData>(initialFullData);
+  const [fullData, setFullData] = useState<FullNutrientData>(
+    initialData || initialFullData
+  );
 
   const [selectedGpl, setSelectedGpl] = useState(
-    maxGpl.tosna.value as number[]
+    maxGpl.tosna.value as string[]
   );
   const [nuteArr, setNuteArr] = useState<string[]>([]);
   const [yeastAmount, setYeastAmount] = useState("0");
@@ -244,7 +252,7 @@ export const NutrientProvider = ({ children }: { children: ReactNode }) => {
     }));
   };
 
-  const editMaxGpl = (index: number, value: number) => {
+  const editMaxGpl = (index: number, value: string) => {
     const copyArr = [...selectedGpl];
     copyArr[index] = value;
     setSelectedGpl(copyArr);
@@ -356,9 +364,8 @@ export const NutrientProvider = ({ children }: { children: ReactNode }) => {
 
       const ppmYan = [];
 
-      console.log(selectedGpl, yanContribution);
       for (let i = 0; i < yanContribution.length; i++) {
-        const totalYan = yanContribution[i] * selectedGpl[i];
+        const totalYan = yanContribution[i] * parseFloat(selectedGpl[i]);
         if (totalYan >= remainingYan) {
           ppmYan.push(remainingYan);
           remainingYan = 0;
@@ -413,32 +420,33 @@ export const NutrientProvider = ({ children }: { children: ReactNode }) => {
     const og = parseFloat(sg);
 
     if (schedule !== "other") {
-      if (typeof value[0] === "number") {
-        setSelectedGpl(value as number[]);
+      if (typeof value[0] === "string") {
+        setSelectedGpl(value as string[]);
       } else {
         if (og <= 1.08) {
           setSelectedGpl(value[0]);
         } else if (og <= 1.11) {
-          setSelectedGpl(value[1] as number[]);
+          setSelectedGpl(value[1] as string[]);
         } else {
-          setSelectedGpl(value[2] as number[]);
+          setSelectedGpl(value[2] as string[]);
         }
       }
     } else {
       const nutrientValues = {
-        "Fermaid O": 0.45,
-        "Fermaid K": 0.5,
-        DAP: 0.96,
-        Other: 1,
+        "Fermaid O": "0.45",
+        "Fermaid K": "0.5",
+        DAP: "0.96",
+        Other: "1",
       };
 
       // Ensure arr has a fixed order corresponding to "Fermaid O", "Fermaid K", "DAP", "Other"
       const arr = ["Fermaid O", "Fermaid K", "DAP", "Other"].map((nute) =>
         nuteArr.includes(nute)
           ? nutrientValues[nute as keyof typeof nutrientValues]
-          : 0
+          : "0"
       );
 
+      console.log(arr);
       setSelectedGpl(arr);
     }
   }, [

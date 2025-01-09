@@ -12,7 +12,7 @@ import { toBrix } from "@/lib/utils/unitConverter";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 
-function VolumeInputs() {
+function VolumeInputs({ disabled }: { disabled?: boolean }) {
   const { t } = useTranslation();
   const { inputs } = useNutrients();
   const sgNum = isNaN(parseFloat(inputs.sg.value))
@@ -24,7 +24,12 @@ function VolumeInputs() {
       <div>
         <label>
           {t("nuteVolume")}
-          <Input {...inputs.volume} />
+          <Input
+            {...inputs.volume}
+            disabled={disabled}
+            inputMode="numeric"
+            onFocus={(e) => e.target.select()}
+          />
         </label>
       </div>
       <div>
@@ -33,6 +38,7 @@ function VolumeInputs() {
           <Select
             value={inputs.volumeUnits.value}
             onValueChange={inputs.volumeUnits.onChange}
+            disabled={disabled}
           >
             <SelectTrigger>
               <SelectValue />
@@ -44,22 +50,31 @@ function VolumeInputs() {
           </Select>
         </label>
       </div>
-      <div className="grid gap-1">
+      <div className="col-span-2 sm:col-span-1 grid gap-1">
         <label className="grid gap-1">
-          <span className="flex gap-1 items-center ">
+          <span className="flex sm:gap-1 items-center">
             {t("nuteSgLabel")} <Tooltip body={t("tipText.nutrientSg")} />
           </span>
-          <Input {...inputs.sg} />
+          <Input
+            {...inputs.sg}
+            disabled={disabled}
+            inputMode="numeric"
+            onFocus={(e) => e.target.select()}
+          />
         </label>
         <p>{brixString + " Brix"}</p>
       </div>
-      <div>
+      <div className="col-span-2 sm:col-span-1">
         <label className="grid gap-1">
-          <span className="flex items-center  gap-1">
+          <span className="flex items-center sm:gap-1">
             {t("offset")}
             <Tooltip body={t("tipText.offsetPpm")} />
           </span>
-          <Input {...inputs.offset} />
+          <Input
+            {...inputs.offset}
+            inputMode="numeric"
+            onFocus={(e) => e.target.select()}
+          />
         </label>
       </div>
     </div>

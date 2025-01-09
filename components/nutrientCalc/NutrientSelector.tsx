@@ -53,7 +53,7 @@ function NutrientSelector() {
           link="https://meadmaking.wiki/en/process/nutrient_schedules"
         />
       </h3>
-      <div className="grid grid-cols-2">
+      <div className="grid sm:grid-cols-2">
         {[
           { value: "Fermaid O", label: "nutrients.fermO" },
           { value: "Fermaid K", label: "nutrients.fermK" },
@@ -91,7 +91,7 @@ function NutrientSelector() {
               <div className="relative">
                 <Input
                   value={maxGpl[3]}
-                  onChange={(e) => editMaxGpl(3, parseFloat(e.target.value))}
+                  onChange={(e) => editMaxGpl(3, e.target.value)}
                 />
                 <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
                   g/L
@@ -152,7 +152,11 @@ const SettingsDialog = ({
             <label className="space-y-2">
               YAN Contribution
               <div className="relative">
-                <Input {...yanContribution} />
+                <Input
+                  {...yanContribution}
+                  onFocus={(e) => e.target.select()}
+                  inputMode="numeric"
+                />
                 <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
                   PPM YAN
                 </p>
@@ -161,7 +165,11 @@ const SettingsDialog = ({
             <label className="space-y-2">
               Max g/L
               <div className="relative">
-                <Input {...maxGpl} />
+                <Input
+                  {...maxGpl}
+                  onFocus={(e) => e.target.select()}
+                  inputMode="numeric"
+                />
                 <span className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
                   g/L
                 </span>
@@ -202,6 +210,8 @@ const LabeledCheckbox = ({
     }
   };
 
+  console.log(maxGpl);
+
   return (
     <label className="flex items-center gap-2">
       <Input
@@ -213,12 +223,22 @@ const LabeledCheckbox = ({
       {t(label.label)}
       <SettingsDialog
         maxGpl={{
-          value: maxGpl[index].toFixed(2),
-          onChange: (e) => editMaxGpl(index, parseFloat(e.target.value)),
+          value: maxGpl[index],
+          onChange: (e) => {
+            const value = e.target.value;
+            if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+              editMaxGpl(index, value);
+            }
+          },
         }}
         yanContribution={{
           value: yanContributions[index],
-          onChange: (e) => editYanContribution(index, e.target.value),
+          onChange: (e) => {
+            const value = e.target.value;
+            if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+              editYanContribution(index, value);
+            }
+          },
         }}
       />
     </label>

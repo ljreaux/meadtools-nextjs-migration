@@ -24,7 +24,7 @@ function YeastDetails() {
   } = useNutrients();
 
   return (
-    <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+    <div className="grid sm:grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <div>
         <label>
           {t("yeastBrand")}
@@ -73,13 +73,14 @@ function YeastDetails() {
             <Input
               value={selected.yeastDetails.name}
               onChange={(e) => setYeastName(e.target.value)}
+              onFocus={(e) => e.target.select()}
             />
           )}
         </label>
       </div>
       <div>
         <label className="grid gap-1">
-          <span className="flex items-center  gap-1">
+          <span className="flex items-center sm:gap-1">
             {t("n2Requirement.label")}
             <Tooltip body={t("tipText.nitrogenRequirements")} />
           </span>
@@ -109,7 +110,7 @@ function YeastDetails() {
       </div>
       <div>
         <span className="grid gap-1">
-          <span className="flex items-center gap-1">
+          <span className="flex items-center sm:gap-1">
             {t("targetYan")}
             <Tooltip body={t("tipText.yan")} />
           </span>

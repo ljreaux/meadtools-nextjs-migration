@@ -15,7 +15,7 @@ export default function Tooltip({
   return (
     <Popover>
       <PopoverTrigger className="hover:text-background hover:bg-foreground transition-colors data-[state=open]:text-background data-[state=open]:bg-foreground p-1 rounded-md">
-        <Info />
+        <Info className="w-4 sm:w-8" />
       </PopoverTrigger>
 
       <PopoverContent>

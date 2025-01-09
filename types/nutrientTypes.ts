@@ -98,7 +98,7 @@ export type NutrientType = {
   setSelectedNutrients: (nutrients: string[]) => void;
   yeastList: Yeast[];
   loadingYeasts: boolean;
-  maxGpl: number[];
+  maxGpl: string[];
   targetYAN: number;
   yeastAmount: string;
   changeYeastAmount: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -125,11 +125,11 @@ export type NutrientType = {
   };
   yanContributions: string[];
   editYanContribution: (index: number, value: string) => void;
-  editMaxGpl: (index: number, value: number) => void;
+  editMaxGpl: (index: number, value: string) => void;
 };
 export type MaxGplEntry = {
   name: string;
-  value: number[] | number[][];
+  value: string[] | string[][];
 };
 
 export type GoFermType = "Go-Ferm" | "protect" | "sterol-flash" | "none";
@@ -137,21 +137,21 @@ export type GoFermType = "Go-Ferm" | "protect" | "sterol-flash" | "none";
 // constants
 
 export const maxGpl: Record<ScheduleType, MaxGplEntry> = {
-  tbe: { name: "TBE (All Three)", value: [0.45, 0.5, 0.96, 0] },
-  tosna: { name: "TOSNA (Fermaid O Only)", value: [2.5, 0, 0, 0] },
-  justK: { name: "Fermaid K Only", value: [0, 3, 0, 0] },
-  dap: { name: "DAP Only", value: [0, 0, 1.5, 0] },
+  tbe: { name: "TBE (All Three)", value: ["0.45", "0.5", "0.96", "0"] },
+  tosna: { name: "TOSNA (Fermaid O Only)", value: ["2.5", "0", "0", "0"] },
+  justK: { name: "Fermaid K Only", value: ["0", "3", "0", "0"] },
+  dap: { name: "DAP Only", value: ["0", "0", " 1.5", "0"] },
   oAndk: {
     name: "Fermaid O & K",
     value: [
-      [0.6, 0.81, 0, 0],
-      [0.9, 0.81, 0, 0],
-      [1.1, 1, 0, 0],
+      ["0.6", "0.81", " 0", " 0"],
+      ["0.9", "0.81", " 0", " 0"],
+      ["1.1", "1", " 0", " 0"],
     ],
   },
-  oAndDap: { name: "Fermaid O & DAP", value: [1, 0, 0.96, 0] },
-  kAndDap: { name: "Fermaid K & DAP", value: [0, 1, 0.96, 0] },
-  other: { name: "Other", value: [0, 0, 0, 0] },
+  oAndDap: { name: "Fermaid O & DAP", value: ["1", " 0", "0.96", " 0"] },
+  kAndDap: { name: "Fermaid K & DAP", value: ["0", "1", "0.96", " 0"] },
+  other: { name: "Other", value: ["0", "0", "0", "0"] },
 };
 
 export const initialFullData = {
