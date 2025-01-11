@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { isValidNumber } from "@/lib/utils/validateInput";
 import { FormEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -22,27 +23,27 @@ function Sulfite() {
   const { t } = useTranslation();
 
   const [sulfite, setSulfite] = useState({
-    batchSize: 1,
+    batchSize: "1",
     units: "gallons",
-    ppm: 50,
+    ppm: "50",
   });
-  const handleChange = (e: FormEvent<EventTarget>) => {
-    const target = e.target as HTMLInputElement;
-    setSulfite((prev) => ({
-      ...prev,
-      [target.id]: target.value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isValidNumber(e.target.value))
+      setSulfite((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.value,
+      }));
   };
 
   const sulfiteAmount =
     sulfite.units === "gallons"
-      ? (sulfite.batchSize * 3.785 * sulfite.ppm) / 570
-      : (sulfite.batchSize * sulfite.ppm) / 570;
+      ? (parseFloat(sulfite.batchSize) * 3.785 * parseFloat(sulfite.ppm)) / 570
+      : (parseFloat(sulfite.batchSize) * parseFloat(sulfite.ppm)) / 570;
 
   const campden =
     sulfite.units !== "gallons"
-      ? (sulfite.ppm / 75) * (sulfite.batchSize / 3.785)
-      : (sulfite.ppm / 75) * sulfite.batchSize;
+      ? (parseFloat(sulfite.ppm) / 75) * (parseFloat(sulfite.batchSize) / 3.785)
+      : (parseFloat(sulfite.ppm) / 75) * parseFloat(sulfite.batchSize);
   return (
     <Table>
       <TableHeader>
@@ -59,7 +60,7 @@ function Sulfite() {
           <TableCell>{t("batchSize")} </TableCell>
           <TableCell>
             <Input
-              type="number"
+              inputMode="numeric"
               id="batchSize"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
@@ -88,7 +89,7 @@ function Sulfite() {
           <TableCell>{t("desiredPpm")} </TableCell>
           <TableCell colSpan={2}>
             <Input
-              type="number"
+              inputMode="numeric"
               name="ppm"
               id="ppm"
               onChange={handleChange}
@@ -101,11 +102,11 @@ function Sulfite() {
           <TableCell colSpan={3}>
             <span className="grid items-center justify-center gap-2 sm:text-2xl text-center">
               <p>
-                {Math.round(sulfiteAmount * 10000) / 10000}g {t("kMeta")}
-              </p>{" "}
-              <p>{t("accountPage.or")}</p>{" "}
+                {sulfiteAmount.toFixed(3)}g {t("kMeta")}
+              </p>
+              <p>{t("accountPage.or")}</p>
               <p className="flex item-center justify-center gap-2">
-                {Math.round(campden * 10) / 10} {t("list.campden")}
+                {campden.toFixed(1)} {t("list.campden")}
                 <Tooltip body={t("tipText.campden")} />
               </p>
             </span>

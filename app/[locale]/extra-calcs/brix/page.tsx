@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useBrix from "@/hooks/useBrix";
+import { isValidNumber } from "@/lib/utils/validateInput";
 import { useTranslation } from "react-i18next";
 
 function Brix() {
@@ -16,19 +17,21 @@ function Brix() {
 
   const displayString =
     units === "SG"
-      ? `${Math.round(brix * 100) / 100} ${t("BRIX")}`
-      : Math.round(sg * 1000) / 1000;
+      ? `${parseFloat(brix).toFixed(2)} ${t("BRIX")}`
+      : parseFloat(sg).toFixed(3);
   return (
     <>
       <h1 className="sm:text-3xl text-xl text-center">{t("brixHeading")} </h1>
       <label htmlFor="gravity">{t("gravityLabel")}</label>
 
       <Input
-        type="number"
+        inputMode="numeric"
         id="gravity"
         onFocus={(e) => e.target.select()}
         value={gravity}
-        onChange={(e) => setGravity(Number(e.target.value))}
+        onChange={(e) => {
+          if (isValidNumber(e.target.value)) setGravity(e.target.value);
+        }}
       />
 
       <Select name="units" onValueChange={setUnits}>

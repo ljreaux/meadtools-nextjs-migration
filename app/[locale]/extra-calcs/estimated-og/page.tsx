@@ -4,20 +4,25 @@ import Tooltip from "@/components/Tooltips";
 import { Input } from "@/components/ui/input";
 import useAbv from "@/hooks/useAbv";
 import { toBrix } from "@/lib/utils/unitConverter";
+import { isValidNumber } from "@/lib/utils/validateInput";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function EstimatedOG() {
   const { t } = useTranslation();
   const [gravity, setGravity] = useState({
-    fgh: 1.0,
-    fgr: 5,
+    fgh: "1.0",
+    fgr: "5",
   });
   const estOG =
-    Math.round((-1.728 * gravity.fgh + 0.01085 * gravity.fgr + 2.728) * 1000) /
-    1000;
+    Math.round(
+      (-1.728 * parseFloat(gravity.fgh) +
+        0.01085 * parseFloat(gravity.fgr) +
+        2.728) *
+        1000
+    ) / 1000;
 
-  const abv = useAbv(estOG, gravity.fgh);
+  const abv = useAbv(estOG.toString(), gravity.fgh.toString());
 
   return (
     <div className="flex flex-col gap-6 sm:gap-8 h-full w-full">
@@ -38,10 +43,11 @@ function EstimatedOG() {
           </label>
           <Input
             value={gravity.fgh}
-            onChange={(e) =>
-              setGravity((prev) => ({ ...prev, fgh: Number(e.target.value) }))
-            }
-            type="number"
+            onChange={(e) => {
+              if (isValidNumber(e.target.value))
+                setGravity((prev) => ({ ...prev, fgh: e.target.value }));
+            }}
+            inputMode="numeric"
             id="hydrometerFG"
             onFocus={(e) => e.target.select()}
           />
@@ -53,10 +59,11 @@ function EstimatedOG() {
           </label>
           <Input
             value={gravity.fgr}
-            onChange={(e) =>
-              setGravity((prev) => ({ ...prev, fgr: Number(e.target.value) }))
-            }
-            type="number"
+            onChange={(e) => {
+              if (isValidNumber(e.target.value))
+                setGravity((prev) => ({ ...prev, fgr: e.target.value }));
+            }}
+            inputMode="numeric"
             id="refractometerFG"
             onFocus={(e) => e.target.select()}
           />

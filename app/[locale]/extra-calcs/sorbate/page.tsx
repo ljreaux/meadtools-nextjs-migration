@@ -1,5 +1,4 @@
 "use client";
-import Tooltip from "@/components/Tooltips";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,28 +14,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FormEvent, useState } from "react";
+import { isValidNumber } from "@/lib/utils/validateInput";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function Sorbate() {
   const { t } = useTranslation();
   const [sorbate, setSorbate] = useState({
-    batchSize: 1,
+    batchSize: "1",
     units: "gallons",
-    abv: 12,
+    abv: "12",
   });
 
   const sorbateAmount =
     sorbate.units === "gallons"
-      ? ((-sorbate.abv * 25 + 400) / 0.75) * sorbate.batchSize * 0.003785411784
-      : (((-sorbate.abv * 25 + 400) / 0.75) * sorbate.batchSize) / 1000;
+      ? ((-parseFloat(sorbate.abv) * 25 + 400) / 0.75) *
+        parseFloat(sorbate.batchSize) *
+        0.003785411784
+      : (((-parseFloat(sorbate.abv) * 25 + 400) / 0.75) *
+          parseFloat(sorbate.batchSize)) /
+        1000;
 
-  const handleChange = (e: FormEvent<EventTarget>) => {
-    const target = e.target as HTMLInputElement;
-    setSorbate((prev) => ({
-      ...prev,
-      [target.id]: target.value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isValidNumber(e.target.value))
+      setSorbate((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.value,
+      }));
   };
   return (
     <Table>
@@ -54,10 +58,11 @@ function Sorbate() {
           <TableCell>{t("batchSize")} </TableCell>
           <TableCell>
             <Input
-              type="number"
+              inputMode="numeric"
               id="batchSize"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
+              value={sorbate.batchSize}
             />
           </TableCell>
           <TableCell>
@@ -84,7 +89,7 @@ function Sorbate() {
           <TableCell colSpan={2}>
             <Input
               id="abv"
-              type="number"
+              inputMode="numeric"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
               value={sorbate.abv}
@@ -94,7 +99,7 @@ function Sorbate() {
 
         <TableRow>
           <TableCell className="my-4 text-lg text-center" colSpan={3}>
-            {Math.round(sorbateAmount * 1000) / 1000}g {t("kSorb")}
+            {sorbateAmount.toFixed(3)}g {t("kSorb")}
           </TableCell>
         </TableRow>
       </TableBody>

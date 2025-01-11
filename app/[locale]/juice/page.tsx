@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
 import useJuice from "@/hooks/useJuice";
+import { isValidNumber } from "@/lib/utils/validateInput";
 
 function Juice() {
   const { t } = useTranslation();
@@ -42,10 +43,12 @@ function Juice() {
               <TableCell>
                 <Input
                   className="min-w-16"
-                  type="number"
+                  inputMode="numeric"
                   onFocus={(e) => e.target.select()}
                   value={sugar}
-                  onChange={(e) => setSugar(e.target.value)}
+                  onChange={(e) => {
+                    if (isValidNumber(e.target.value)) setSugar(e.target.value);
+                  }}
                 />
               </TableCell>
               <TableCell>
@@ -65,10 +68,13 @@ function Juice() {
               <TableCell>
                 <Input
                   className="min-w-16"
-                  type="number"
+                  inputMode="numeric"
                   onFocus={(e) => e.target.select()}
                   value={servingSize}
-                  onChange={(e) => setServingSize(e.target.value)}
+                  onChange={(e) => {
+                    if (isValidNumber(e.target.value))
+                      setServingSize(e.target.value);
+                  }}
                 />
               </TableCell>
               <TableCell>
@@ -90,10 +96,13 @@ function Juice() {
               <TableCell>{t("perContainer")}</TableCell>
               <TableCell colSpan={2}>
                 <Input
-                  type="number"
+                  inputMode="numeric"
                   onFocus={(e) => e.target.select()}
                   value={servings}
-                  onChange={(e) => setServings(e.target.value)}
+                  onChange={(e) => {
+                    if (isValidNumber(e.target.value))
+                      setServings(e.target.value);
+                  }}
                 />
               </TableCell>
             </TableRow>

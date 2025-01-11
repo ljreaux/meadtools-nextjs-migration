@@ -19,6 +19,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { isValidNumber } from "@/lib/utils/validateInput";
+import { cn } from "@/lib/utils";
 
 function NutrientSelector() {
   const { t } = useTranslation();
@@ -130,6 +132,9 @@ export default NutrientSelector;
 const SettingsDialog = ({
   maxGpl,
   yanContribution,
+  providedYan,
+  adjustAllowed,
+  setAdjustAllowed,
 }: {
   maxGpl: {
     value: string;
@@ -139,7 +144,14 @@ const SettingsDialog = ({
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
+  providedYan: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
+  adjustAllowed: boolean;
+  setAdjustAllowed: (value: boolean) => void;
 }) => {
+  const { t } = useTranslation();
   return (
     <Dialog>
       <DialogTrigger>
@@ -149,32 +161,69 @@ const SettingsDialog = ({
         <DialogHeader>
           <DialogTitle>Adjust Nutrient Settings</DialogTitle>
           <DialogDescription>
-            <label className="space-y-2">
-              YAN Contribution
-              <div className="relative">
+            <div className="p-2">
+              <label className="space-y-2">
+                YAN Contribution
+                <div className="relative">
+                  <Input
+                    {...yanContribution}
+                    onFocus={(e) => e.target.select()}
+                    inputMode="numeric"
+                  />
+                  <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
+                    PPM YAN
+                  </p>
+                </div>
+              </label>
+            </div>
+            <div className="p-2">
+              <label className="space-y-2">
+                Max g/L
+                <div className="relative">
+                  <Input
+                    {...maxGpl}
+                    onFocus={(e) => e.target.select()}
+                    inputMode="numeric"
+                  />
+                  <span className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
+                    g/L
+                  </span>
+                </div>
+              </label>
+            </div>
+            <div
+              className={cn(
+                adjustAllowed && "bg-destructive",
+                "flex gap-2 items-center p-2 rounded-md transition-colors"
+              )}
+            >
+              <label className="space-y-2 w-full">
+                Provided YAN
+                <div className="relative">
+                  <Input
+                    {...providedYan}
+                    onFocus={(e) => e.target.select()}
+                    inputMode="numeric"
+                    disabled={!adjustAllowed}
+                  />
+                  <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
+                    PPM YAN
+                  </p>
+                </div>
+              </label>
+              <label className="flex gap-1">
+                Adjust Value
                 <Input
-                  {...yanContribution}
-                  onFocus={(e) => e.target.select()}
-                  inputMode="numeric"
-                />
-                <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
-                  PPM YAN
-                </p>
-              </div>
-            </label>
-            <label className="space-y-2">
-              Max g/L
-              <div className="relative">
-                <Input
-                  {...maxGpl}
-                  onFocus={(e) => e.target.select()}
-                  inputMode="numeric"
-                />
-                <span className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
-                  g/L
-                </span>
-              </div>
-            </label>
+                  type="checkbox"
+                  className="w-6"
+                  checked={adjustAllowed}
+                  onChange={(e) => {
+                    setAdjustAllowed(e.target.checked);
+                  }}
+                />{" "}
+                <Tooltip body={t("tipText.adjustYanValue")} />
+              </label>
+            </div>
           </DialogDescription>
         </DialogHeader>
       </DialogContent>
@@ -197,6 +246,10 @@ const LabeledCheckbox = ({
     editMaxGpl,
     editYanContribution,
     setSelectedNutrients,
+    providedYan,
+    updateProvidedYan,
+    adjustAllowed,
+    setAdjustAllowed,
   } = useNutrients();
   const handleNutrientChange = (nutrient: string) => {
     const prevSelected = selected.selectedNutrients;
@@ -226,7 +279,7 @@ const LabeledCheckbox = ({
           value: maxGpl[index],
           onChange: (e) => {
             const value = e.target.value;
-            if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+            if (isValidNumber(value)) {
               editMaxGpl(index, value);
             }
           },
@@ -235,11 +288,22 @@ const LabeledCheckbox = ({
           value: yanContributions[index],
           onChange: (e) => {
             const value = e.target.value;
-            if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+            if (isValidNumber(value)) {
               editYanContribution(index, value);
             }
           },
         }}
+        providedYan={{
+          value: providedYan[index],
+          onChange: (e) => {
+            const value = e.target.value;
+            if (isValidNumber(value)) {
+              updateProvidedYan(index, e.target.value);
+            }
+          },
+        }}
+        adjustAllowed={adjustAllowed}
+        setAdjustAllowed={setAdjustAllowed}
       />
     </label>
   );

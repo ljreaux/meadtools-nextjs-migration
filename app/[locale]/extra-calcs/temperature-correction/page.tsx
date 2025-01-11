@@ -18,6 +18,7 @@ import {
 import { temperatureCorrection, toFahrenheit } from "@/lib/utils/temperature";
 import { FormEvent, useState } from "react";
 import { toBrix } from "@/lib/utils/unitConverter";
+import { isValidNumber } from "@/lib/utils/validateInput";
 
 function TempCorrection() {
   const { t } = useTranslation();
@@ -34,21 +35,23 @@ function TempCorrection() {
             <TableCell>{t("measuredSG")} </TableCell>
             <TableCell>
               <Input
-                type="number"
+                onFocus={(e) => e.target.select()}
+                inputMode="numeric"
                 id="measured"
                 value={tempObj.measured}
                 onChange={handleChange}
               />
             </TableCell>
             <TableCell>
-              {Math.round(toBrix(tempObj.measured) * 100) / 100} {t("Brix")}
+              {toBrix(parseFloat(tempObj.measured)).toFixed(2)} {t("Brix")}
             </TableCell>
           </TableRow>
           <TableRow>
             <TableCell>{t("curTemp")} </TableCell>
             <TableCell>
               <Input
-                type="number"
+                onFocus={(e) => e.target.select()}
+                inputMode="numeric"
                 id="curTemp"
                 value={tempObj.curTemp}
                 onChange={handleChange}
@@ -74,7 +77,8 @@ function TempCorrection() {
             <TableCell>{t("calTemp")} </TableCell>
             <TableCell colSpan={2}>
               <Input
-                type="number"
+                onFocus={(e) => e.target.select()}
+                inputMode="numeric"
                 id="calTemp"
                 value={tempObj.calTemp}
                 onChange={handleChange}
@@ -86,8 +90,7 @@ function TempCorrection() {
           <TableRow>
             <TableCell colSpan={3}>
               <span className="flex items-center justify-center text-lg">
-                {Math.round(result * 1000) / 1000},{" "}
-                {Math.round(resultBrix * 100) / 100} {t("Brix")}
+                {result.toFixed(3)}, {resultBrix.toFixed(2)} {t("Brix")}
               </span>
             </TableCell>
           </TableRow>
@@ -101,31 +104,31 @@ export default TempCorrection;
 
 const useTempCorrection = () => {
   const [tempObj, setTempObj] = useState({
-    measured: 1.1,
+    measured: "1.1",
     tempUnits: "F",
-    curTemp: 90,
-    calTemp: 68,
+    curTemp: "90",
+    calTemp: "68",
   });
 
-  const handleChange = (e: FormEvent<EventTarget>) => {
-    const target = e.target as HTMLInputElement;
-    setTempObj((prev) => ({
-      ...prev,
-      [target.id]: target.value,
-    }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (isValidNumber(e.target.value))
+      setTempObj((prev) => ({
+        ...prev,
+        [e.target.id]: e.target.value,
+      }));
   };
 
   const result =
     tempObj.tempUnits === "F"
       ? temperatureCorrection(
-          tempObj.measured,
-          tempObj.curTemp,
-          tempObj.calTemp
+          parseFloat(tempObj.measured),
+          parseFloat(tempObj.curTemp),
+          parseFloat(tempObj.calTemp)
         )
       : temperatureCorrection(
-          tempObj.measured,
-          toFahrenheit(tempObj.curTemp),
-          toFahrenheit(tempObj.calTemp)
+          parseFloat(tempObj.measured),
+          toFahrenheit(parseFloat(tempObj.curTemp)),
+          toFahrenheit(parseFloat(tempObj.calTemp))
         );
   const resultBrix = toBrix(result);
 

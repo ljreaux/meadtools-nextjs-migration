@@ -63,6 +63,9 @@ export const NutrientProvider = ({
     "0",
   ]);
   const [otherNutrientName, setOtherNutrientName] = useState("");
+  const [remainingYan, setRemainingYan] = useState(0);
+  const [providedYan, setProvidedYan] = useState(["0", "0", "0", "0"]);
+  const [adjustAllowed, setAdjustAllowed] = useState(false);
 
   const calculateGoFerm = (type: GoFermType, yeastAmount: number) => {
     let multiplier = 0;
@@ -325,79 +328,82 @@ export const NutrientProvider = ({
     setGoFerm((prev) => ({ ...prev, ...gf }));
   }, [yeastAmount]);
 
+  // Calculate target YAN
+  const calculateYAN = () => {
+    const sg = parseFloat(fullData.inputs.sg);
+    const offset = parseFloat(fullData.inputs.offset || "0");
+    const nitrogen = fullData.selected.n2Requirement;
+
+    const multiplier =
+      nitrogen == "Low"
+        ? 0.75
+        : nitrogen == "Medium"
+        ? 0.9
+        : nitrogen == "High"
+        ? 1.25
+        : 1.8;
+    const gpl = toBrix(sg) * sg * 10;
+    const targetYan = gpl * multiplier;
+    return Math.round(targetYan - offset);
+  };
   // calculate the target YAN
   useEffect(() => {
-    // Calculate target YAN
-    const calculateYAN = () => {
-      const sg = parseFloat(fullData.inputs.sg);
-      const offset = parseFloat(fullData.inputs.offset || "0");
-      const nitrogen = fullData.selected.n2Requirement;
+    if (!adjustAllowed) {
+      // Calculate nutrient additions based on target YAN
+      const calculateNutrientAdditions = (
+        totalYan: number,
+        currentYanContribution = [40, 100, 210, 0]
+      ) => {
+        const units = fullData.selected.volumeUnits;
+        const volume = parseFloat(fullData.inputs.volume);
+        const numberOfAdditions = parseFloat(fullData.inputs.numberOfAdditions);
 
-      const multiplier =
-        nitrogen == "Low"
-          ? 0.75
-          : nitrogen == "Medium"
-          ? 0.9
-          : nitrogen == "High"
-          ? 1.25
-          : 1.8;
-      const gpl = toBrix(sg) * sg * 10;
-      const targetYan = gpl * multiplier;
-      return Math.round(targetYan - offset);
-    };
+        let remainingYan = totalYan;
+        const yanContribution = [...currentYanContribution];
+        let organicNutrientMultiplier = 4;
+        if (goFerm.type == "none") organicNutrientMultiplier = 3;
 
-    // Calculate nutrient additions based on target YAN
-    const calculateNutrientAdditions = (
-      totalYan: number,
-      currentYanContribution = [40, 100, 210, 0]
-    ) => {
-      const units = fullData.selected.volumeUnits;
-      const volume = parseFloat(fullData.inputs.volume);
-      const numberOfAdditions = parseFloat(fullData.inputs.numberOfAdditions);
+        yanContribution[0] *= organicNutrientMultiplier;
 
-      let remainingYan = totalYan;
-      const yanContribution = [...currentYanContribution];
-      let organicNutrientMultiplier = 4;
-      if (goFerm.type == "none") organicNutrientMultiplier = 3;
+        const ppmYan = [0, 0, 0, 0];
 
-      yanContribution[0] *= organicNutrientMultiplier;
-
-      const ppmYan = [];
-
-      for (let i = 0; i < yanContribution.length; i++) {
-        const totalYan = yanContribution[i] * parseFloat(selectedGpl[i]);
-        if (totalYan >= remainingYan) {
-          ppmYan.push(remainingYan);
-          remainingYan = 0;
-          break;
+        for (let i = 0; i < yanContribution.length; i++) {
+          const totalYan = yanContribution[i] * parseFloat(selectedGpl[i]);
+          if (totalYan >= remainingYan) {
+            ppmYan[i] = remainingYan;
+            remainingYan = 0;
+            break;
+          }
+          ppmYan[i] = totalYan;
+          remainingYan -= totalYan;
         }
-        ppmYan.push(totalYan);
-        remainingYan -= totalYan;
-      }
 
-      const totalGrams = ppmYan.map((num, i) => {
-        const contribution =
-          yanContribution[i] === 0 ? 0 : num / yanContribution[i];
+        const totalGrams = ppmYan.map((num, i) => {
+          const contribution =
+            yanContribution[i] === 0 ? 0 : num / yanContribution[i];
 
-        return units === "liter"
-          ? contribution * volume
-          : contribution * volume * 3.785;
-      });
+          return units === "liter"
+            ? contribution * volume
+            : contribution * volume * 3.785;
+        });
 
-      const perAddition = totalGrams.map((num) => num / numberOfAdditions);
+        const perAddition = totalGrams.map((num) => num / numberOfAdditions);
 
-      return { totalGrams, perAddition };
-    };
+        setRemainingYan(remainingYan);
+        setProvidedYan(ppmYan.map((num) => num.toString()));
+        return { totalGrams, perAddition };
+      };
 
-    // Calculate YAN and nutrient additions after fullData or schedule changes
-    const yan = calculateYAN();
-    const additions = calculateNutrientAdditions(
-      yan,
-      yanContributions.map(parseFloat)
-    );
+      // Calculate YAN and nutrient additions after fullData or schedule changes
+      const yan = calculateYAN();
+      const additions = calculateNutrientAdditions(
+        yan,
+        yanContributions.map(parseFloat)
+      );
 
-    setNutrientAdditions(additions);
-    setTargetYAN(yan);
+      setNutrientAdditions(additions);
+      setTargetYAN(yan);
+    }
   }, [
     fullData.inputs.sg,
     fullData.inputs.offset,
@@ -410,7 +416,35 @@ export const NutrientProvider = ({
     fullData.inputs.numberOfAdditions,
     yanContributions,
     nuteArr,
+    adjustAllowed,
   ]);
+
+  useEffect(() => {
+    if (adjustAllowed) {
+      let totalYan = targetYAN;
+      const yanContribution = yanContributions.map(parseFloat);
+      const units = fullData.selected.volumeUnits;
+      const volume = parseFloat(fullData.inputs.volume);
+      const numberOfAdditions = parseFloat(fullData.inputs.numberOfAdditions);
+      const ppmYan = providedYan.map(parseFloat);
+
+      ppmYan.forEach((num) => (totalYan -= num));
+
+      const totalGrams = ppmYan.map((num, i) => {
+        const contribution =
+          yanContribution[i] === 0 ? 0 : num / yanContribution[i];
+
+        return units === "liter"
+          ? contribution * volume
+          : contribution * volume * 3.785;
+      });
+
+      const perAddition = totalGrams.map((num) => num / numberOfAdditions);
+
+      setRemainingYan(totalYan);
+      setNutrientAdditions({ totalGrams, perAddition });
+    }
+  }, [providedYan]);
 
   // determine how much yan comes from each source
   useEffect(() => {
@@ -446,7 +480,6 @@ export const NutrientProvider = ({
           : "0"
       );
 
-      console.log(arr);
       setSelectedGpl(arr);
     }
   }, [
@@ -509,6 +542,15 @@ export const NutrientProvider = ({
     editMaxGpl,
     editYanContribution,
     yanContributions,
+    remainingYan,
+    providedYan,
+    updateProvidedYan: (index: number, value: string) => {
+      const arrCopy = [...providedYan];
+      arrCopy[index] = value;
+      setProvidedYan(arrCopy);
+    },
+    adjustAllowed,
+    setAdjustAllowed,
   };
 
   return (

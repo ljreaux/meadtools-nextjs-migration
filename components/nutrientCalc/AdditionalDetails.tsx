@@ -26,9 +26,9 @@ function AdditionalDetails() {
           {t("goFermType")}
           <Tooltip body={t("tipText.goFerm")} />
         </span>
-        <Select onValueChange={goFermType.onChange}>
+        <Select onValueChange={goFermType.onChange} value={goFermType.value}>
           <SelectTrigger>
-            <SelectValue placeholder={t("nuteResults.gfTypes.gf")} />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             {gfOptions.map(({ value, label }) => (

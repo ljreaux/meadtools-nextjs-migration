@@ -2,6 +2,7 @@ import React from "react";
 import { useNutrients } from "../providers/NutrientProvider";
 import InputWithUnits from "./InputWithUnits";
 import { useTranslation } from "react-i18next";
+import Tooltip from "../Tooltips";
 
 const goFermKeys = {
   "Go-Ferm": "nuteResults.gfTypes.gf",
@@ -12,7 +13,8 @@ const goFermKeys = {
 
 function Results() {
   const { t } = useTranslation();
-  const { nutrientAdditions, goFerm, goFermType } = useNutrients();
+  const { nutrientAdditions, goFerm, goFermType, remainingYan } =
+    useNutrients();
 
   const labels = [
     "nutrients.fermO",
@@ -38,6 +40,17 @@ function Results() {
             </label>
           );
         })}
+        {Math.round(remainingYan) !== 0 && (
+          <div className="col-span-2 bg-destructive p-2">
+            <span className="flex gap-1 items-center">
+              {t("nuteResults.sideLabels.remainingYan")}
+              <Tooltip body={t("tipText.remainingYan")} />
+            </span>{" "}
+            <p>
+              {remainingYan.toFixed(0)} {t("PPM")}
+            </p>
+          </div>
+        )}
       </div>
       {goFermType.value !== "none" && (
         <div className="grid grid-cols-2 gap-2 py-6">
@@ -47,7 +60,7 @@ function Results() {
             <p>{`${goFerm.amount}g ${goFermLabel}`}</p>
           </label>
           <label>
-            {t("water")}{" "}
+            {t("water")}
             <InputWithUnits value={goFerm.water} text="ml" disabled />
           </label>
         </div>

@@ -126,6 +126,11 @@ export type NutrientType = {
   yanContributions: string[];
   editYanContribution: (index: number, value: string) => void;
   editMaxGpl: (index: number, value: string) => void;
+  remainingYan: number;
+  providedYan: string[];
+  updateProvidedYan: (index: number, value: string) => void;
+  adjustAllowed: boolean;
+  setAdjustAllowed: (value: boolean) => void;
 };
 export type MaxGplEntry = {
   name: string;

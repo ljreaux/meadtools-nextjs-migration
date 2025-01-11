@@ -10,27 +10,32 @@ import {
   TableFooter,
   TableRow,
 } from "@/components/ui/table";
+import { isValidNumber } from "@/lib/utils/validateInput";
 
 function Blending() {
   const { t } = useTranslation();
   const [input, setInput] = useState<blendingArr>([
-    [0, 0],
-    [0, 0],
+    ["0", "0"],
+    ["0", "0"],
   ]);
 
-  function handleChange(e: FormEvent<EventTarget>, row: number, col: number) {
-    const target = e.target as HTMLInputElement;
-    setInput((prev) =>
-      prev.map((arr, i) =>
-        i === row
-          ? ([
-              ...arr.slice(0, col),
-              Number(target.value),
-              ...arr.slice(col + 1),
-            ] as [number, number])
-          : arr
-      )
-    );
+  function handleChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+    row: number,
+    col: number
+  ) {
+    if (isValidNumber(e.target.value))
+      setInput((prev) =>
+        prev.map((arr, i) =>
+          i === row
+            ? ([
+                ...arr.slice(0, col),
+                e.target.value,
+                ...arr.slice(col + 1),
+              ] as [string, string])
+            : arr
+        )
+      );
   }
 
   const { blendedValue, totalVolume } = blendValues(input);
@@ -49,11 +54,10 @@ function Blending() {
                   {t(`val${rowIndex + 1}`)}
 
                   <Input
-                    type="number"
+                    inputMode="numeric"
                     value={val}
                     onChange={(e) => handleChange(e, rowIndex, 0)}
                     onFocus={(e) => e.target.select()}
-                    step={0.001}
                   />
                 </span>
               </TableCell>
@@ -62,11 +66,10 @@ function Blending() {
                   {t(`vol${rowIndex + 1}`)}
 
                   <Input
-                    type="number"
+                    inputMode="numeric"
                     value={vol}
                     onChange={(e) => handleChange(e, rowIndex, 1)}
                     onFocus={(e) => e.target.select()}
-                    step={0.001}
                   />
                 </span>
               </TableCell>

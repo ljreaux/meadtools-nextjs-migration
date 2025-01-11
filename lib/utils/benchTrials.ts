@@ -28,22 +28,25 @@ function calculateScaledBatch(scaledAdjunct: number, batchSize: number) {
 }
 
 export function calculateAdjunctValues(
-  volume: number,
+  volume: string,
   batchDetails: BatchDetails
 ) {
   const { stockSolutionConcentration, sampleSize, units, batchSize } =
     batchDetails;
 
   const adjunctAmount = calculateAdjunctAmount(
-    volume,
-    stockSolutionConcentration
+    parseFloat(volume),
+    parseFloat(stockSolutionConcentration)
   );
   const adjunctConcentration = calculateAdjunctConcentration(
     adjunctAmount,
-    sampleSize + volume
+    parseFloat(sampleSize) + parseFloat(volume)
   );
   const scaledAdjunct = scaleAdjunctConcentration(adjunctConcentration, units);
-  const scaledBatch = calculateScaledBatch(scaledAdjunct, batchSize);
+  const scaledBatch = calculateScaledBatch(
+    scaledAdjunct,
+    parseFloat(batchSize)
+  );
 
   return {
     adjunctAmount,

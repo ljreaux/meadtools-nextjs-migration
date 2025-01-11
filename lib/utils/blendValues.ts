@@ -1,11 +1,15 @@
-export type blendingArr = [value: number, volume: number][];
+export type blendingArr = [value: string, volume: string][];
 
 export function blendValues(arr: blendingArr) {
   const { numerator, denominator } = arr.reduce(
-    (acc, [val, vol]) => ({
-      numerator: acc.numerator + (vol > 0 ? val * vol : 0),
-      denominator: acc.denominator + vol,
-    }),
+    (acc, [val, vol]) => {
+      const value = parseFloat(val);
+      const volume = parseFloat(vol);
+      return {
+        numerator: acc.numerator + (volume > 0 ? value * volume : 0),
+        denominator: acc.denominator + volume,
+      };
+    },
     { numerator: 0, denominator: 0 }
   );
 

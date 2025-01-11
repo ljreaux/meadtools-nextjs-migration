@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { ChangeEvent, useEffect, useState } from "react";
 import Trials from "../../../../components/extraCalcs/Trials";
+import { isValidNumber } from "@/lib/utils/validateInput";
 
 function BenchTrials() {
   const { t } = useTranslation();
@@ -46,10 +47,9 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="batchSize"
-                type="number"
+                inputMode="numeric"
                 value={batchDetails.batchSize}
                 onFocus={(e) => e.target.select()}
-                step={0.01}
                 onChange={setInput}
               />
             </TableCell>
@@ -77,7 +77,7 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="sampleSize"
-                type="number"
+                inputMode="numeric"
                 value={batchDetails.sampleSize}
                 onFocus={(e) => e.target.select()}
                 onChange={setInput}
@@ -89,7 +89,7 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="stockSolutionConcentration"
-                type="number"
+                inputMode="numeric"
                 value={batchDetails.stockSolutionConcentration}
                 onFocus={(e) => e.target.select()}
                 onChange={setInput}
@@ -107,9 +107,9 @@ export default BenchTrials;
 
 const useBenchTrials = () => {
   const [batchDetails, setBatchDetails] = useState({
-    batchSize: 1,
-    sampleSize: 50,
-    stockSolutionConcentration: 10,
+    batchSize: "1",
+    sampleSize: "50",
+    stockSolutionConcentration: "10",
     units: "gallon",
   });
 
@@ -118,9 +118,11 @@ const useBenchTrials = () => {
   };
 
   const setInput = (e: ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    const key = e.target.id;
-    setBatchDetails((prev) => ({ ...prev, [key]: val }));
+    const val = e.target.value;
+    if (isValidNumber(e.target.value)) {
+      const key = e.target.id;
+      setBatchDetails((prev) => ({ ...prev, [key]: val }));
+    }
   };
 
   return { batchDetails, changeUnits, setInput };

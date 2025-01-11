@@ -5,24 +5,30 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { calculateAdjunctValues } from "../../lib/utils/benchTrials";
+import { isValidNumber } from "@/lib/utils/validateInput";
 
 interface TrialsProps {
   batchDetails: BatchDetails;
 }
 
 export type BatchDetails = {
-  batchSize: number;
-  sampleSize: number;
-  stockSolutionConcentration: number;
+  batchSize: string;
+  sampleSize: string;
+  stockSolutionConcentration: string;
   units: string;
 };
 
 export default function Trials({ batchDetails }: TrialsProps) {
   const { t } = useTranslation();
 
-  const [stockVolume, setStockVolume] = useState<number[]>([0.5, 1, 1.5, 2]);
+  const [stockVolume, setStockVolume] = useState<string[]>([
+    "0.5",
+    "1",
+    "1.5",
+    "2",
+  ]);
 
-  const handleStockVolumeChange = (index: number, value: number) => {
+  const handleStockVolumeChange = (index: number, value: string) => {
     setStockVolume((prev) => prev.map((vol, i) => (i === index ? value : vol)));
   };
 
@@ -45,9 +51,9 @@ export default function Trials({ batchDetails }: TrialsProps) {
 
 interface StockVolumeRowProps {
   index: number;
-  volume: number;
+  volume: string;
   batchDetails: BatchDetails;
-  onVolumeChange: (index: number, value: number) => void;
+  onVolumeChange: (index: number, value: string) => void;
 }
 
 function StockVolumeRow({
@@ -62,7 +68,6 @@ function StockVolumeRow({
   const { t } = useTranslation();
   return (
     <>
-      {/* Full-width row for Solution Volume */}
       <TableRow className="border-none">
         <TableCell colSpan={4} className="font-bold text-center">
           <div className="flex flex-col items-center">
@@ -71,11 +76,13 @@ function StockVolumeRow({
             </label>
             <Input
               id={`stockVolume-${index}`}
-              type="number"
+              inputMode="numeric"
               value={volume}
-              onChange={(e) => onVolumeChange(index, Number(e.target.value))}
+              onChange={(e) => {
+                if (isValidNumber(e.target.value))
+                  onVolumeChange(index, e.target.value);
+              }}
               onFocus={(e) => e.target.select()}
-              step={0.01}
               className="w-1/2"
             />
           </div>

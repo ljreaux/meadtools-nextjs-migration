@@ -11,14 +11,13 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import useAbv from "@/hooks/useAbv";
 import useRefrac from "@/hooks/useRefrac";
-import { FormEvent } from "react";
 ("react");
 import { useTranslation } from "react-i18next";
 
 function RefractometerCorrection() {
   const { t } = useTranslation();
   const { refrac, handleChange, handleUnitChange } = useRefrac();
-  const abv = useAbv(refrac.og, refrac.fg);
+  const abv = useAbv(refrac.og.toString(), refrac.fg.toString());
 
   return (
     <>
@@ -33,7 +32,7 @@ function RefractometerCorrection() {
             </TableCell>
             <TableCell colSpan={2}>
               <Input
-                type="number"
+                inputMode="numeric"
                 name="cf"
                 id="cf"
                 value={refrac.cf}
@@ -61,7 +60,7 @@ function RefractometerCorrection() {
             </TableCell>
             <TableCell className="p-1 md:p-4">
               <Input
-                type="number"
+                inputMode="numeric"
                 name="og"
                 id="og"
                 value={refrac.og}
@@ -75,7 +74,7 @@ function RefractometerCorrection() {
             <TableCell colSpan={2}>
               <span className="flex">
                 <Input
-                  type="number"
+                  inputMode="numeric"
                   name="fgInBrix"
                   id="fg"
                   value={refrac.fgInBrix}
@@ -83,8 +82,8 @@ function RefractometerCorrection() {
                   onFocus={(e) => e.target.select()}
                 />
                 <span className=" sm:flex grid items-center gap-1 justify-center text-center min-w-fit mx-1">
-                  <p>{refrac.calcSg.toFixed(3)}</p>
-                  <p className="min-w-fit">{`${refrac.calcBrix.toFixed(2)} ${t(
+                  <p>{refrac.calcSg}</p>
+                  <p className="min-w-fit">{`${refrac.calcBrix} ${t(
                     "BRIX"
                   )}`}</p>
                 </span>
