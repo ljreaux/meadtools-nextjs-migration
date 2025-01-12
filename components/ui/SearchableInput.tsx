@@ -74,9 +74,7 @@ function SearchableInput<T extends { [key: string]: any }>({
                 onSelect(suggestion); // Pass the selected item to the parent
               }}
             >
-              {suggestion["translationKey"]
-                ? t(suggestion["translationKey"])
-                : suggestion[keyName]?.toString()}
+              {suggestion[keyName]?.toString()}
             </li>
           ))}
         </ul>
