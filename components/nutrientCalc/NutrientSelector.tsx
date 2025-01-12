@@ -21,6 +21,7 @@ import {
 } from "../ui/dialog";
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { cn } from "@/lib/utils";
+import { Switch } from "../ui/switch";
 
 function NutrientSelector() {
   const { t } = useTranslation();
@@ -64,11 +65,9 @@ function NutrientSelector() {
           <LabeledCheckbox key={label.value + i} label={label} index={i} />
         ))}
         <label className="flex items-center gap-2">
-          <Input
-            type="checkbox"
-            className="w-4"
+          <Switch
             checked={selected.selectedNutrients.includes("Other")}
-            onChange={() => handleNutrientChange("Other")}
+            onCheckedChange={() => handleNutrientChange("Other")}
           />
           {t("other.label")}
         </label>
@@ -213,14 +212,10 @@ const SettingsDialog = ({
               </label>
               <label className="flex gap-1">
                 Adjust Value
-                <Input
-                  type="checkbox"
-                  className="w-6"
+                <Switch
                   checked={adjustAllowed}
-                  onChange={(e) => {
-                    setAdjustAllowed(e.target.checked);
-                  }}
-                />{" "}
+                  onCheckedChange={setAdjustAllowed}
+                />
                 <Tooltip body={t("tipText.adjustYanValue")} />
               </label>
             </div>
@@ -267,11 +262,9 @@ const LabeledCheckbox = ({
 
   return (
     <label className="flex items-center gap-2">
-      <Input
-        type="checkbox"
-        className="w-4"
+      <Switch
         checked={selected.selectedNutrients.includes(label.value)}
-        onChange={() => handleNutrientChange(label.value)}
+        onCheckedChange={() => handleNutrientChange(label.value)}
       />
       {t(label.label)}
       <SettingsDialog

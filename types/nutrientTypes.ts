@@ -164,7 +164,7 @@ export const initialFullData = {
     volume: "1",
     sg: "1",
     offset: "0",
-    numberOfAdditions: "3",
+    numberOfAdditions: "1",
   },
   selected: {
     yeastBrand: "Lalvin",

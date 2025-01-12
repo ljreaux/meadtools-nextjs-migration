@@ -1,14 +1,16 @@
 "use client";
 import useCards from "@/hooks/useCards";
-import VolumeInputs from "./VolumeInputs";
-import YeastDetails from "./YeastDetails";
-import NutrientSelector from "./NutrientSelector";
-import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
-import AdditionalDetails from "./AdditionalDetails";
-import Results from "./Results";
+import { Button } from "../ui/button";
 import { CardWrapper } from "../CardWrapper";
-function NutrientCalculator() {
+import Ingredients from "./Ingredients";
+import VolumeInputs from "../nutrientCalc/VolumeInputs";
+import YeastDetails from "../nutrientCalc/YeastDetails";
+import AdditionalDetails from "../nutrientCalc/AdditionalDetails";
+import NutrientSelector from "../nutrientCalc/NutrientSelector";
+import Results from "../nutrientCalc/Results";
+
+function RecipeBuilder() {
   const { card, currentStepIndex, back, next } = useCards(cards);
   const { t } = useTranslation();
   return (
@@ -37,8 +39,7 @@ function NutrientCalculator() {
   );
 }
 
-export default NutrientCalculator;
-
+export default RecipeBuilder;
 const Heading = ({ text }: { text: string }) => {
   const { t } = useTranslation();
   return <h1 className="text-3xl text-center">{t(text)}</h1>;
@@ -46,8 +47,12 @@ const Heading = ({ text }: { text: string }) => {
 
 const cards = [
   <CardWrapper>
+    <Heading text="recipeBuilder.homeHeading" />
+    <Ingredients />
+  </CardWrapper>,
+  <CardWrapper>
     <Heading text="nutesHeading" />
-    <VolumeInputs />
+    <VolumeInputs disabled />
     <YeastDetails />
     <AdditionalDetails />
   </CardWrapper>,
