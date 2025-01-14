@@ -14,8 +14,8 @@ export default function Tooltip({
   const { t } = useTranslation();
   return (
     <Popover>
-      <PopoverTrigger className="hover:text-background hover:bg-foreground transition-colors data-[state=open]:text-background data-[state=open]:bg-foreground p-1 rounded-md">
-        <Info className="w-4 sm:w-8" />
+      <PopoverTrigger className="hover:text-background hover:bg-foreground transition-colors data-[state=open]:text-background data-[state=open]:bg-foreground rounded-sm px-1">
+        <Info className="w-4" />
       </PopoverTrigger>
 
       <PopoverContent>

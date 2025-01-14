@@ -1,0 +1,55 @@
+{
+  "ingredients": [
+    {
+      "name": "Water",
+      "brix": 0,
+      "details": [33.3803, 4],
+      "secondary": false,
+      "category": "water"
+    },
+    {
+      "name": "Honey",
+      "brix": 79.6,
+      "details": [12, 1.0163],
+      "secondary": false,
+      "category": "sugar"
+    },
+    {
+      "name": "Honey",
+      "brix": 79.6,
+      "details": [2, 0.1694],
+      "secondary": true,
+      "category": "sugar"
+    },
+    {
+      "name": "Honey",
+      "brix": 79.6,
+      "details": [2, 0.1694],
+      "secondary": true,
+      "category": "sugar"
+    },
+    {
+      "name": "Strawberry",
+      "brix": 5.45,
+      "details": [15, 1.7597],
+      "secondary": true,
+      "category": "fruit"
+    }
+  ],
+  "OG": 1.0840743004291402,
+  "volume": 5.0163,
+  "ABV": 5.817660483654165,
+  "FG": 0.996,
+  "offset": 0,
+  "units": { "weight": "lbs", "volume": "gal" },
+  "additives": [
+    { "name": "Red Wine Tannin", "amount": 5, "unit": "g" },
+    { "name": "Cinnamon Sticks", "amount": 6, "unit": "units" },
+    { "name": "Vanilla Extract", "amount": 8, "unit": "fl oz" },
+    { "name": "Phosphoric Acid", "amount": 10, "unit": "ml" },
+    { "name": "Hibiscus", "amount": 5, "unit": "oz" }
+  ],
+  "sorbate": 9.141177570224878,
+  "sulfite": 2.3622384210526324,
+  "campden": 4.7432
+}

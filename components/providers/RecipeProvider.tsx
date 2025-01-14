@@ -15,7 +15,7 @@ import {
   Recipe,
 } from "@/types/recipeDataTypes";
 import { initialFullData } from "@/types/nutrientTypes";
-import { toSG } from "@/lib/utils/unitConverter";
+import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { blendValues } from "@/lib/utils/blendValues";
 import lodash from "lodash";
@@ -26,6 +26,10 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
   const [recipeData, setRecipeData] = useState(initialData);
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
+  const [backsweetenedFG, setBacksweetenedFG] = useState(1);
+  const [totalVolume, setTotalVolume] = useState(0);
+  const [totalForAbv, setTotalForAbv] = useState(1);
+  const [delle, setDelle] = useState(0);
 
   const addIngredient = () => {
     setRecipeData((prev) => ({
@@ -88,6 +92,26 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
         }),
       }));
     }
+  };
+
+  const changeVolumeUnits = (unit: string) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      units: {
+        ...prev.units,
+        volume: unit as "gal" | "liter",
+      },
+    }));
+  };
+
+  const changeWeightUnits = (unit: string) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      units: {
+        ...prev.units,
+        weight: unit as "lbs" | "kg",
+      },
+    }));
   };
 
   const { units } = recipeData;
@@ -182,6 +206,12 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
     }));
   };
 
+  const updateFG = (FG: string) => {
+    if (isValidNumber(FG)) {
+      setRecipeData((prev) => ({ ...prev, FG }));
+    }
+  };
+
   // fetch initial ingredient data
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -221,21 +251,84 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
         ];
       });
 
+    const total = blendValues([...secondaryBlendArr, ...primaryBlendArr]);
+    setTotalForAbv(total.blendedValue);
+
     const { blendedValue: secondaryVal, totalVolume: secondaryVol } =
       blendValues(secondaryBlendArr);
     const { blendedValue: primaryVal, totalVolume: primaryVol } =
       blendValues(primaryBlendArr);
-    const blend = blendValues([
-      [(0.996).toFixed(4), primaryVol.toFixed(4)],
-      [secondaryVal.toFixed(4), secondaryVol.toFixed(4)],
+    const { blendedValue: backFG, totalVolume } = blendValues([
+      [recipeData.FG, primaryVol.toFixed(3)],
+      [secondaryVal.toFixed(3), secondaryVol.toFixed(3)],
     ]);
-    console.log(
-      "Total Primary Volume: " + primaryVol,
-      "Total Volume: " + blend.totalVolume,
-      "Estimated OG: " + primaryVal,
-      "Backsweetend FG: " + blend.blendedValue
-    );
-  }, [recipeData.ingredients]);
+
+    setBacksweetenedFG(backFG);
+    setTotalVolume(totalVolume);
+
+    const offset = recipeData.ingredients
+      .filter((ing) => !ing.secondary && ing.category === "fruit")
+      .map((ing) => {
+        return parseFloat(ing.details[0]) * 25;
+      })
+      .reduce((prev, curr) => {
+        return curr / primaryVol + prev;
+      }, 0)
+      .toFixed();
+
+    const volume = primaryVol.toFixed(3);
+    const OG = Math.round(primaryVal * 1000) / 1000;
+
+    setRecipeData((prev) => ({
+      ...prev,
+      volume,
+      OG,
+      offset,
+    }));
+  }, [recipeData.ingredients, recipeData.FG]);
+
+  useEffect(() => {
+    const ABV = calcABV(totalForAbv, backsweetenedFG);
+    const delle = toBrix(backsweetenedFG) + 4.5 * ABV;
+    setDelle(delle);
+    setRecipeData((prev) => ({ ...prev, ABV }));
+  }, [backsweetenedFG, recipeData.OG, totalForAbv]);
+
+  useEffect(() => {
+    const { weight } = recipeData.units;
+
+    let scaler = 2.20462;
+
+    if (weight === "kg") {
+      scaler = 0.453592;
+    }
+    const updatedIngredients = recipeData.ingredients.map((ing) => {
+      const updatedWeight = parseFloat(ing.details[0]) * scaler;
+      return {
+        ...ing,
+        details: [updatedWeight.toFixed(3), ing.details[1]] as [string, string],
+      };
+    });
+    setRecipeData({ ...recipeData, ingredients: updatedIngredients });
+  }, [recipeData.units.weight]);
+
+  useEffect(() => {
+    const { volume } = recipeData.units;
+
+    let scaler = 0.264172;
+
+    if (volume === "liter") {
+      scaler = 3.78541;
+    }
+    const updatedIngredients = recipeData.ingredients.map((ing) => {
+      const updatedVolume = parseFloat(ing.details[1]) * scaler;
+      return {
+        ...ing,
+        details: [ing.details[0], updatedVolume.toFixed(3)] as [string, string],
+      };
+    });
+    setRecipeData({ ...recipeData, ingredients: updatedIngredients });
+  }, [recipeData.units.volume]);
 
   return (
     <RecipeContext.Provider
@@ -244,12 +337,18 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
         addIngredient,
         removeIngredient,
         changeIngredient,
+        changeVolumeUnits,
+        changeWeightUnits,
         ingredientList,
         loadingIngredients,
         updateIngredientWeight,
         updateIngredientVolume,
         updateBrix,
         toggleSecondaryChecked,
+        updateFG,
+        backsweetenedFG,
+        totalVolume,
+        delle,
       }}
     >
       <NutrientProvider

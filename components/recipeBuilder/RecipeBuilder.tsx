@@ -9,6 +9,8 @@ import YeastDetails from "../nutrientCalc/YeastDetails";
 import AdditionalDetails from "../nutrientCalc/AdditionalDetails";
 import NutrientSelector from "../nutrientCalc/NutrientSelector";
 import Results from "../nutrientCalc/Results";
+import IngredientResults from "./Results";
+import Units from "./Units";
 
 function RecipeBuilder() {
   const { card, currentStepIndex, back, next } = useCards(cards);
@@ -48,7 +50,9 @@ const Heading = ({ text }: { text: string }) => {
 const cards = [
   <CardWrapper>
     <Heading text="recipeBuilder.homeHeading" />
+    <Units />
     <Ingredients />
+    <IngredientResults />
   </CardWrapper>,
   <CardWrapper>
     <Heading text="nutesHeading" />

@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import Loading from "../loading";
 import SearchableInput from "../ui/SearchableInput";
 import { useTranslation } from "react-i18next";
+import InputWithUnits from "../nutrientCalc/InputWithUnits";
 
 function Ingredients() {
   const {
@@ -25,29 +26,42 @@ function Ingredients() {
   }
 
   return (
-    <div className="grid gap-4 items-center">
-      {ingredients.map((ing, i) => {
-        return (
-          <IngredientLine
-            ing={ing}
-            deleteFn={() => removeIngredient(i)}
-            changeIng={(val) => changeIngredient(i, val)}
-            updateWeight={(val) => {
-              updateIngredientWeight(ing, i, val);
-            }}
-            updateVolume={(val) => {
-              updateIngredientVolume(ing, i, val);
-            }}
-            updateBrix={(val) => {
-              updateBrix(val, i);
-            }}
-            toggleChecked={(val) => {
-              toggleSecondaryChecked(i, val);
-            }}
-            key={i}
-          />
-        );
-      })}
+    <div className="grid gap-4 items-center border-b border-muted-foreground py-6">
+      <h3>Ingredients</h3>
+      <span>
+        {ingredients.length === 0
+          ? "Add Some Ingredients to Continue Building your Recipe."
+          : ingredients.map((ing, i) => {
+              return (
+                <div
+                  className={`${
+                    i !== ingredients.length - 1
+                      ? "border-b border-dotted "
+                      : ""
+                  }`}
+                  key={i}
+                >
+                  <IngredientLine
+                    ing={ing}
+                    deleteFn={() => removeIngredient(i)}
+                    changeIng={(val) => changeIngredient(i, val)}
+                    updateWeight={(val) => {
+                      updateIngredientWeight(ing, i, val);
+                    }}
+                    updateVolume={(val) => {
+                      updateIngredientVolume(ing, i, val);
+                    }}
+                    updateBrix={(val) => {
+                      updateBrix(val, i);
+                    }}
+                    toggleChecked={(val) => {
+                      toggleSecondaryChecked(i, val);
+                    }}
+                  />
+                </div>
+              );
+            })}
+      </span>
       <Button
         onClick={addIngredient}
         variant={"secondary"}
@@ -80,6 +94,7 @@ const IngredientLine = ({
 }) => {
   const { ingredientList } = useRecipe();
   const { t } = useTranslation();
+  const { units } = useRecipe();
 
   const handleIngredientSelect = (selectedIngredient: Ingredient) => {
     // Translate the name when the ingredient is selected
@@ -87,7 +102,7 @@ const IngredientLine = ({
   };
 
   return (
-    <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+    <div className="grid grid-cols-2 gap-2 py-6">
       <label>
         Name
         <SearchableInput
@@ -112,21 +127,19 @@ const IngredientLine = ({
 
       <label>
         Weight
-        <Input
+        <InputWithUnits
           value={ing.details[0]}
-          inputMode="numeric"
-          onFocus={(e) => e.target.select()}
-          onChange={(e) => updateWeight(e.target.value)}
+          handleChange={(e) => updateWeight(e.target.value)}
+          text={units.weight}
         />
       </label>
 
       <label>
         Volume
-        <Input
+        <InputWithUnits
           value={ing.details[1]}
-          inputMode="numeric"
-          onFocus={(e) => e.target.select()}
-          onChange={(e) => updateVolume(e.target.value)}
+          handleChange={(e) => updateVolume(e.target.value)}
+          text={units.volume}
         />
       </label>
 

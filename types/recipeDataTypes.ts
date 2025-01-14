@@ -63,7 +63,7 @@ export const initialData: RecipeData = {
   OG: 1.0,
   volume: "0",
   ABV: 0,
-  FG: "0",
+  FG: "0.996",
   offset: "0",
   units: {
     weight: "lbs",
@@ -81,6 +81,8 @@ export interface Recipe extends RecipeData {
   ingredientList: Ingredient[];
   loadingIngredients: boolean;
   changeIngredient: (index: number, name: string) => void;
+  changeVolumeUnits: (unit: string) => void;
+  changeWeightUnits: (unit: string) => void;
   updateIngredientVolume: (
     ing: IngredientDetails,
     index: number,
@@ -93,6 +95,10 @@ export interface Recipe extends RecipeData {
   ) => void;
   updateBrix: (brix: string, index: number) => void;
   toggleSecondaryChecked: (i: number, b: boolean) => void;
+  updateFG: (FG: string) => void;
+  backsweetenedFG: number;
+  totalVolume: number;
+  delle: number;
 }
 
 export const blankIngredient: IngredientDetails = {
