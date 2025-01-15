@@ -8,28 +8,37 @@ import {
 } from "react";
 import { NutrientProvider } from "./NutrientProvider";
 import {
+  Additive,
+  blankAdditive,
   blankIngredient,
   Ingredient,
   IngredientDetails,
   initialData,
   Recipe,
 } from "@/types/recipeDataTypes";
-import { initialFullData } from "@/types/nutrientTypes";
 import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { blendValues } from "@/lib/utils/blendValues";
 import lodash from "lodash";
+import { useTranslation } from "react-i18next";
 
 const RecipeContext = createContext<Recipe | undefined>(undefined);
 
 export default function RecipeProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [recipeData, setRecipeData] = useState(initialData);
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
+  const [additiveList, setAdditiveList] = useState<Additive[]>([]);
+  const [loadingAdditives, setLoadingAdditives] = useState(true);
   const [backsweetenedFG, setBacksweetenedFG] = useState(1);
   const [totalVolume, setTotalVolume] = useState(0);
   const [totalForAbv, setTotalForAbv] = useState(1);
   const [delle, setDelle] = useState(0);
+
+  const [addingStabilizers, setAddingStabilizers] = useState(false);
+  const [takingPh, setTakingPh] = useState(false);
+  const [phReading, setPhReading] = useState("3.6");
 
   const addIngredient = () => {
     setRecipeData((prev) => ({
@@ -48,12 +57,14 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
   };
 
   const changeIngredient = (index: number, name: string) => {
+    const translatedName = t(lodash.camelCase(name));
+
     const foundIng = ingredientList.find((ing) => ing.name === name);
 
     if (foundIng) {
       const changed = {
         id: foundIng.id,
-        name,
+        name: translatedName, // Use the translated name
         brix: parseFloat(foundIng.sugar_content).toFixed(2) || "0",
         secondary: false,
         category: foundIng.category || "water",
@@ -65,7 +76,6 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
           if (i === index) {
             return {
               ...changed,
-              // updates the details with the brix of the new Ingredient. Uses old weight to determine new volume.
               details: [
                 ing.details[0],
                 weightToVolume(
@@ -85,13 +95,86 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
           if (i === index) {
             return {
               ...ing,
-              name,
+              name, // Use the translated name
             };
           }
           return ing;
         }),
       }));
     }
+  };
+
+  const changeAdditive = (index: number, name: string) => {
+    const multiplier = recipeData.units.volume === "liter" ? 0.264172 : 1;
+    const translatedName = t(lodash.camelCase(name));
+
+    const foundAdd = additiveList.find((add) => add.name === name);
+
+    if (foundAdd) {
+      const changed = {
+        name: translatedName,
+        amount: (
+          parseFloat(foundAdd.dosage) *
+          multiplier *
+          totalVolume
+        ).toFixed(3),
+        unit: foundAdd.unit,
+      };
+
+      setRecipeData((prev) => ({
+        ...prev,
+        additives: prev.additives.map((add, i) =>
+          i === index ? changed : add
+        ),
+      }));
+    } else {
+      setRecipeData((prev) => ({
+        ...prev,
+        additives: prev.additives.map((add, i) => {
+          if (i === index) {
+            return {
+              ...add,
+              name, // Use the translated name
+            };
+          }
+          return add;
+        }),
+      }));
+    }
+  };
+
+  const changeAdditiveUnits = (index: number, unit: string) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives: prev.additives.map((add, i) =>
+        i === index ? { ...add, unit } : add
+      ),
+    }));
+  };
+
+  const changeAdditiveAmount = (index: number, amount: string) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives: prev.additives.map((add, i) =>
+        i === index ? { ...add, amount } : add
+      ),
+    }));
+  };
+
+  const addAdditive = () => {
+    setRecipeData((prev) => {
+      return {
+        ...prev,
+        additives: [...prev.additives, blankAdditive],
+      };
+    });
+  };
+
+  const removeAdditive = (index: number) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives: prev.additives.filter((_, i) => i !== index),
+    }));
   };
 
   const changeVolumeUnits = (unit: string) => {
@@ -212,25 +295,67 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const toggleStabilizers = (val: boolean) => {
+    setAddingStabilizers(val);
+  };
+
+  const toggleTakingPh = (val: boolean) => {
+    setTakingPh(val);
+  };
+
+  const updatePhReading = (ph: string) => {
+    if (isValidNumber(ph)) {
+      setPhReading(ph);
+    }
+  };
+
+  const scaleRecipe = (curVol: number, targetVol: number) => {
+    const scale = targetVol / curVol;
+
+    const newIngredients = recipeData.ingredients.map((ing) => {
+      const newDetails = ing.details.map((det) =>
+        (parseFloat(det) * scale).toFixed(3)
+      ) as [string, string];
+      return { ...ing, details: newDetails };
+    });
+    setRecipeData((prev) => {
+      const newAdditives = prev.additives.map((add) => ({
+        ...add,
+        amount: (parseFloat(add.amount) * scale * 1000).toFixed(3),
+      }));
+
+      return { ...prev, ingredients: newIngredients, additives: newAdditives };
+    });
+  };
+
   // fetch initial ingredient data
   useEffect(() => {
     const fetchIngredients = async () => {
       try {
         const response = await fetch("/api/ingredients");
         const data = await response.json();
-        const translated = data.map((item: Ingredient) => {
-          const name = lodash.camelCase(item.name);
-          return { ...item, translationKey: name };
-        });
-        setIngredientList(translated);
+        setIngredientList(data);
         setLoadingIngredients(false);
       } catch (error) {
         console.error("Error fetching ingredient list:", error);
         setLoadingIngredients(false);
       }
     };
+    const fetchAdditives = async () => {
+      try {
+        const response = await fetch("/api/additives");
+        const data = await response.json();
+
+        setAdditiveList(data);
+        setLoadingAdditives(false);
+      } catch (error) {
+        console.error("Error fetching ingredient list:", error);
+        setLoadingAdditives(false);
+      }
+    };
 
     fetchIngredients();
+    fetchAdditives();
   }, []);
 
   useEffect(() => {
@@ -330,6 +455,66 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
     setRecipeData({ ...recipeData, ingredients: updatedIngredients });
   }, [recipeData.units.volume]);
 
+  useEffect(() => {
+    if (!takingPh) {
+      updatePhReading("3.6");
+    }
+  }, [takingPh]);
+
+  useEffect(() => {
+    if (addingStabilizers) {
+      const volume = parseFloat(recipeData.volume);
+      const { volume: volumeUnits } = recipeData.units;
+      const ph = parseFloat(phReading);
+      const vol =
+        volumeUnits == "gal" ? volume * 0.003785411784 : volume / 1000;
+      const sorbate = ((-recipeData.ABV * 25 + 400) / 0.75) * vol;
+
+      let ppm = 50;
+      if (ph <= 2.9) ppm = 11;
+      if (ph == 3) ppm = 13;
+      if (ph == 3.1) ppm = 16;
+      if (ph == 3.2) ppm = 21;
+      if (ph == 3.3) ppm = 26;
+      if (ph == 3.4) ppm = 32;
+      if (ph == 3.5) ppm = 39;
+      if (ph == 3.6) ppm = 50;
+      if (ph == 3.7) ppm = 63;
+      if (ph == 3.8) ppm = 98;
+      if (ph >= 3.9) ppm = 123;
+
+      const sulfite =
+        volumeUnits == "gal"
+          ? (volume * 3.785 * ppm) / 570
+          : (volume * ppm) / 570;
+
+      const campden =
+        volumeUnits !== "gal"
+          ? (ppm / 75) * (volume / 3.785)
+          : (ppm / 75) * volume;
+
+      setRecipeData((prev) => ({
+        ...prev,
+        sulfite,
+        sorbate,
+        campden,
+      }));
+    } else {
+      setRecipeData((prev) => ({
+        ...prev,
+        sulfite: 0,
+        sorbate: 0,
+        campden: 0,
+      }));
+    }
+  }, [
+    phReading,
+    recipeData.units,
+    recipeData.ABV,
+    recipeData.volume,
+    addingStabilizers,
+  ]);
+
   return (
     <RecipeContext.Provider
       value={{
@@ -349,17 +534,28 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
         backsweetenedFG,
         totalVolume,
         delle,
+        scaleRecipe,
+        addingStabilizers,
+        toggleStabilizers,
+        takingPh,
+        toggleTakingPh,
+        phReading,
+        updatePhReading,
+        additiveList,
+        loadingAdditives,
+        changeAdditive,
+        changeAdditiveUnits,
+        changeAdditiveAmount,
+        addAdditive,
+        removeAdditive,
       }}
     >
       <NutrientProvider
-        initialData={{
-          ...initialFullData,
-          inputs: {
-            volume: recipeData.volume,
-            sg: (recipeData.OG - parseFloat(recipeData.FG)).toString(),
-            offset: "0",
-            numberOfAdditions: "1",
-          },
+        recipeData={{
+          volume: recipeData.volume,
+          sg: (1 + recipeData.OG - parseFloat(recipeData.FG)).toFixed(3),
+          offset: recipeData.offset,
+          numberOfAdditions: "1",
         }}
       >
         {children}

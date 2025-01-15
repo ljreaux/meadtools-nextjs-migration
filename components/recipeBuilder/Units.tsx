@@ -14,9 +14,9 @@ function Units() {
   const { t } = useTranslation();
   return (
     <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
-      <h2 className="col-span-2">Units</h2>
+      <h2 className="col-span-2">{t("UNITS")}</h2>
       <label>
-        Volume
+        {t("nuteVolume")}
         <Select value={units.volume} onValueChange={changeVolumeUnits}>
           <SelectTrigger>
             <SelectValue />
@@ -28,7 +28,7 @@ function Units() {
         </Select>
       </label>
       <label>
-        Weight
+        {t("recipeBuilder.labels.weight")}
         <Select value={units.weight} onValueChange={changeWeightUnits}>
           <SelectTrigger>
             <SelectValue />

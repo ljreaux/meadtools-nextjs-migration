@@ -22,8 +22,8 @@ function Results() {
   if (totalVolume <= 0 || OG <= 1) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <h3 className="col-span-full">Results</h3>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-muted-foreground py-6">
+      <h3 className="col-span-full">{t("results")}</h3>
       <label className="sm:col-span-2">
         {t("recipeBuilder.resultsLabels.estOG")}
         <Input value={OG.toFixed(3)} disabled />

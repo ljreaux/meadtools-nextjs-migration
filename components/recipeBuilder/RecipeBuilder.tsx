@@ -11,6 +11,10 @@ import NutrientSelector from "../nutrientCalc/NutrientSelector";
 import Results from "../nutrientCalc/Results";
 import IngredientResults from "./Results";
 import Units from "./Units";
+import ScaleRecipeForm from "./ScaleRecipeForm";
+import Stabilizers from "./Stabilizers";
+import Tooltip from "../Tooltips";
+import Additives from "./Additives";
 
 function RecipeBuilder() {
   const { card, currentStepIndex, back, next } = useCards(cards);
@@ -42,27 +46,54 @@ function RecipeBuilder() {
 }
 
 export default RecipeBuilder;
-const Heading = ({ text }: { text: string }) => {
+const Heading = ({
+  text,
+  toolTipProps,
+}: {
+  text: string;
+  toolTipProps?: { body: string; link: string };
+}) => {
   const { t } = useTranslation();
-  return <h1 className="text-3xl text-center">{t(text)}</h1>;
+  return (
+    <h1 className="text-3xl text-center">
+      {t(text)}{" "}
+      {toolTipProps && (
+        <Tooltip {...toolTipProps} body={t(toolTipProps.body)} />
+      )}
+    </h1>
+  );
 };
 
 const cards = [
-  <CardWrapper>
+  <CardWrapper key="card 1">
     <Heading text="recipeBuilder.homeHeading" />
     <Units />
     <Ingredients />
     <IngredientResults />
+    <ScaleRecipeForm />
   </CardWrapper>,
-  <CardWrapper>
+  <CardWrapper key="card 2">
     <Heading text="nutesHeading" />
     <VolumeInputs disabled />
     <YeastDetails />
     <AdditionalDetails />
   </CardWrapper>,
-  <CardWrapper>
+  <CardWrapper key="card 3">
     <Heading text="nuteResults.label" />
     <NutrientSelector />
     <Results />
+  </CardWrapper>,
+  <CardWrapper key="card 4">
+    <Heading
+      text="stabilizersHeading"
+      toolTipProps={{
+        body: "tipText.stabilizers",
+        link: "https://meadmaking.wiki/en/process/stabilization",
+      }}
+    />
+    <Stabilizers />
+  </CardWrapper>,
+  <CardWrapper key="card 5">
+    <Additives />
   </CardWrapper>,
 ];

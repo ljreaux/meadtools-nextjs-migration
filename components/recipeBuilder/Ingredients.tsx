@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
 
 function Ingredients() {
+  const { t } = useTranslation();
   const {
     ingredients,
     removeIngredient,
@@ -27,7 +28,7 @@ function Ingredients() {
 
   return (
     <div className="grid gap-4 items-center border-b border-muted-foreground py-6">
-      <h3>Ingredients</h3>
+      <h3> {t("recipeBuilder.labels.ingredients")}</h3>
       <span>
         {ingredients.length === 0
           ? "Add Some Ingredients to Continue Building your Recipe."
@@ -67,7 +68,7 @@ function Ingredients() {
         variant={"secondary"}
         disabled={ingredients.length >= 10}
       >
-        Add New Ingredient
+        {t("recipeBuilder.addNew")}
       </Button>
     </div>
   );
@@ -97,26 +98,25 @@ const IngredientLine = ({
   const { units } = useRecipe();
 
   const handleIngredientSelect = (selectedIngredient: Ingredient) => {
-    // Translate the name when the ingredient is selected
-    changeIng(selectedIngredient.name); // Pass the translated name
+    changeIng(selectedIngredient.name);
   };
 
   return (
     <div className="grid grid-cols-2 gap-2 py-6">
       <label>
-        Name
+        {t("ingredient")}
         <SearchableInput
           items={ingredientList}
           query={ing.name}
           setQuery={(value) => changeIng(value)}
           keyName="name"
-          onSelect={handleIngredientSelect} // Set the full ingredient details when selected
+          onSelect={handleIngredientSelect}
         />
       </label>
 
       {/* Other fields */}
       <label>
-        Brix
+        {t("BRIX")}
         <Input
           value={ing.brix}
           inputMode="numeric"
@@ -126,7 +126,7 @@ const IngredientLine = ({
       </label>
 
       <label>
-        Weight
+        {t("recipeBuilder.labels.weight")}
         <InputWithUnits
           value={ing.details[0]}
           handleChange={(e) => updateWeight(e.target.value)}
@@ -135,7 +135,7 @@ const IngredientLine = ({
       </label>
 
       <label>
-        Volume
+        {t("recipeBuilder.labels.volume")}
         <InputWithUnits
           value={ing.details[1]}
           handleChange={(e) => updateVolume(e.target.value)}
@@ -144,7 +144,7 @@ const IngredientLine = ({
       </label>
 
       <label className="flex gap-1 flex-col sm:flex-row items-center justify-center">
-        Secondary Addition?
+        {t("recipeBuilder.labels.secondary")}
         <Switch checked={ing.secondary} onCheckedChange={toggleChecked} />
       </label>
 

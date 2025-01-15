@@ -4,7 +4,7 @@ import {
   getIngredientsByCategory,
   getIngredientByName,
   createIngredient,
-} from "@/lib/db/ingredients"; // Adjust path based on your project structure
+} from "@/lib/db/ingredients";
 import { verifyAdmin } from "@/lib/middleware";
 
 // GET /api/ingredients

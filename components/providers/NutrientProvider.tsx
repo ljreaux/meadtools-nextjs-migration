@@ -24,18 +24,21 @@ const NutrientContext = createContext<NutrientType | undefined>(undefined);
 
 export const NutrientProvider = ({
   children,
-  initialData,
+  recipeData,
 }: {
   children: ReactNode;
-  initialData?: FullNutrientData;
+  recipeData?: {
+    volume: string;
+    sg: string;
+    offset: string;
+    numberOfAdditions: string;
+  };
 }) => {
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
   const [loadingYeasts, setLoadingYeasts] = useState(true);
 
-  const [fullData, setFullData] = useState<FullNutrientData>(
-    initialData || initialFullData
-  );
+  const [fullData, setFullData] = useState<FullNutrientData>(initialFullData);
 
   const [selectedGpl, setSelectedGpl] = useState(
     maxGpl.tosna.value as string[]
@@ -488,6 +491,14 @@ export const NutrientProvider = ({
     yanContributions,
     nuteArr,
   ]);
+
+  useEffect(() => {
+    if (recipeData)
+      setFullData((prev) => ({
+        ...prev,
+        inputs: { ...prev.inputs, ...recipeData },
+      }));
+  }, [recipeData]);
 
   // Expose only the necessary state to the UI
   const uiState = {

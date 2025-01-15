@@ -21,9 +21,15 @@ type UnitType = {
   volume: "gal" | "liter";
 };
 
-type AdditiveType = {
+export type AdditiveType = {
   name: string;
   amount: string;
+  unit: string;
+};
+
+export type Additive = {
+  name: string;
+  dosage: string;
   unit: string;
 };
 
@@ -40,6 +46,11 @@ export interface RecipeData {
   sulfite: number;
   campden: number;
 }
+export const blankAdditive: AdditiveType = {
+  name: "",
+  amount: "",
+  unit: "g",
+};
 
 export const initialData: RecipeData = {
   ingredients: [
@@ -69,7 +80,7 @@ export const initialData: RecipeData = {
     weight: "lbs",
     volume: "gal",
   },
-  additives: [],
+  additives: [blankAdditive],
   sorbate: 0,
   sulfite: 0,
   campden: 0,
@@ -99,6 +110,20 @@ export interface Recipe extends RecipeData {
   backsweetenedFG: number;
   totalVolume: number;
   delle: number;
+  scaleRecipe: (val: number, scaler: number) => void;
+  addingStabilizers: boolean;
+  toggleStabilizers: (val: boolean) => void;
+  takingPh: boolean;
+  toggleTakingPh: (val: boolean) => void;
+  phReading: string;
+  updatePhReading: (val: string) => void;
+  additiveList: Additive[];
+  loadingAdditives: boolean;
+  changeAdditive: (index: number, name: string) => void;
+  changeAdditiveUnits: (index: number, unit: string) => void;
+  changeAdditiveAmount: (index: number, amount: string) => void;
+  addAdditive: () => void;
+  removeAdditive: (i: number) => void;
 }
 
 export const blankIngredient: IngredientDetails = {

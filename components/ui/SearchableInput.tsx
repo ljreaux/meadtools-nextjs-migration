@@ -1,16 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Input } from "../ui/input"; // Assuming this is the same Input component you're using
+import React, { useRef, useEffect } from "react";
+import { Input } from "../ui/input";
 import useSuggestions from "@/hooks/useSuggestions";
 import { useTranslation } from "react-i18next";
+import lodash from "lodash";
 
 type SearchableInputProps<T> = {
   items: T[];
   query: string;
   setQuery: (val: string) => void;
-  keyName: keyof T; // Property to search within each item
+  keyName: keyof T;
   onSelect: (item: T) => void;
 };
-
 function SearchableInput<T extends { [key: string]: any }>({
   items,
   query,
@@ -20,6 +20,7 @@ function SearchableInput<T extends { [key: string]: any }>({
 }: SearchableInputProps<T>) {
   const dropdownRef = useRef<HTMLUListElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const { t } = useTranslation();
 
   const { suggestions, isDropdownVisible } = useSuggestions(
     items,
@@ -27,7 +28,6 @@ function SearchableInput<T extends { [key: string]: any }>({
     keyName
   );
 
-  // Close the dropdown if clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -36,8 +36,7 @@ function SearchableInput<T extends { [key: string]: any }>({
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        // Close the dropdown if clicked outside
-        setQuery(""); // Clear the query when the dropdown is closed
+        setQuery("");
       }
     };
 
@@ -47,7 +46,6 @@ function SearchableInput<T extends { [key: string]: any }>({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  const { t } = useTranslation();
 
   return (
     <div className="relative">
@@ -60,7 +58,6 @@ function SearchableInput<T extends { [key: string]: any }>({
           if (query.length > 0) setQuery(query);
         }}
       />
-      {/* Display suggestions only if there are matches */}
       {isDropdownVisible && suggestions.length > 0 && (
         <ul
           ref={dropdownRef}
@@ -71,10 +68,10 @@ function SearchableInput<T extends { [key: string]: any }>({
               key={index}
               className="px-3 py-2 text-sm text-foreground hover:bg-muted cursor-pointer"
               onClick={() => {
-                onSelect(suggestion); // Pass the selected item to the parent
+                onSelect(suggestion);
               }}
             >
-              {suggestion[keyName]?.toString()}
+              {t(lodash.camelCase(suggestion[keyName]?.toString()))}
             </li>
           ))}
         </ul>
