@@ -73,8 +73,9 @@ function Additives() {
         onClick={addAdditive}
         variant={"secondary"}
         disabled={additives.length >= 10}
+        className="w-full"
       >
-        {t("recipeBuilder.addNew")}
+        {t("additives.addNew")}
       </Button>
     </div>
   );
@@ -102,7 +103,7 @@ const AdditiveLine = ({
     changeAdditive(selectedIngredient.name);
   };
   return (
-    <div className="grid grid-cols-6 gap-2">
+    <div className="grid sm:grid-cols-6 grid-cols-3 gap-2 py-6">
       <span className="col-span-2">
         <SearchableInput
           items={additiveList}

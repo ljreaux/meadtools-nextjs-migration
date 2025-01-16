@@ -11,10 +11,12 @@ import {
   Additive,
   blankAdditive,
   blankIngredient,
+  blankNote,
   Ingredient,
   IngredientDetails,
   initialData,
   Recipe,
+  RecipeData,
 } from "@/types/recipeDataTypes";
 import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
 import { isValidNumber } from "@/lib/utils/validateInput";
@@ -24,13 +26,28 @@ import { useTranslation } from "react-i18next";
 
 const RecipeContext = createContext<Recipe | undefined>(undefined);
 
-export default function RecipeProvider({ children }: { children: ReactNode }) {
+export default function RecipeProvider({
+  children,
+  storeData,
+  savedData,
+}: {
+  children: ReactNode;
+  // for main recipe builder local storage
+  storeData?: boolean;
+  // for saved user recipes
+  savedData?: RecipeData;
+}) {
   const { t } = useTranslation();
-  const [recipeData, setRecipeData] = useState(initialData);
+  const [firstMount, setFirstMount] = useState(true);
+
+  const [recipeData, setRecipeData] = useState(savedData || initialData);
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [additiveList, setAdditiveList] = useState<Additive[]>([]);
   const [loadingAdditives, setLoadingAdditives] = useState(true);
+  const [primaryNotes, setPrimaryNotes] = useState([blankNote]);
+  const [secondaryNotes, setSecondaryNotes] = useState([blankNote]);
+
   const [backsweetenedFG, setBacksweetenedFG] = useState(1);
   const [totalVolume, setTotalVolume] = useState(0);
   const [totalForAbv, setTotalForAbv] = useState(1);
@@ -314,18 +331,57 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
 
     const newIngredients = recipeData.ingredients.map((ing) => {
       const newDetails = ing.details.map((det) =>
-        (parseFloat(det) * scale).toFixed(3)
+        (parseFloat(det || "0") * scale).toFixed(3)
       ) as [string, string];
       return { ...ing, details: newDetails };
     });
     setRecipeData((prev) => {
       const newAdditives = prev.additives.map((add) => ({
         ...add,
-        amount: (parseFloat(add.amount) * scale * 1000).toFixed(3),
+        amount: (parseFloat(add.amount || "0") * scale * 1000).toFixed(3),
       }));
 
       return { ...prev, ingredients: newIngredients, additives: newAdditives };
     });
+  };
+
+  const editPrimaryNoteText = (index: number, text: string) => {
+    setPrimaryNotes((prev) =>
+      prev.map((note, i) => (i === index ? [text, note[1]] : note))
+    );
+  };
+
+  const editPrimaryNoteDetails = (index: number, text: string) => {
+    setPrimaryNotes((prev) =>
+      prev.map((note, i) => (i === index ? [note[0], text] : note))
+    );
+  };
+
+  const addPrimaryNote = () => {
+    setPrimaryNotes((prev) => [...prev, blankNote]);
+  };
+
+  const removePrimaryNote = (index: number) => {
+    setPrimaryNotes((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const editSecondaryNoteText = (index: number, text: string) => {
+    setSecondaryNotes((prev) =>
+      prev.map((note, i) => (i === index ? [text, note[1]] : note))
+    );
+  };
+
+  const editSecondaryNoteDetails = (index: number, text: string) => {
+    setSecondaryNotes((prev) =>
+      prev.map((note, i) => (i === index ? [note[0], text] : note))
+    );
+  };
+
+  const addSecondaryNote = () => {
+    setSecondaryNotes((prev) => [...prev, blankNote]);
+  };
+  const removeSecondaryNote = (index: number) => {
+    setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
   };
 
   // fetch initial ingredient data
@@ -356,6 +412,14 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
 
     fetchIngredients();
     fetchAdditives();
+
+    if (storeData) {
+      const storedData = localStorage.getItem("recipeData") || "false";
+      const parsed = JSON.parse(storedData) as RecipeData | false;
+      if (parsed) setRecipeData(parsed);
+    }
+
+    setFirstMount(false);
   }, []);
 
   useEffect(() => {
@@ -420,39 +484,49 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
   }, [backsweetenedFG, recipeData.OG, totalForAbv]);
 
   useEffect(() => {
-    const { weight } = recipeData.units;
+    if (!firstMount) {
+      const { weight } = recipeData.units;
 
-    let scaler = 2.20462;
+      let scaler = 2.20462;
 
-    if (weight === "kg") {
-      scaler = 0.453592;
+      if (weight === "kg") {
+        scaler = 0.453592;
+      }
+      const updatedIngredients = recipeData.ingredients.map((ing) => {
+        const updatedWeight = parseFloat(ing.details[0]) * scaler;
+        return {
+          ...ing,
+          details: [updatedWeight.toFixed(3), ing.details[1]] as [
+            string,
+            string
+          ],
+        };
+      });
+      setRecipeData({ ...recipeData, ingredients: updatedIngredients });
     }
-    const updatedIngredients = recipeData.ingredients.map((ing) => {
-      const updatedWeight = parseFloat(ing.details[0]) * scaler;
-      return {
-        ...ing,
-        details: [updatedWeight.toFixed(3), ing.details[1]] as [string, string],
-      };
-    });
-    setRecipeData({ ...recipeData, ingredients: updatedIngredients });
   }, [recipeData.units.weight]);
 
   useEffect(() => {
-    const { volume } = recipeData.units;
+    if (!firstMount) {
+      const { volume } = recipeData.units;
 
-    let scaler = 0.264172;
+      let scaler = 0.264172;
 
-    if (volume === "liter") {
-      scaler = 3.78541;
+      if (volume === "liter") {
+        scaler = 3.78541;
+      }
+      const updatedIngredients = recipeData.ingredients.map((ing) => {
+        const updatedVolume = parseFloat(ing.details[1]) * scaler;
+        return {
+          ...ing,
+          details: [ing.details[0], updatedVolume.toFixed(3)] as [
+            string,
+            string
+          ],
+        };
+      });
+      setRecipeData({ ...recipeData, ingredients: updatedIngredients });
     }
-    const updatedIngredients = recipeData.ingredients.map((ing) => {
-      const updatedVolume = parseFloat(ing.details[1]) * scaler;
-      return {
-        ...ing,
-        details: [ing.details[0], updatedVolume.toFixed(3)] as [string, string],
-      };
-    });
-    setRecipeData({ ...recipeData, ingredients: updatedIngredients });
   }, [recipeData.units.volume]);
 
   useEffect(() => {
@@ -515,6 +589,14 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
     addingStabilizers,
   ]);
 
+  useEffect(() => {
+    if (storeData) {
+      localStorage.setItem("recipeData", JSON.stringify(recipeData));
+      localStorage.setItem("primaryNotes", JSON.stringify(primaryNotes));
+      localStorage.setItem("secondaryNotes", JSON.stringify(primaryNotes));
+    }
+  }, [recipeData, primaryNotes, secondaryNotes]);
+
   return (
     <RecipeContext.Provider
       value={{
@@ -548,6 +630,22 @@ export default function RecipeProvider({ children }: { children: ReactNode }) {
         changeAdditiveAmount,
         addAdditive,
         removeAdditive,
+        notes: {
+          primary: primaryNotes,
+          secondary: secondaryNotes,
+        },
+        editPrimaryNote: {
+          text: editPrimaryNoteText,
+          details: editPrimaryNoteDetails,
+        },
+        addPrimaryNote,
+        removePrimaryNote,
+        editSecondaryNote: {
+          text: editSecondaryNoteText,
+          details: editSecondaryNoteDetails,
+        },
+        addSecondaryNote,
+        removeSecondaryNote,
       }}
     >
       <NutrientProvider

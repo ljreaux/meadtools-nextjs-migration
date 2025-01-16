@@ -46,6 +46,9 @@ export interface RecipeData {
   sulfite: number;
   campden: number;
 }
+
+export type NotesType = [string, string][];
+
 export const blankAdditive: AdditiveType = {
   name: "",
   amount: "",
@@ -124,6 +127,22 @@ export interface Recipe extends RecipeData {
   changeAdditiveAmount: (index: number, amount: string) => void;
   addAdditive: () => void;
   removeAdditive: (i: number) => void;
+  notes: {
+    primary: NotesType;
+    secondary: NotesType;
+  };
+  editPrimaryNote: {
+    text: (index: number, note: string) => void;
+    details: (index: number, note: string) => void;
+  };
+  addPrimaryNote: () => void;
+  removePrimaryNote: (i: number) => void;
+  editSecondaryNote: {
+    text: (index: number, note: string) => void;
+    details: (index: number, note: string) => void;
+  };
+  addSecondaryNote: () => void;
+  removeSecondaryNote: (i: number) => void;
 }
 
 export const blankIngredient: IngredientDetails = {
@@ -134,3 +153,5 @@ export const blankIngredient: IngredientDetails = {
   secondary: false,
   category: "sugar",
 };
+
+export const blankNote: [string, string] = ["", ""];
