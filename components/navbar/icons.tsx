@@ -103,7 +103,7 @@ const MailIcon = () => (
 
 export const socialIcons = [
   {
-    href: "https://github.com/ljreaux/MeadTools-React/tree/main",
+    href: "https://github.com/ljreaux/meadtools-nextjs-migration",
     logo: <GithubIcon />,
   },
   { href: "https://www.linkedin.com/in/ljreaux/", logo: <LinkedInIcon /> },

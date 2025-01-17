@@ -131,6 +131,7 @@ export type NutrientType = {
   updateProvidedYan: (index: number, value: string) => void;
   adjustAllowed: boolean;
   setAdjustAllowed: (value: boolean) => void;
+  fullData: FullNutrientData;
 };
 export type MaxGplEntry = {
   name: string;

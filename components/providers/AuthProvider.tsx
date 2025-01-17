@@ -13,6 +13,8 @@ interface AuthContextType {
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
   fetchAuthenticatedData: (endpoint: string) => Promise<any>;
+  fetchAuthenticatedPost: (endpoint: string, body: any) => Promise<any>;
+  isLoggedIn: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -79,6 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       localStorage.setItem("googleToastShown", "true");
       await signIn("google");
     } catch (error) {
+      console.error(error);
       toast({
         title: t("auth.googleLogin.error.title", "Google Login Failed"),
         description: t(
@@ -203,6 +206,32 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return res.json();
   };
 
+  const fetchAuthenticatedPost = async (endpoint: string, body: any) => {
+    if (!user) throw new Error("User not authenticated");
+
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        logout();
+        throw new Error("Session expired. Please log in again.");
+      }
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to fetch authenticated data");
+    }
+
+    return res.json();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -213,6 +242,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         register,
         logout,
         fetchAuthenticatedData,
+        fetchAuthenticatedPost,
+        isLoggedIn: !!user,
       }}
     >
       <SessionProvider>{children}</SessionProvider>

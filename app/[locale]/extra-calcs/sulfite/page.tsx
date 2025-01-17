@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { isValidNumber } from "@/lib/utils/validateInput";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function Sulfite() {
@@ -106,7 +106,7 @@ function Sulfite() {
               </p>
               <p>{t("accountPage.or")}</p>
               <p className="flex item-center justify-center gap-2">
-                {campden.toFixed(1)} {t("list.campden")}
+                {campden.toFixed(1)} {t("campden")}
                 <Tooltip body={t("tipText.campden")} />
               </p>
             </span>

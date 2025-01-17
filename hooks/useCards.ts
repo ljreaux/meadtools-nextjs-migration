@@ -14,7 +14,7 @@ export default function useCards(cards: ReactElement[]) {
     setCurrentStepIndex((prev) => (prev >= 0 ? (prev -= 1) : prev));
   }
   return {
-    currentStepIndex: currentStepIndex,
+    currentStepIndex,
     card: cards[currentStepIndex],
     goTo,
     next,

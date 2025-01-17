@@ -68,7 +68,7 @@ function Stabilizers() {
             <p className="text-center"> {t("accountPage.or")}</p>
             <label>
               <span className="items-center flex gap-1">
-                {t("list.campden")}
+                {t("campden")}
                 <Tooltip body={t("tipText.campden")} />
               </span>
               <InputWithUnits value={campden.toFixed(2)} disabled text="" />

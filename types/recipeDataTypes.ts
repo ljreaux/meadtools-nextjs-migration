@@ -143,6 +143,10 @@ export interface Recipe extends RecipeData {
   };
   addSecondaryNote: () => void;
   removeSecondaryNote: (i: number) => void;
+  recipeNameProps: {
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  };
 }
 
 export const blankIngredient: IngredientDetails = {

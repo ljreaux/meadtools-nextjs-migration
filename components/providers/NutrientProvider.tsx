@@ -25,6 +25,7 @@ const NutrientContext = createContext<NutrientType | undefined>(undefined);
 export const NutrientProvider = ({
   children,
   recipeData,
+  storeData,
 }: {
   children: ReactNode;
   recipeData?: {
@@ -33,6 +34,7 @@ export const NutrientProvider = ({
     offset: string;
     numberOfAdditions: string;
   };
+  storeData?: boolean;
 }) => {
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
@@ -284,6 +286,34 @@ export const NutrientProvider = ({
       }
     };
 
+    const getStoredData = () => {
+      const storedData = localStorage.getItem("nutrientData") || "false";
+      const parsedData = JSON.parse(storedData);
+      if (parsedData) {
+        setFullData(parsedData);
+      }
+
+      const storedYan = localStorage.getItem("yanContribution") || "false";
+      const parsedYan = JSON.parse(storedYan) as number[] | false;
+      if (parsedYan) {
+        setYanContributions(parsedYan.map(String));
+      }
+
+      const storedOtherName = localStorage.getItem("otherNutrientName");
+      if (storedOtherName) {
+        setOtherNutrientName(storedOtherName);
+      }
+
+      const storedSelectedGpl = localStorage.getItem("selectedGpl") || "false";
+      const parsedSelectedGpl = JSON.parse(storedSelectedGpl) as
+        | string[]
+        | false;
+      if (parsedSelectedGpl) {
+        setSelectedGpl(parsedSelectedGpl);
+      }
+    };
+
+    if (storeData) getStoredData();
     fetchYeasts();
   }, []);
 
@@ -500,6 +530,28 @@ export const NutrientProvider = ({
       }));
   }, [recipeData]);
 
+  useEffect(() => {
+    if (storeData) {
+      localStorage.setItem("nutrientData", JSON.stringify(fullData));
+    }
+  }, [fullData]);
+
+  useEffect(() => {
+    if (storeData) {
+      localStorage.setItem(
+        "yanContribution",
+        JSON.stringify(yanContributions.map(parseFloat))
+      );
+      localStorage.setItem("selectedGpl", JSON.stringify(selectedGpl));
+    }
+  }, [yanContributions, selectedGpl]);
+
+  useEffect(() => {
+    if (storeData) {
+      localStorage.setItem("otherNutrientName", otherNutrientName);
+    }
+  }, [otherNutrientName]);
+
   // Expose only the necessary state to the UI
   const uiState = {
     inputs: {
@@ -562,6 +614,7 @@ export const NutrientProvider = ({
     },
     adjustAllowed,
     setAdjustAllowed,
+    fullData,
   };
 
   return (

@@ -30,12 +30,14 @@ export default function RecipeProvider({
   children,
   storeData,
   savedData,
+  recipeName: providedName,
 }: {
   children: ReactNode;
   // for main recipe builder local storage
   storeData?: boolean;
   // for saved user recipes
   savedData?: RecipeData;
+  recipeName?: string;
 }) {
   const { t } = useTranslation();
   const [firstMount, setFirstMount] = useState(true);
@@ -56,6 +58,7 @@ export default function RecipeProvider({
   const [addingStabilizers, setAddingStabilizers] = useState(false);
   const [takingPh, setTakingPh] = useState(false);
   const [phReading, setPhReading] = useState("3.6");
+  const [recipeName, setRecipeName] = useState(providedName || "");
 
   const addIngredient = () => {
     setRecipeData((prev) => ({
@@ -384,6 +387,45 @@ export default function RecipeProvider({
     setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const retrieveStoredData = () => {
+    // get recipe Data
+    const storedData = localStorage.getItem("recipeData") || "false";
+    const parsed = JSON.parse(storedData) as RecipeData | false;
+    if (parsed) setRecipeData(parsed);
+
+    // get notes data
+    const primaryNotes = localStorage.getItem("primaryNotes") || "false";
+    const secondaryNotes = localStorage.getItem("secondaryNotes") || "false";
+    const parsedPrimaryNotes = JSON.parse(primaryNotes) as
+      | [string, string][]
+      | false;
+    if (parsedPrimaryNotes) {
+      setPrimaryNotes(parsedPrimaryNotes);
+    }
+    const parsedSecondaryNotes = JSON.parse(secondaryNotes) as
+      | [string, string][]
+      | false;
+    if (parsedSecondaryNotes) {
+      setSecondaryNotes(parsedSecondaryNotes);
+    }
+
+    // get stabilizers data
+    const storedStabilizers =
+      localStorage.getItem("addingStabilizers") || "false";
+    const parsedStabilizers = JSON.parse(storedStabilizers) as
+      | { adding: boolean; pH: boolean; pHReading: string }
+      | false;
+    if (parsedStabilizers) {
+      setAddingStabilizers(parsedStabilizers.adding);
+      setTakingPh(parsedStabilizers.pH);
+      setPhReading(parsedStabilizers.pHReading);
+    }
+    const storedName = localStorage.getItem("recipeName");
+    if (storedName) {
+      setRecipeName(storedName);
+    }
+  };
+
   // fetch initial ingredient data
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -413,11 +455,7 @@ export default function RecipeProvider({
     fetchIngredients();
     fetchAdditives();
 
-    if (storeData) {
-      const storedData = localStorage.getItem("recipeData") || "false";
-      const parsed = JSON.parse(storedData) as RecipeData | false;
-      if (parsed) setRecipeData(parsed);
-    }
+    if (storeData) retrieveStoredData();
 
     setFirstMount(false);
   }, []);
@@ -530,7 +568,7 @@ export default function RecipeProvider({
   }, [recipeData.units.volume]);
 
   useEffect(() => {
-    if (!takingPh) {
+    if (!takingPh && !firstMount) {
       updatePhReading("3.6");
     }
   }, [takingPh]);
@@ -593,9 +631,26 @@ export default function RecipeProvider({
     if (storeData) {
       localStorage.setItem("recipeData", JSON.stringify(recipeData));
       localStorage.setItem("primaryNotes", JSON.stringify(primaryNotes));
-      localStorage.setItem("secondaryNotes", JSON.stringify(primaryNotes));
+      localStorage.setItem("secondaryNotes", JSON.stringify(secondaryNotes));
+      localStorage.setItem("recipeName", recipeName);
+      localStorage.setItem(
+        "addingStabilizers",
+        JSON.stringify({
+          adding: addingStabilizers,
+          pH: takingPh,
+          pHReading: phReading,
+        })
+      );
     }
-  }, [recipeData, primaryNotes, secondaryNotes]);
+  }, [
+    recipeData,
+    primaryNotes,
+    secondaryNotes,
+    addingStabilizers,
+    takingPh,
+    phReading,
+    recipeName,
+  ]);
 
   return (
     <RecipeContext.Provider
@@ -646,6 +701,11 @@ export default function RecipeProvider({
         },
         addSecondaryNote,
         removeSecondaryNote,
+        recipeNameProps: {
+          value: recipeName,
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+            setRecipeName(e.target.value),
+        },
       }}
     >
       <NutrientProvider
@@ -655,6 +715,7 @@ export default function RecipeProvider({
           offset: recipeData.offset,
           numberOfAdditions: "1",
         }}
+        storeData
       >
         {children}
       </NutrientProvider>

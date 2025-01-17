@@ -4,26 +4,16 @@ import { createRecipe, getAllRecipes } from "@/lib/db/recipes";
 import { requireAdmin, verifyUser } from "@/lib/middleware";
 
 export async function GET(req: NextRequest) {
-  // Verify user authentication
-  const userOrResponse = await verifyUser(req);
-  if (userOrResponse instanceof NextResponse) {
-    return userOrResponse; // Return error response if the user is not verified
-  }
-
-  const userId = userOrResponse;
+  const userId = await verifyUser(req);
+  let isAdmin = false;
 
   try {
-    // Check admin privileges using requireAdmin
-    const isAdmin = await requireAdmin(userId);
-    if (!isAdmin) {
-      return NextResponse.json(
-        { error: "Unauthorized access" },
-        { status: 403 }
-      );
-    }
+    if (typeof userId === "number") isAdmin = await requireAdmin(userId);
 
-    // Fetch all recipes
-    const recipes = await getAllRecipes();
+    let recipes = await getAllRecipes();
+
+    if (!isAdmin) recipes = recipes.filter((rec) => !rec.private);
+
     return NextResponse.json({ recipes });
   } catch (error: any) {
     console.error("Error fetching recipes:", error);

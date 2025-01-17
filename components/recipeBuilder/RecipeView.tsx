@@ -39,10 +39,10 @@ function RecipeView({
   } = recipeData;
 
   const nuteNames = [
-    " g Fermaid O",
-    " g Fermaid K",
-    " g DAP",
-    ` g ${otherNutrientName.value}`,
+    "g Fermaid O",
+    "g Fermaid K",
+    "g DAP",
+    `g ${otherNutrientName.value}`,
   ];
 
   const { t } = useTranslation();
@@ -132,30 +132,23 @@ function RecipeView({
             <tbody>
               <tr>
                 <td>
-                  <p>{OG !== undefined && Math.round(OG * 1000) / 1000}</p>
-                  <p>
-                    {OG !== undefined &&
-                      `${Math.round(toBrix(OG) * 100) / 100} ${t("BRIX")}`}
-                  </p>
+                  <p>{OG.toFixed(3)}</p>
+                  <p>{toBrix(OG).toFixed(2)}</p>
                 </td>
                 <td>
-                  <p>{FG && parseFloat(FG).toFixed(3)}</p>
-                  <p>
-                    {FG && `${toBrix(parseFloat(FG)).toFixed(3)} ${t("BRIX")}`}
-                  </p>
+                  <p>{parseFloat(FG).toFixed(3)}</p>
+                  <p>{`${toBrix(parseFloat(FG)).toFixed(3)} ${t("BRIX")}`}</p>
                 </td>
                 <td>
                   <p>{`${selected?.yeastDetails.tolerance}%`}</p>
                   <p>
                     {OG !== undefined
-                      ? `${t("PDF.sugarBreak")} ${
-                          Math.round(calcSb(OG) * 1000) / 1000
-                        }`
+                      ? `${t("PDF.sugarBreak")} ${calcSb(OG).toFixed(3)}`
                       : ""}
                   </p>
                 </td>
                 <td>
-                  <p>{ABV && Math.round(ABV * 100) / 100}%</p>
+                  <p>{ABV.toFixed(2)}%</p>
                   <p>
                     {delle.toFixed()} {t("DU")}
                   </p>
@@ -184,8 +177,8 @@ function RecipeView({
                         {nuteNames[i]}
                       </p>
                     ) : null
-                  )}{" "}
-                </td>{" "}
+                  )}
+                </td>
                 <td>
                   {nutrientAdditions.totalGrams.map((nute, i) =>
                     nute > 0 ? (
@@ -214,20 +207,12 @@ function RecipeView({
                 {addingStabilizers && (
                   <td>
                     <p>
-                      {sulfite &&
-                        campden &&
-                        `${Math.round(sulfite * 1000) / 1000}g ${t(
-                          "PDF.kmeta"
-                        )} ${t("accountPage.or")} ${
-                          Math.round(campden * 10) / 10
+                      {`${sulfite.toFixed(3)}g ${t("PDF.kmeta")} ${t(
+                        "accountPage.or"
+                      )} ${campden.toFixed(3)}
                         } ${t("campden")}`}
                     </p>
-                    <p>
-                      {sorbate &&
-                        `${Math.round(sorbate * 1000) / 1000}g ${t(
-                          "PDF.ksorb"
-                        )}`}
-                    </p>
+                    <p>{`${sorbate.toFixed(3)}g ${t("PDF.ksorb")}`}</p>
                   </td>
                 )}
                 <td>{`${remainingYan}PPM`}</td>
@@ -239,10 +224,10 @@ function RecipeView({
               <tr>
                 <td>{t("PDF.primary")}</td>
                 <td>
-                  {t("PDF.weight")} {units && units.weight}
+                  {t("PDF.weight")} {units.weight}
                 </td>
                 <td>
-                  {t("PDF.volume")} {units && units.volume}
+                  {t("PDF.volume")} {units.volume}
                 </td>
               </tr>
             </thead>
@@ -290,21 +275,21 @@ function RecipeView({
             <img src="/pdf-logo.png" />
           </div>
           <section className="secondary-section">
-            {secondary?.length > 0 && (
+            {secondary.length > 0 && (
               <table>
                 <thead>
                   <tr>
                     <td>{t("PDF.secondary")}</td>
                     <td>
-                      {t("PDF.weight")} {units && units.weight}
+                      {t("PDF.weight")} {units.weight}
                     </td>
                     <td>
-                      {t("PDF.volume")} {units && units.volume}
+                      {t("PDF.volume")} {units.volume}
                     </td>
                   </tr>
                 </thead>
                 <tbody>
-                  {secondary?.map((item, i) => (
+                  {secondary.map((item, i) => (
                     <tr key={item.name + i}>
                       <td>
                         {i + 1}. {t(`${lodash.camelCase(item.name)}`)}
