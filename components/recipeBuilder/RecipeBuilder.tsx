@@ -1,4 +1,5 @@
 "use client";
+
 import useCards from "@/hooks/useCards";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
@@ -24,19 +25,19 @@ import ResetButton from "./ResetButton";
 
 function RecipeBuilder() {
   const { card, currentStepIndex, back, next, goTo } = useCards(cards);
-
   const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">
-      <RecipeCalculatorSideBar goTo={goTo}>
-        {
-          <div className="py-2">
-            <SaveRecipe />
-            <ResetButton />
-          </div>
-        }
+      <RecipeCalculatorSideBar goTo={goTo} cardNumber={currentStepIndex + 1}>
+        <div className="py-2">
+          <SaveRecipe />
+          <ResetButton />
+        </div>
       </RecipeCalculatorSideBar>
+
       {card}
+
       <div className="flex py-12 gap-4 w-11/12 max-w-[1000px] items-center justify-center">
         <Button
           variant={"secondary"}

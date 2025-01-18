@@ -17,6 +17,7 @@ import {
   initialData,
   Recipe,
   RecipeData,
+  UnitType,
 } from "@/types/recipeDataTypes";
 import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
 import { isValidNumber } from "@/lib/utils/validateInput";
@@ -41,6 +42,7 @@ export default function RecipeProvider({
 }) {
   const { t } = useTranslation();
   const [firstMount, setFirstMount] = useState(true);
+  const [preferredUnits, setPreferredUnits] = useState("US");
 
   const [recipeData, setRecipeData] = useState(savedData || initialData);
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
@@ -456,6 +458,10 @@ export default function RecipeProvider({
     fetchAdditives();
 
     if (storeData) retrieveStoredData();
+    const units = localStorage.getItem("units");
+    if (units) {
+      setPreferredUnits(units);
+    }
 
     setFirstMount(false);
   }, []);
@@ -626,6 +632,23 @@ export default function RecipeProvider({
     recipeData.volume,
     addingStabilizers,
   ]);
+
+  // default to users preferred units when recipe is reset. The abv check is required to ensure it doesn't change the state of the recipe if there is data in local storage.
+  useEffect(() => {
+    if (recipeData.ABV < 1 && storeData) {
+      const units: UnitType =
+        preferredUnits === "US"
+          ? {
+              weight: "lbs",
+              volume: "gal",
+            }
+          : {
+              weight: "kg",
+              volume: "liter",
+            };
+      setRecipeData((prev) => ({ ...prev, units }));
+    }
+  }, [preferredUnits]);
 
   useEffect(() => {
     if (storeData) {

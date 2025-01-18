@@ -54,6 +54,7 @@ export async function createUser(data: {
   password?: string;
   role?: string;
   google_id?: string;
+  public_username?: string;
 }) {
   return await prisma.users.create({
     data,
@@ -63,7 +64,12 @@ export async function createUser(data: {
 // Update a user
 export async function updateUser(
   id: number,
-  fields: Partial<{ email: string; password: string; role: string }>
+  fields: Partial<{
+    email: string;
+    password: string;
+    role: string;
+    public_username: string;
+  }>
 ) {
   return await prisma.users.update({
     where: { id },

@@ -12,10 +12,14 @@ export async function requireAdmin(userId: number): Promise<boolean> {
   return user?.role === "admin";
 }
 export async function verifyUser(req: NextRequest) {
+  console.log("Verifying user...");
+
   try {
     const authHeader = req.headers.get("Authorization");
+    console.log("Authorization header:", authHeader);
 
     if (!authHeader) {
+      console.error("Authorization header missing");
       return NextResponse.json(
         { error: "Authorization header missing" },
         { status: 401 }
@@ -23,8 +27,10 @@ export async function verifyUser(req: NextRequest) {
     }
 
     const token = authHeader.split(" ")[1];
+    console.log("Extracted token:", token);
 
     if (!token) {
+      console.error("Token missing");
       return NextResponse.json({ error: "Token missing" }, { status: 401 });
     }
 
@@ -33,6 +39,7 @@ export async function verifyUser(req: NextRequest) {
     // Try verifying as a custom token
     try {
       const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as { id: number };
+      console.log("Decoded custom token:", decoded);
       userId = decoded?.id;
 
       // Fetch the user by custom ID
@@ -40,22 +47,30 @@ export async function verifyUser(req: NextRequest) {
         where: { id: userId },
       });
 
+      console.log("User fetched by custom token:", user);
+
       if (!user) {
+        console.error("User not found for custom token");
         return NextResponse.json({ error: "User not found" }, { status: 404 });
       }
 
       return user.id;
     } catch (err) {
-      console.warn("Failed to verify custom token, trying Google OAuth...");
+      console.warn("Failed to verify custom token:", err);
     }
 
     // If not a custom token, try getting the user from the session
     if (!userId) {
+      console.log("Trying to verify user via session...");
       const session = await getServerSession(authOptions);
+      console.log("Session fetched:", session);
+
       if (session?.user?.email) {
         const user = await prisma.users.findUnique({
           where: { email: session.user.email },
         });
+
+        console.log("User fetched by session email:", user);
 
         if (user) {
           return user.id;
@@ -68,6 +83,8 @@ export async function verifyUser(req: NextRequest) {
           where: { google_id: session.user.id as string }, // Assuming profile.sub is mapped to google_id
         });
 
+        console.log("User fetched by google_id:", user);
+
         if (user) {
           return user.id;
         }
@@ -75,6 +92,9 @@ export async function verifyUser(req: NextRequest) {
     }
 
     // If no valid userId, return an error
+    console.error(
+      "No valid userId found. Invalid token or unauthorized access."
+    );
     return NextResponse.json(
       { error: "Invalid token or unauthorized access" },
       { status: 401 }
@@ -111,7 +131,7 @@ export async function verifyAdmin(
     }
 
     return user.id;
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to verify admin" },
       { status: 500 }

@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 const { ACCESS_TOKEN_SECRET = "", REFRESH_TOKEN_SECRET = "" } = process.env;
 
 export async function POST(req: NextRequest) {
-  const { email, password: unhashed } = await req.json();
+  const { email, password: unhashed, public_username } = await req.json();
 
   // Check if email or password is missing
   if (!email || !unhashed) {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const password = await bcrypt.hash(unhashed, 10);
-    const newUser = await createUser({ email, password });
+    const newUser = await createUser({ email, password, public_username });
 
     const accessToken = jwt.sign({ id: newUser.id }, ACCESS_TOKEN_SECRET, {
       expiresIn: "1w",

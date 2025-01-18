@@ -15,18 +15,7 @@ function Units() {
   return (
     <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <h2 className="col-span-2">{t("UNITS")}</h2>
-      <label>
-        {t("nuteVolume")}
-        <Select value={units.volume} onValueChange={changeVolumeUnits}>
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="gal">{t("GAL")}</SelectItem>
-            <SelectItem value="liter">{t("LIT")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </label>
+
       <label>
         {t("recipeBuilder.labels.weight")}
         <Select value={units.weight} onValueChange={changeWeightUnits}>
@@ -37,6 +26,18 @@ function Units() {
           <SelectContent>
             <SelectItem value="lbs">{t("LBS")}</SelectItem>
             <SelectItem value="kg">{t("KG")}</SelectItem>
+          </SelectContent>
+        </Select>
+      </label>
+      <label>
+        {t("nuteVolume")}
+        <Select value={units.volume} onValueChange={changeVolumeUnits}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="gal">{t("GAL")}</SelectItem>
+            <SelectItem value="liter">{t("LIT")}</SelectItem>
           </SelectContent>
         </Select>
       </label>

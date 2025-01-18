@@ -15,6 +15,7 @@ interface AuthContextType {
   fetchAuthenticatedData: (endpoint: string) => Promise<any>;
   fetchAuthenticatedPost: (endpoint: string, body: any) => Promise<any>;
   isLoggedIn: boolean;
+  updatePublicUsername: (username: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -191,7 +192,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) throw new Error("User not authenticated");
 
     const headers: Record<string, string> = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else if (session?.user) {
+      headers["Authorization"] = `Bearer ${session.user.id}`;
+    }
 
     const res = await fetch(endpoint, { headers });
 
@@ -212,7 +218,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
     };
-    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else if (session?.user) {
+      headers["Authorization"] = `Bearer ${session.user.id}`;
+    }
 
     const res = await fetch(endpoint, {
       method: "POST",
@@ -231,6 +242,63 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return res.json();
   };
+  const updatePublicUsername = async (username: string) => {
+    if (!user) {
+      toast({
+        title: t("auth.username.error.title", "Update Failed"),
+        description: t(
+          "auth.username.error.description",
+          "You must be logged in to update your username."
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/create-username", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token || session?.user?.id}`,
+        },
+        body: JSON.stringify({ public_username: username }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(
+          errorData.error ||
+            t(
+              "auth.username.error.description",
+              "An error occurred while updating your username."
+            )
+        );
+      }
+
+      const data = await res.json();
+
+      // Update local user data with the new username
+      setUser((prevUser) =>
+        prevUser ? { ...prevUser, public_username: data.public_username } : null
+      );
+
+      toast({
+        title: t("auth.username.success.title", "Username Updated!"),
+        description: t(
+          "auth.username.success.description",
+          "Your public username has been successfully updated."
+        ),
+        variant: "default",
+      });
+    } catch (error: any) {
+      toast({
+        title: t("auth.username.error.title", "Update Failed"),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -244,6 +312,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         fetchAuthenticatedData,
         fetchAuthenticatedPost,
         isLoggedIn: !!user,
+        updatePublicUsername,
       }}
     >
       <SessionProvider>{children}</SessionProvider>

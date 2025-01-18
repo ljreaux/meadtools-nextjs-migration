@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "@/lib/prisma";
 
-// Ensure the typing for the callbacks is clear
+// Extend Session and JWT types for TypeScript
 declare module "next-auth" {
   interface Session {
     user: {
@@ -11,6 +11,7 @@ declare module "next-auth" {
       email: string;
       role: string;
     };
+    accessToken?: string; // Add accessToken to the session
   }
 
   interface User {
@@ -25,6 +26,7 @@ declare module "next-auth/jwt" {
     id: string;
     email: string;
     role: string;
+    accessToken?: string; // Add accessToken to the JWT
   }
 }
 
@@ -49,7 +51,7 @@ export const authOptions: NextAuthOptions = {
         where: { email: user.email },
       });
 
-      console.log("Existing user from DB:", existingUser); // Log the fetched user
+      console.log("Existing user from DB:", existingUser);
 
       if (existingUser) {
         if (account?.provider === "google" && !existingUser.google_id) {
@@ -68,17 +70,23 @@ export const authOptions: NextAuthOptions = {
         session.user = {
           id: token.id,
           email: token.email,
-          role: token.role || "user", // Default to "user" if role is not set
+          role: token.role || "user",
         };
+        session.accessToken = token.accessToken; // Attach the accessToken
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role || "user"; // Ensure role is set
+        token.role = user.role || "user";
       }
+
+      if (account?.access_token) {
+        token.accessToken = account.access_token; // Store access token from provider
+      }
+
       return token;
     },
   },

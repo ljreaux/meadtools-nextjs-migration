@@ -1,6 +1,6 @@
-import INGREDIENTS from "@/lib/db/initialIngredientData";
-import YEASTS, { Yeast } from "@/lib/db/initialYeastData";
-import prisma from "@/lib/prisma";
+import INGREDIENTS from "../lib/db/initialIngredientData";
+import YEASTS, { Yeast } from "../lib/db/initialYeastData";
+import prisma from "../lib/prisma";
 import bcrypt from "bcrypt";
 
 if (process.env.NODE_ENV === "production") {

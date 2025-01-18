@@ -1,10 +1,10 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider = "prisma-client-js"
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -81,25 +81,36 @@ model recipes {
 }
 
 model users {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique @db.VarChar(255)
-  password    String?   @db.VarChar(255)
-  google_id   String?   @unique @db.VarChar(255)
-  role        String?   @default("user") @db.VarChar(255)
-  hydro_token String?   @unique
-  brews       brews[]
-  devices     devices[]
-  recipes     recipes[]
+  id              Int       @id @default(autoincrement())
+  email           String    @unique @db.VarChar(255)
+  password        String?   @db.VarChar(255)
+  google_id       String?   @db.VarChar(255)
+  role            String?   @default("user") @db.VarChar(255)
+  hydro_token     String?   @unique
+  public_username String?   @db.VarChar(50)
+  brews           brews[]
+  devices         devices[]
+  recipes         recipes[]
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(cuid()) // Add cuid() as the default
   email         String?   @unique
   name          String?
   emailVerified DateTime?
   image         String?
-  accounts      Account[]
-  sessions      Session[]
+  accounts      Account[] // Use accounts as relation name
+  sessions      Session[] // Use sessions as relation name
+}
+
+model yeasts {
+  id                   Int     @id @default(autoincrement())
+  brand                String  @db.VarChar(255)
+  name                 String  @db.VarChar(255)
+  nitrogen_requirement String  @db.VarChar(255)
+  tolerance            Decimal @db.Decimal
+  low_temp             Decimal @db.Decimal
+  high_temp            Decimal @db.Decimal
 }
 
 model Account {
@@ -134,16 +145,6 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-}
-
-model yeasts {
-  id                   Int     @id @default(autoincrement())
-  brand                String  @db.VarChar(255)
-  name                 String  @db.VarChar(255)
-  nitrogen_requirement String  @db.VarChar(255)
-  tolerance            Decimal @db.Decimal
-  low_temp             Decimal @db.Decimal
-  high_temp            Decimal @db.Decimal
 }
 
 enum temp_units {

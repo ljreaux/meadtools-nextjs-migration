@@ -16,7 +16,7 @@ export type Ingredient = {
   translationKey?: string;
 };
 
-type UnitType = {
+export type UnitType = {
   weight: "lbs" | "kg";
   volume: "gal" | "liter";
 };

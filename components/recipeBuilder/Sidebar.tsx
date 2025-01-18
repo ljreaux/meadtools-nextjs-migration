@@ -16,9 +16,11 @@ import {
 function RecipeCalculatorSideBar({
   goTo,
   children,
+  cardNumber,
 }: {
   goTo: (pageNum: number) => void;
   children: JSX.Element;
+  cardNumber: number;
 }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -28,32 +30,32 @@ function RecipeCalculatorSideBar({
   const links = [
     {
       label: t("recipeBuilder.homeHeading"),
-      pageNumber: 0,
+      pageNumber: 1,
       icon: <CookingPot />,
     },
     {
       label: t("nutesHeading"),
-      pageNumber: 1,
+      pageNumber: 2,
       icon: <SmartphoneCharging />,
     },
     {
       label: t("stabilizersHeading"),
-      pageNumber: 3,
+      pageNumber: 4,
       icon: <Pipette />,
     },
     {
       label: t("additivesHeading"),
-      pageNumber: 4,
+      pageNumber: 5,
       icon: <Scale />,
     },
     {
       label: t("notes.title"),
-      pageNumber: 5,
+      pageNumber: 6,
       icon: <NotebookPen />,
     },
     {
       label: t("PDF.title"),
-      pageNumber: 6,
+      pageNumber: 7,
       icon: <FileText />,
     },
   ];
@@ -88,7 +90,8 @@ function RecipeCalculatorSideBar({
             key={idx}
             icon={link.icon}
             label={link.label}
-            clickFn={() => goTo(link.pageNumber)}
+            isActive={link.pageNumber === cardNumber} // Match active state
+            clickFn={() => goTo(link.pageNumber - 1)}
           />
         ))}
         {children}
@@ -101,17 +104,23 @@ function NavItem({
   clickFn,
   icon,
   label,
+  isActive,
 }: {
   clickFn: () => void;
   icon: JSX.Element;
   label: string;
+  isActive: boolean; // Added to highlight active state
 }) {
   return (
     <div className="relative group flex flex-col items-center">
       {/* Icon Link */}
       <button
         onClick={clickFn}
-        className="flex items-center justify-center sm:w-12 sm:h-12 w-8 h-8 bg-background text-foreground rounded-full border border-foreground hover:text-background hover:bg-foreground transition-colors"
+        className={`flex items-center justify-center sm:w-12 sm:h-12 w-8 h-8 rounded-full border border-foreground transition-colors ${
+          isActive
+            ? "bg-foreground text-background"
+            : "bg-background text-foreground hover:text-background hover:bg-foreground"
+        }`}
       >
         {icon}
       </button>
