@@ -32,7 +32,11 @@ function Register() {
 
   return (
     <div className="h-screen flex items-center pt-24 flex-col space-y-4">
-      <AuthForm formText={t("accountPage.register")} authFunction={register} />
+      <AuthForm
+        formText={t("accountPage.register")}
+        authFunction={register}
+        formType="register"
+      />
       <button
         onClick={() => router.push("/login")}
         className="font-bold underline transition-all text-foreground hover:text-sidebar"

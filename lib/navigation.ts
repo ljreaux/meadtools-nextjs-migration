@@ -11,6 +11,10 @@ export const mainCalcs = [
     path: "/stabilizers/",
     label: "calculators.extraCalcs.stabilizers",
   },
+  {
+    path: "public-recipes",
+    label: "publicRecipes.title",
+  },
 ];
 
 export const extraCalculatorLinks = [

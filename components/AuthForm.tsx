@@ -5,27 +5,39 @@ import { Input } from "./ui/input";
 import { useState } from "react";
 import { PasswordInput } from "./PasswordInput";
 import { LoadingButton } from "./ui/LoadingButton";
+import Tooltip from "./Tooltips";
 
 function AuthForm({
   formText,
   authFunction,
+  formType,
 }: {
   formText: string;
-  authFunction: (email: string, password: string) => Promise<void>;
+  authFunction: (
+    email: string,
+    password: string,
+    public_username?: string
+  ) => Promise<void>;
+  formType?: "register";
 }) {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    email: string;
+    password: string;
+    public_username?: string;
+  }>({
     email: "",
     password: "",
+    public_username: "",
   });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const { email, password } = formData;
+    const { email, password, public_username } = formData;
     setLoading(true);
     try {
-      await authFunction(email, password);
+      await authFunction(email, password, public_username);
     } catch (error) {
       console.error("Authentication failed:", error);
     } finally {
@@ -50,6 +62,25 @@ function AuthForm({
         className="col-span-2"
         disabled={loading} // Disable input during loading
       />
+
+      {formType === "register" && (
+        <>
+          <label htmlFor="public_username">
+            {t("publicUsername.label")}
+            <Tooltip body={t("publicUsername.description")}></Tooltip>
+          </label>
+          <Input
+            type="text"
+            id="public_username"
+            value={formData.public_username}
+            onChange={(e) =>
+              setFormData({ ...formData, public_username: e.target.value })
+            }
+            className="col-span-2"
+            disabled={loading} // Disable input during loading
+          />
+        </>
+      )}
 
       <label htmlFor="password">{t("accountPage.password")}</label>
       <PasswordInput

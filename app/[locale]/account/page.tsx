@@ -198,18 +198,15 @@ const CreateUsernamePopup = ({
     <AlertDialog open={isDialogOpen} onOpenChange={closeDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Set Your Public Username</AlertDialogTitle>
+          <AlertDialogTitle>{t("publicUsername.title")}</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-2">
-            To make your recipes easier to share and identify, we need you to
-            create a public username. This username will be displayed alongside
-            your recipes on the public recipe list and will help others
-            recognize your contributions.
+            {t("publicUsername.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div>
           <Input
             type="text"
-            placeholder="Enter a public username"
+            placeholder={t("publicUsername.placeholder")}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -224,7 +221,7 @@ const CreateUsernamePopup = ({
               closeDialog();
             }}
           >
-            {t("submit")}
+            {t("SUBMIT")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
