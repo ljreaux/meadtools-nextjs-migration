@@ -167,6 +167,113 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const updatePublicUsername = async (username: string) => {
+    if (!user) {
+      toast({
+        title: t("auth.username.error.title", "Update Failed"),
+        description: t(
+          "auth.username.error.description",
+          "You must be logged in to update your username."
+        ),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/auth/create-username", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token || session?.user?.id}`,
+        },
+        body: JSON.stringify({ public_username: username }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(
+          errorData.error ||
+            t(
+              "auth.username.error.description",
+              "An error occurred while updating your username."
+            )
+        );
+      }
+
+      const data = await res.json();
+
+      // Update local user data with the new username
+      setUser((prevUser) =>
+        prevUser ? { ...prevUser, public_username: data.public_username } : null
+      );
+
+      toast({
+        title: t("auth.username.success.title", "Username Updated!"),
+        description: t(
+          "auth.username.success.description",
+          "Your public username has been successfully updated."
+        ),
+        variant: "default",
+      });
+    } catch (error: any) {
+      toast({
+        title: t("auth.username.error.title", "Update Failed"),
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+  const deleteRecipe = async (recipeId: string): Promise<void> => {
+    if (!user) {
+      toast({
+        title: t("auth.delete.error.title", "Delete Failed"),
+        description: t(
+          "auth.delete.error.description",
+          "You must be logged in to delete a recipe."
+        ),
+        variant: "destructive",
+      });
+      throw new Error("User not authenticated"); // Re-throw the error
+    }
+
+    try {
+      const res = await fetch(`/api/recipes/${recipeId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token || session?.user?.id}`,
+        },
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(
+          errorData.error ||
+            t("auth.delete.error.description", "Failed to delete recipe.")
+        );
+      }
+
+      const data = await res.json();
+
+      toast({
+        title: t("auth.delete.success.title", "Recipe Deleted"),
+        description: t(
+          "auth.delete.success.description",
+          `${data.message || "Recipe has been successfully deleted."}`
+        ),
+        variant: "default",
+      });
+    } catch (error: any) {
+      // Show toast for error but re-throw it for the calling function to handle
+      toast({
+        title: t("auth.delete.error.title", "Delete Failed"),
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error; // Re-throw the error
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -202,8 +309,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return res.json();
         },
         isLoggedIn: !!user,
-        updatePublicUsername: async () => {}, // Add update logic if needed
-        deleteRecipe: async () => {}, // Add delete logic if needed
+        updatePublicUsername,
+        deleteRecipe,
       }}
     >
       <SessionProvider>{children}</SessionProvider>
