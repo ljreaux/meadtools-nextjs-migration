@@ -138,12 +138,12 @@ const PrintableIframe: React.FC<PrintableIframeProps> = ({ content }) => {
         title="MeadTools Recipe PDF"
         srcDoc="<html><head></head><body></body></html>"
       />
-      <div className="absolute flex items-center space-x-1 sm:space-x-2 right-1 sm:right-2 top-2 md:right-10">
-        <span className="flex gap-2 mr-2">
+      <div className="absolute flex items-center space-x-2 right-1 sm:right-2 top-2 md:right-10 flex-wrap space-y-1">
+        <span className="flex sm:gap-2 mr-2 gap-1">
           <Button onClick={handleZoomOut} variant="secondary">
             <Minus />
           </Button>
-          <span className="relative">
+          <span className="relative flex items-center">
             <Input
               value={inputValue}
               onChange={handleInputChange}

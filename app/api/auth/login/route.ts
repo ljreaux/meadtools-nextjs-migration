@@ -35,6 +35,7 @@ export async function POST(req: NextRequest) {
         refreshToken,
         role: user.role,
         email: user.email,
+        id: user.id,
       });
     } else {
       return NextResponse.json(

@@ -6,7 +6,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { NutrientProvider } from "./NutrientProvider";
 import {
   Additive,
   blankAdditive,
@@ -17,37 +16,49 @@ import {
   initialData,
   Recipe,
   RecipeData,
-  UnitType,
 } from "@/types/recipeDataTypes";
 import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { blendValues } from "@/lib/utils/blendValues";
 import lodash from "lodash";
 import { useTranslation } from "react-i18next";
+import { SavedNutrientProvider } from "./SavedNutrientProvider";
+import { FullNutrientData } from "@/types/nutrientTypes";
 
 const RecipeContext = createContext<Recipe | undefined>(undefined);
 
-export default function RecipeProvider({
+export default function SavedRecipeProvider({
   children,
-
-  recipeName: providedName,
+  recipe,
 }: {
   children: ReactNode;
-  // for main recipe builder local storage
-
-  recipeName?: string;
+  // for saved user recipes
+  recipe: {
+    id: number;
+    name: string;
+    recipeData: RecipeData;
+    nutrientData: FullNutrientData;
+    primaryNotes: [string, string][];
+    secondaryNotes: [string, string][];
+    user_id: string;
+    yanContribution: string[];
+    users: {
+      public_username: string | null;
+    };
+  };
 }) {
   const { t } = useTranslation();
   const [firstMount, setFirstMount] = useState(true);
-  const [preferredUnits, setPreferredUnits] = useState("US");
 
-  const [recipeData, setRecipeData] = useState(initialData);
+  const [recipeData, setRecipeData] = useState(
+    recipe.recipeData || initialData
+  );
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [additiveList, setAdditiveList] = useState<Additive[]>([]);
   const [loadingAdditives, setLoadingAdditives] = useState(true);
-  const [primaryNotes, setPrimaryNotes] = useState([blankNote]);
-  const [secondaryNotes, setSecondaryNotes] = useState([blankNote]);
+  const [primaryNotes, setPrimaryNotes] = useState(recipe.primaryNotes);
+  const [secondaryNotes, setSecondaryNotes] = useState(recipe.secondaryNotes);
 
   const [backsweetenedFG, setBacksweetenedFG] = useState(1);
   const [totalVolume, setTotalVolume] = useState(0);
@@ -57,7 +68,7 @@ export default function RecipeProvider({
   const [addingStabilizers, setAddingStabilizers] = useState(false);
   const [takingPh, setTakingPh] = useState(false);
   const [phReading, setPhReading] = useState("3.6");
-  const [recipeName, setRecipeName] = useState(providedName || "");
+  const [recipeName, setRecipeName] = useState(recipe.name || "");
 
   const addIngredient = () => {
     setRecipeData((prev) => ({
@@ -386,45 +397,6 @@ export default function RecipeProvider({
     setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const retrieveStoredData = () => {
-    // get recipe Data
-    const storedData = localStorage.getItem("recipeData") || "false";
-    const parsed = JSON.parse(storedData) as RecipeData | false;
-    if (parsed) setRecipeData(parsed);
-
-    // get notes data
-    const primaryNotes = localStorage.getItem("primaryNotes") || "false";
-    const secondaryNotes = localStorage.getItem("secondaryNotes") || "false";
-    const parsedPrimaryNotes = JSON.parse(primaryNotes) as
-      | [string, string][]
-      | false;
-    if (parsedPrimaryNotes) {
-      setPrimaryNotes(parsedPrimaryNotes);
-    }
-    const parsedSecondaryNotes = JSON.parse(secondaryNotes) as
-      | [string, string][]
-      | false;
-    if (parsedSecondaryNotes) {
-      setSecondaryNotes(parsedSecondaryNotes);
-    }
-
-    // get stabilizers data
-    const storedStabilizers =
-      localStorage.getItem("addingStabilizers") || "false";
-    const parsedStabilizers = JSON.parse(storedStabilizers) as
-      | { adding: boolean; pH: boolean; pHReading: string }
-      | false;
-    if (parsedStabilizers) {
-      setAddingStabilizers(parsedStabilizers.adding);
-      setTakingPh(parsedStabilizers.pH);
-      setPhReading(parsedStabilizers.pHReading);
-    }
-    const storedName = localStorage.getItem("recipeName");
-    if (storedName) {
-      setRecipeName(storedName);
-    }
-  };
-
   // fetch initial ingredient data
   useEffect(() => {
     const fetchIngredients = async () => {
@@ -453,12 +425,6 @@ export default function RecipeProvider({
 
     fetchIngredients();
     fetchAdditives();
-
-    retrieveStoredData();
-    const units = localStorage.getItem("units");
-    if (units) {
-      setPreferredUnits(units);
-    }
 
     setFirstMount(false);
   }, []);
@@ -630,46 +596,6 @@ export default function RecipeProvider({
     addingStabilizers,
   ]);
 
-  // default to users preferred units when recipe is reset. The abv check is required to ensure it doesn't change the state of the recipe if there is data in local storage.
-  useEffect(() => {
-    if (recipeData.ABV < 1) {
-      const units: UnitType =
-        preferredUnits === "US"
-          ? {
-              weight: "lbs",
-              volume: "gal",
-            }
-          : {
-              weight: "kg",
-              volume: "liter",
-            };
-      setRecipeData((prev) => ({ ...prev, units }));
-    }
-  }, [preferredUnits]);
-
-  useEffect(() => {
-    localStorage.setItem("recipeData", JSON.stringify(recipeData));
-    localStorage.setItem("primaryNotes", JSON.stringify(primaryNotes));
-    localStorage.setItem("secondaryNotes", JSON.stringify(secondaryNotes));
-    localStorage.setItem("recipeName", recipeName);
-    localStorage.setItem(
-      "addingStabilizers",
-      JSON.stringify({
-        adding: addingStabilizers,
-        pH: takingPh,
-        pHReading: phReading,
-      })
-    );
-  }, [
-    recipeData,
-    primaryNotes,
-    secondaryNotes,
-    addingStabilizers,
-    takingPh,
-    phReading,
-    recipeName,
-  ]);
-
   return (
     <RecipeContext.Provider
       value={{
@@ -724,18 +650,15 @@ export default function RecipeProvider({
           onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
             setRecipeName(e.target.value),
         },
+        public_username: recipe.users.public_username,
       }}
     >
-      <NutrientProvider
-        recipeData={{
-          volume: recipeData.volume,
-          sg: (1 + recipeData.OG - parseFloat(recipeData.FG)).toFixed(3),
-          offset: recipeData.offset,
-          numberOfAdditions: "1",
-        }}
+      <SavedNutrientProvider
+        storedFullData={recipe.nutrientData}
+        storedYanContribution={recipe.yanContribution}
       >
         {children}
-      </NutrientProvider>
+      </SavedNutrientProvider>
     </RecipeContext.Provider>
   );
 }

@@ -16,6 +16,7 @@ interface AuthContextType {
   fetchAuthenticatedPost: (endpoint: string, body: any) => Promise<any>;
   isLoggedIn: boolean;
   updatePublicUsername: (username: string) => void;
+  deleteRecipe: (id: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,70 +30,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("accessToken");
-    const googleToastShown = !!JSON.parse(
-      JSON.stringify(localStorage.getItem("googleToastShown"))
-    );
+    const fetchInternalUser = async () => {
+      try {
+        const storedToken = localStorage.getItem("accessToken");
+        if (!storedToken && status !== "authenticated") {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
 
-    if (status === "authenticated" && session?.user) {
-      if (googleToastShown) {
-        toast({
-          title: t("auth.googleLogin.success.title", "Logged in with Google!"),
-          description: t(
-            "auth.googleLogin.success.description",
-            "Welcome back!"
-          ),
-          variant: "default",
+        // Fetch user data using token or Google session
+        const res = await fetch("/api/auth/account-info", {
+          headers: {
+            Authorization: `Bearer ${session?.accessToken || storedToken}`,
+          },
         });
-        localStorage.removeItem("googleToastShown");
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch user data");
+        }
+
+        const data = await res.json();
+        console.log("Fetched user data on init:", data);
+
+        setUser({
+          id: data.user.id,
+          email: data.user.email,
+          role: data.user.role || "user",
+        });
+        setToken(storedToken); // Maintain token for custom users
+      } catch (error) {
+        console.error("Error fetching internal user on init:", error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setUser({
-        id: session.user.id,
-        email: session.user.email!,
-        role: session.user.role!,
-      });
-      setToken(null); // Clear custom token
-    } else if (storedToken) {
-      setToken(storedToken);
-      fetch("/api/auth/account-info", {
-        headers: {
-          Authorization: `Bearer ${storedToken}`,
-        },
-      })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to fetch user data");
-          return res.json();
-        })
-        .then((data) => {
-          setUser(data);
-        })
-        .catch(() => {
-          localStorage.removeItem("accessToken");
-          setToken(null);
-        });
-    } else {
-      setUser(null);
-    }
+    };
 
-    setLoading(false);
+    fetchInternalUser();
   }, [session, status]);
-
-  const loginWithGoogle = async () => {
-    try {
-      localStorage.setItem("googleToastShown", "true");
-      await signIn("google");
-    } catch (error) {
-      console.error(error);
-      toast({
-        title: t("auth.googleLogin.error.title", "Google Login Failed"),
-        description: t(
-          "auth.googleLogin.error.description",
-          "Please try again later."
-        ),
-        variant: "destructive",
-      });
-    }
-  };
 
   const loginWithCredentials = async (email: string, password: string) => {
     try {
@@ -134,14 +110,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const register = async (email: string, password: string) => {
+  const register = async (
+    email: string,
+    password: string,
+    public_username?: string
+  ) => {
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, public_username }),
       });
 
       if (!res.ok) {
@@ -175,11 +155,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = async () => {
+    await signOut({ redirect: false }); // For Google sessions
     setUser(null);
     setToken(null);
     localStorage.removeItem("accessToken");
-
-    await signOut({ redirect: false });
 
     toast({
       title: t("auth.logout.success.title", "Logged out successfully."),
@@ -188,131 +167,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
-  const fetchAuthenticatedData = async (endpoint: string) => {
-    if (!user) throw new Error("User not authenticated");
-
-    const headers: Record<string, string> = {};
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    } else if (session?.user) {
-      headers["Authorization"] = `Bearer ${session.user.id}`;
-    }
-
-    const res = await fetch(endpoint, { headers });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        logout();
-        throw new Error("Session expired. Please log in again.");
-      }
-      throw new Error("Failed to fetch authenticated data");
-    }
-
-    return res.json();
-  };
-
-  const fetchAuthenticatedPost = async (endpoint: string, body: any) => {
-    if (!user) throw new Error("User not authenticated");
-
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-    };
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    } else if (session?.user) {
-      headers["Authorization"] = `Bearer ${session.user.id}`;
-    }
-
-    const res = await fetch(endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-    });
-
-    if (!res.ok) {
-      if (res.status === 401) {
-        logout();
-        throw new Error("Session expired. Please log in again.");
-      }
-      const errorData = await res.json();
-      throw new Error(errorData.error || "Failed to fetch authenticated data");
-    }
-
-    return res.json();
-  };
-  const updatePublicUsername = async (username: string) => {
-    if (!user) {
-      toast({
-        title: t("auth.username.error.title", "Update Failed"),
-        description: t(
-          "auth.username.error.description",
-          "You must be logged in to update your username."
-        ),
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/auth/create-username", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token || session?.user?.id}`,
-        },
-        body: JSON.stringify({ public_username: username }),
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(
-          errorData.error ||
-            t(
-              "auth.username.error.description",
-              "An error occurred while updating your username."
-            )
-        );
-      }
-
-      const data = await res.json();
-
-      // Update local user data with the new username
-      setUser((prevUser) =>
-        prevUser ? { ...prevUser, public_username: data.public_username } : null
-      );
-
-      toast({
-        title: t("auth.username.success.title", "Username Updated!"),
-        description: t(
-          "auth.username.success.description",
-          "Your public username has been successfully updated."
-        ),
-        variant: "default",
-      });
-    } catch (error: any) {
-      toast({
-        title: t("auth.username.error.title", "Update Failed"),
-        description: error.message,
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
     <AuthContext.Provider
       value={{
         user,
         loading,
-        loginWithGoogle,
+        loginWithGoogle: () => signIn("google"),
         loginWithCredentials,
         register,
         logout,
-        fetchAuthenticatedData,
-        fetchAuthenticatedPost,
+        fetchAuthenticatedData: async (endpoint: string) => {
+          const headers: Record<string, string> = {
+            Authorization: `Bearer ${token || session?.accessToken}`,
+          };
+          const res = await fetch(endpoint, { headers });
+          if (!res.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          return res.json();
+        },
+        fetchAuthenticatedPost: async (endpoint: string, body: any) => {
+          const headers: Record<string, string> = {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token || session?.accessToken}`,
+          };
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(body),
+          });
+          if (!res.ok) {
+            throw new Error("Failed to fetch data");
+          }
+          return res.json();
+        },
         isLoggedIn: !!user,
-        updatePublicUsername,
+        updatePublicUsername: async () => {}, // Add update logic if needed
+        deleteRecipe: async () => {}, // Add delete logic if needed
       }}
     >
       <SessionProvider>{children}</SessionProvider>

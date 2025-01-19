@@ -1,3 +1,16 @@
+interface RecipeData {
+  userId: number;
+  name: string;
+  recipeData: string;
+  yanFromSource?: string | null;
+  yanContribution: string;
+  nutrientData: string;
+  advanced: boolean;
+  nuteInfo?: string | null;
+  primaryNotes?: string[];
+  secondaryNotes?: string[];
+  private?: boolean;
+}
 import prisma from "@/lib/prisma";
 
 function concatNotes(notes: string[]): string[][] {
@@ -11,6 +24,7 @@ export async function getAllRecipesForUser(userId: number) {
   try {
     const recipes = await prisma.recipes.findMany({
       where: { user_id: userId },
+      include: { users: { select: { public_username: true } } },
     });
 
     const parsedRecipes = recipes.map((rec) => {
@@ -20,6 +34,7 @@ export async function getAllRecipesForUser(userId: number) {
         ...rec,
         primaryNotes,
         secondaryNotes,
+        public_username: rec.users?.public_username || null,
       };
     });
 
@@ -32,7 +47,10 @@ export async function getAllRecipesForUser(userId: number) {
 
 export async function getAllRecipes() {
   try {
-    const recipes = await prisma.recipes.findMany();
+    const recipes = await prisma.recipes.findMany({
+      include: { users: { select: { public_username: true } } },
+    });
+
     const parsedRecipes = recipes.map((rec) => {
       const primaryNotes = concatNotes(rec.primaryNotes);
       const secondaryNotes = concatNotes(rec.secondaryNotes);
@@ -40,6 +58,7 @@ export async function getAllRecipes() {
         ...rec,
         primaryNotes,
         secondaryNotes,
+        public_username: rec.users?.public_username || null,
       };
     });
 
@@ -48,20 +67,6 @@ export async function getAllRecipes() {
     console.error("Error fetching all recipes:", error);
     throw new Error("Could not fetch recipes");
   }
-}
-
-interface RecipeData {
-  userId: number;
-  name: string;
-  recipeData: string;
-  yanFromSource?: string | null;
-  yanContribution: string;
-  nutrientData: string;
-  advanced: boolean;
-  nuteInfo?: string | null;
-  primaryNotes?: string[];
-  secondaryNotes?: string[];
-  private?: boolean;
 }
 
 export async function createRecipe(data: RecipeData) {
@@ -81,16 +86,19 @@ export async function createRecipe(data: RecipeData) {
     },
   });
 }
+
 export async function getRecipeInfo(recipeId: number) {
   try {
     const recipe = await prisma.recipes.findUnique({
       where: { id: recipeId },
+      include: { users: { select: { public_username: true } } },
     });
     if (recipe)
       return {
         ...recipe,
         primaryNotes: concatNotes(recipe?.primaryNotes),
         secondaryNotes: concatNotes(recipe?.secondaryNotes),
+        public_username: recipe.users?.public_username || null,
       };
   } catch (error) {
     console.error("Error fetching recipe info:", error);

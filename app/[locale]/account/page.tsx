@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import LanguageSwitcher from "@/components/ui/language-switcher";
+import { LoadingButton } from "@/components/ui/LoadingButton";
 
 type Recipe = {
   id: number;
@@ -60,9 +61,25 @@ type UserData = {
 
 function Account() {
   const { t } = useTranslation();
-  const { fetchAuthenticatedData, logout } = useAuth();
+  const { fetchAuthenticatedData, logout, deleteRecipe } = useAuth();
   const [data, setData] = useState<UserData | null>(null);
   const [isUsernameDialogOpen, setUsernameDialogOpen] = useState(false);
+
+  const deleteIndividualRecipe = async (id: number) => {
+    try {
+      await deleteRecipe(id.toString());
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              recipes: prev.recipes.filter((r) => r.id !== id),
+            }
+          : null
+      );
+    } catch (err) {
+      console.error("Error deleting recipe:", err);
+    }
+  };
 
   useEffect(() => {
     fetchAuthenticatedData("/api/auth/account-info")
@@ -79,11 +96,11 @@ function Account() {
 
   return (
     <div className="p-12 py-8 rounded-xl bg-background w-11/12 max-w-[1000px] relative">
-      <div className="absolute right-4 top-4">
+      <div className="absolute right-4 top-4 flex flex-col sm:flex-row">
         <SettingsDialog username={user.public_username} />
         <Button onClick={logout} variant={"ghost"}>
           <p className="sr-only">Log Out</p>
-          <LogOut />{" "}
+          <LogOut />
         </Button>
       </div>
       <h1 className="text-3xl text-center">{t("accountPage.title")}</h1>
@@ -98,7 +115,13 @@ function Account() {
         <h2 className="text-2xl">{t("accountPage.myRecipes")}</h2>
         <div className="flex flex-wrap gap-4 justify-center py-6">
           {recipes.length > 0 ? (
-            recipes.map((rec) => <RecipeCard recipe={rec} key={rec.id} />)
+            recipes.map((rec) => (
+              <RecipeCard
+                recipe={rec}
+                key={rec.id}
+                deleteRecipe={() => deleteIndividualRecipe(rec.id)}
+              />
+            ))
           ) : (
             <p className="mr-auto">
               You currently do not have any saved recipes.
@@ -112,8 +135,27 @@ function Account() {
 
 export default Account;
 
-const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
+const RecipeCard = ({
+  recipe,
+  deleteRecipe,
+}: {
+  recipe: Recipe;
+  deleteRecipe: () => Promise<void>;
+}) => {
   const { t } = useTranslation();
+  const [isDeleting, setIsDeleting] = React.useState(false);
+
+  const handleDelete = async () => {
+    setIsDeleting(true); // Set loading state to true
+    try {
+      await deleteRecipe();
+    } catch (err) {
+      console.error("Error deleting recipe:", err);
+    } finally {
+      setIsDeleting(false); // Reset loading state
+    }
+  };
+
   return (
     <div className="grid text-center gap-1 p-4 rounded-xl border-secondary border">
       <h2 className="text-2xl">{recipe.name}</h2>
@@ -131,7 +173,13 @@ const RecipeCard = ({ recipe }: { recipe: Recipe }) => {
           {t("PDF.title")}
         </Link>
       </span>
-      <Button variant={"destructive"}> {t("accountPage.deleteRecipe")}</Button>
+      <LoadingButton
+        variant="destructive"
+        loading={isDeleting}
+        onClick={handleDelete}
+      >
+        {t("accountPage.deleteRecipe")}
+      </LoadingButton>
     </div>
   );
 };

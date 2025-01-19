@@ -11,7 +11,6 @@ function RecipeView({
   nutrientData: NutrientType;
   recipeData: Recipe;
 }) {
-  const recipeName = "";
   const {
     selected,
     inputs,
@@ -36,6 +35,8 @@ function RecipeView({
     sulfite,
     campden,
     addingStabilizers,
+    recipeNameProps,
+    public_username,
   } = recipeData;
 
   const nuteNames = [
@@ -81,8 +82,14 @@ function RecipeView({
       <div className="page-one">
         <header>
           <img src="/pdf-logo.png" />
-
-          <h1>{recipeName ? recipeName : t("PDF.pageTitle")}</h1>
+          <span>
+            <h1>
+              {recipeNameProps.value
+                ? recipeNameProps.value
+                : t("PDF.pageTitle")}
+            </h1>
+            {public_username && <p>{t("byUser", { public_username })}</p>}
+          </span>
         </header>
         <section>
           <table>

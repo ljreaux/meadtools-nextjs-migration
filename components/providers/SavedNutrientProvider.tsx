@@ -3,7 +3,6 @@ import { toBrix } from "@/lib/utils/unitConverter";
 import {
   FullNutrientData,
   GoFermType,
-  initialFullData,
   maxGpl,
   NitrogenRequirement,
   NutrientType,
@@ -22,23 +21,20 @@ import {
 
 const NutrientContext = createContext<NutrientType | undefined>(undefined);
 
-export const NutrientProvider = ({
+export const SavedNutrientProvider = ({
   children,
-  recipeData,
+  storedFullData,
+  storedYanContribution,
 }: {
   children: ReactNode;
-  recipeData?: {
-    volume: string;
-    sg: string;
-    offset: string;
-    numberOfAdditions: string;
-  };
+  storedFullData: FullNutrientData;
+  storedYanContribution: string[];
 }) => {
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
   const [loadingYeasts, setLoadingYeasts] = useState(true);
 
-  const [fullData, setFullData] = useState<FullNutrientData>(initialFullData);
+  const [fullData, setFullData] = useState<FullNutrientData>(storedFullData);
 
   const [selectedGpl, setSelectedGpl] = useState(
     maxGpl.tosna.value as string[]
@@ -59,12 +55,9 @@ export const NutrientProvider = ({
     perAddition: [],
   });
 
-  const [yanContributions, setYanContributions] = useState([
-    "40",
-    "100",
-    "210",
-    "0",
-  ]);
+  const [yanContributions, setYanContributions] = useState(
+    storedYanContribution
+  );
   const [otherNutrientName, setOtherNutrientName] = useState("");
   const [remainingYan, setRemainingYan] = useState(0);
   const [providedYan, setProvidedYan] = useState(["0", "0", "0", "0"]);
@@ -284,34 +277,6 @@ export const NutrientProvider = ({
       }
     };
 
-    const getStoredData = () => {
-      const storedData = localStorage.getItem("nutrientData") || "false";
-      const parsedData = JSON.parse(storedData);
-      if (parsedData) {
-        setFullData(parsedData);
-      }
-
-      const storedYan = localStorage.getItem("yanContribution") || "false";
-      const parsedYan = JSON.parse(storedYan) as number[] | false;
-      if (parsedYan) {
-        setYanContributions(parsedYan.map(String));
-      }
-
-      const storedOtherName = localStorage.getItem("otherNutrientName");
-      if (storedOtherName) {
-        setOtherNutrientName(storedOtherName);
-      }
-
-      const storedSelectedGpl = localStorage.getItem("selectedGpl") || "false";
-      const parsedSelectedGpl = JSON.parse(storedSelectedGpl) as
-        | string[]
-        | false;
-      if (parsedSelectedGpl) {
-        setSelectedGpl(parsedSelectedGpl);
-      }
-    };
-
-    getStoredData();
     fetchYeasts();
   }, []);
 
@@ -519,30 +484,6 @@ export const NutrientProvider = ({
     yanContributions,
     nuteArr,
   ]);
-
-  useEffect(() => {
-    if (recipeData)
-      setFullData((prev) => ({
-        ...prev,
-        inputs: { ...prev.inputs, ...recipeData },
-      }));
-  }, [recipeData]);
-
-  useEffect(() => {
-    localStorage.setItem("nutrientData", JSON.stringify(fullData));
-  }, [fullData]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "yanContribution",
-      JSON.stringify(yanContributions.map(parseFloat))
-    );
-    localStorage.setItem("selectedGpl", JSON.stringify(selectedGpl));
-  }, [yanContributions, selectedGpl]);
-
-  useEffect(() => {
-    localStorage.setItem("otherNutrientName", otherNutrientName);
-  }, [otherNutrientName]);
 
   // Expose only the necessary state to the UI
   const uiState = {
