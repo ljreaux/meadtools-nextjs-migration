@@ -1,11 +1,11 @@
 import React from "react";
-import { useRecipe } from "../providers/RecipeProvider";
 import { Input } from "../ui/input";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
+import { Recipe } from "@/types/recipeDataTypes";
 
-function Results() {
+function Results({ useRecipe }: { useRecipe: () => Recipe }) {
   const {
     OG,
     FG,

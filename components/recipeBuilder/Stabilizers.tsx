@@ -1,12 +1,12 @@
 import React from "react";
 import { Switch } from "../ui/switch";
-import { useRecipe } from "../providers/RecipeProvider";
 import { useTranslation } from "react-i18next";
 import { Input } from "../ui/input";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
 import Tooltip from "../Tooltips";
+import { Recipe } from "@/types/recipeDataTypes";
 
-function Stabilizers() {
+function Stabilizers({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
   const {
     addingStabilizers,

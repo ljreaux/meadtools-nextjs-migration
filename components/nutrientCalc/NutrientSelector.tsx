@@ -1,6 +1,5 @@
 import React from "react";
 import { Input } from "../ui/input";
-import { useNutrients } from "../providers/NutrientProvider";
 import {
   Select,
   SelectContent,
@@ -22,8 +21,13 @@ import {
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { cn } from "@/lib/utils";
 import { Switch } from "../ui/switch";
+import { NutrientType } from "@/types/nutrientTypes";
 
-function NutrientSelector() {
+function NutrientSelector({
+  useNutrients,
+}: {
+  useNutrients: () => NutrientType;
+}) {
   const { t } = useTranslation();
   const {
     selected,
@@ -62,7 +66,12 @@ function NutrientSelector() {
           { value: "Fermaid K", label: "nutrients.fermK" },
           { value: "DAP", label: "nutrients.dap" },
         ].map((label, i) => (
-          <LabeledCheckbox key={label.value + i} label={label} index={i} />
+          <LabeledCheckbox
+            key={label.value + i}
+            label={label}
+            index={i}
+            useNutrients={useNutrients}
+          />
         ))}
         <label className="flex items-center gap-2">
           <Switch
@@ -229,7 +238,9 @@ const SettingsDialog = ({
 const LabeledCheckbox = ({
   index,
   label,
+  useNutrients,
 }: {
+  useNutrients: () => NutrientType;
   index: number;
   label: { value: string; label: string };
 }) => {

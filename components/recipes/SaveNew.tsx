@@ -1,14 +1,13 @@
 "use client";
+
 import React, { useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import { useTranslation } from "react-i18next";
-import Link from "next/link";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { useRouter } from "next/navigation";
-import { useRecipe } from "../providers/RecipeProvider";
-import { useNutrients } from "../providers/NutrientProvider";
-import { resetRecipe } from "@/lib/utils/resetRecipe";
+import { useRecipe } from "../providers/SavedRecipeProvider";
+import { useNutrients } from "../providers/SavedNutrientProvider";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -19,10 +18,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { Save } from "lucide-react";
+import { FilePlus } from "lucide-react";
 import { LoadingButton } from "../ui/LoadingButton";
 
-function SaveRecipe() {
+function SaveNew() {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -39,16 +38,17 @@ function SaveRecipe() {
     sulfite,
     campden,
     notes,
-    recipeNameProps,
   } = useRecipe();
 
   const { fullData, yanContributions } = useNutrients();
 
-  const { isLoggedIn, fetchAuthenticatedPost } = useAuth();
+  const { fetchAuthenticatedPost } = useAuth();
 
   const [checked, setChecked] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  const [recipeName, setRecipeName] = useState("");
 
   const createRecipe = async () => {
     setIsSubmitting(true); // Start loading
@@ -71,9 +71,8 @@ function SaveRecipe() {
     const primaryNotes = notes.primary.flat();
     const secondaryNotes = notes.secondary.flat();
     const advanced = false;
-
     const body = {
-      name: recipeNameProps.value,
+      name: recipeName,
       recipeData,
       yanFromSource: null,
       yanContribution,
@@ -88,7 +87,7 @@ function SaveRecipe() {
     try {
       const response = await fetchAuthenticatedPost("/api/recipes", body);
       console.log("Recipe created successfully:", response.recipe);
-      resetRecipe();
+
       toast({
         description: "Recipe created successfully.",
       });
@@ -108,52 +107,46 @@ function SaveRecipe() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative group flex flex-col items-center">
+        <div className="relative group flex flex-col items-center my-2">
           <button className="flex items-center justify-center sm:w-12 sm:h-12 w-8 h-8 bg-background text-foreground rounded-full border border-foreground hover:text-background hover:bg-foreground transition-colors">
-            <Save />
+            <FilePlus />
           </button>
           <span className="absolute top-1/2 -translate-y-1/2 right-16 whitespace-nowrap px-2 py-1 bg-background text-foreground border border-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity">
-            {t("recipeForm.submit")}
+            {t("changesForm.saveAs")}
           </span>
         </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("recipeForm.title")}</DialogTitle>
-          {isLoggedIn ? (
-            <div className="space-y-4">
-              <label>
-                {t("recipeForm.subtitle")}
-                <Input {...recipeNameProps} />
-              </label>
-              <label className="grid">
-                {t("private")}
-                <Switch checked={checked} onCheckedChange={setChecked} />
-              </label>
-            </div>
-          ) : (
-            <Link
-              href={"/login"}
-              className="flex items-center justify-center gap-4 px-8 py-2 my-4 text-lg border border-solid rounded-lg bg-background text-foreground hover:bg-foreground hover:border-background hover:text-background sm:gap-8 group"
-            >
-              {t("recipeForm.login")}
-            </Link>
-          )}
+          <DialogTitle>{t("changesForm.saveAs")}</DialogTitle>
+
+          <div className="space-y-4">
+            <label>
+              {t("changesForm.subtitle")}
+              <Input
+                value={recipeName}
+                onChange={(e) => setRecipeName(e.target.value)}
+              />
+            </label>
+            <label className="grid">
+              {t("private")}
+              <Switch checked={checked} onCheckedChange={setChecked} />
+            </label>
+          </div>
         </DialogHeader>
-        {isLoggedIn && (
-          <DialogFooter>
-            <LoadingButton
-              onClick={createRecipe}
-              loading={isSubmitting}
-              variant="secondary"
-            >
-              {t("SUBMIT")}
-            </LoadingButton>
-          </DialogFooter>
-        )}
+
+        <DialogFooter>
+          <LoadingButton
+            onClick={createRecipe}
+            loading={isSubmitting}
+            variant="secondary"
+          >
+            {t("SUBMIT")}
+          </LoadingButton>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-export default SaveRecipe;
+export default SaveNew;

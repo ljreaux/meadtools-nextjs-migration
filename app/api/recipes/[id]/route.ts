@@ -60,19 +60,28 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  console.log("Received ID:", id);
+
   const recipeId = parseInt(id);
+  console.log("Parsed Recipe ID:", recipeId);
+
   if (isNaN(recipeId)) {
     return NextResponse.json({ error: "Invalid recipe ID" }, { status: 400 });
   }
+
   // Verify user authentication
   const userOrResponse = await verifyUser(request);
   if (userOrResponse instanceof NextResponse) {
-    return userOrResponse; // Return error response if the user is not verified
+    return userOrResponse;
   }
+
   const userId = userOrResponse;
+  console.log("User ID:", userId);
 
   const isAdmin = await requireAdmin(userId);
   const recipe = await getRecipeInfo(recipeId);
+
+  console.log("Fetched Recipe:", recipe);
 
   if (!recipe) {
     return NextResponse.json({ error: "Recipe not found" }, { status: 404 });
@@ -80,10 +89,16 @@ export async function PATCH(
 
   try {
     const body = await request.json();
+    console.log("Received Body:", body);
+
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+    }
 
     if (userId && (recipe.user_id === userId || isAdmin)) {
-      const updatedIngredient = await updateRecipe(id, body);
-      return NextResponse.json(updatedIngredient);
+      const updatedRecipe = await updateRecipe(recipeId.toString(), body);
+      console.log("Updated Recipe:", updatedRecipe);
+      return NextResponse.json(updatedRecipe);
     } else {
       return NextResponse.json(
         { error: "You are not authorized to update this recipe" },

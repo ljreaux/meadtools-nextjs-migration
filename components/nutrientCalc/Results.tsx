@@ -1,8 +1,8 @@
 import React from "react";
-import { useNutrients } from "../providers/NutrientProvider";
 import InputWithUnits from "./InputWithUnits";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
+import { NutrientType } from "@/types/nutrientTypes";
 
 const goFermKeys = {
   "Go-Ferm": "nuteResults.gfTypes.gf",
@@ -11,7 +11,7 @@ const goFermKeys = {
   none: "nuteResults.gfTypes.none",
 };
 
-function Results() {
+function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
   const { t } = useTranslation();
   const { nutrientAdditions, goFerm, goFermType, remainingYan } =
     useNutrients();

@@ -665,7 +665,7 @@ export default function SavedRecipeProvider({
 export const useRecipe = () => {
   const context = useContext(RecipeContext);
   if (!context) {
-    throw new Error("useRecipe must be used within an RecipeProvider");
+    throw new Error("useRecipe must be used within an SavedRecipeProvider");
   }
   return context;
 };

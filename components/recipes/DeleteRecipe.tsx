@@ -15,12 +15,16 @@ import {
 } from "@radix-ui/react-alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Trash } from "lucide-react";
-import { resetRecipe } from "@/lib/utils/resetRecipe";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../providers/AuthProvider";
+import { useParams } from "next/navigation";
 
-export default function ResetButton() {
+export default function DeleteRecipe() {
   const { toast } = useToast();
   const { t } = useTranslation();
+  const { deleteRecipe } = useAuth();
+  const params = useParams();
+  const recipeId = params?.id;
 
   return (
     <>
@@ -31,7 +35,7 @@ export default function ResetButton() {
               <Trash />
             </button>
             <span className="absolute top-1/2 -translate-y-1/2 right-16 whitespace-nowrap px-2 py-1 bg-background text-foreground border border-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity">
-              {t("recipeBuilder.reset")}
+              {t("accountPage.deleteRecipe")}
             </span>
           </div>
         </AlertDialogTrigger>
@@ -47,15 +51,17 @@ export default function ResetButton() {
             <AlertDialogAction
               className={buttonVariants({ variant: "destructive" })}
               onClick={() => {
-                resetRecipe();
-                toast({
-                  title: "Recipe Reset",
-                  description: `Recipe has been reset.`,
-                });
-                location.reload();
+                if (recipeId && typeof recipeId === "string") {
+                  deleteRecipe(recipeId);
+                  toast({
+                    title: "Recipe Deleted",
+                    description: `Recipe has been deleted.`,
+                  });
+                  window.location.href = "/account"; // Redirect back to account page
+                }
               }}
             >
-              {t("reset")}
+              {t("desktop.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

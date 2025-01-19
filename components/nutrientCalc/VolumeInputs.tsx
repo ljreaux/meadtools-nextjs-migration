@@ -1,6 +1,5 @@
 "use client";
 import { Input } from "../ui/input";
-import { useNutrients } from "../providers/NutrientProvider";
 import {
   Select,
   SelectContent,
@@ -11,8 +10,15 @@ import {
 import { toBrix } from "@/lib/utils/unitConverter";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
+import { NutrientType } from "@/types/nutrientTypes";
 
-function VolumeInputs({ disabled }: { disabled?: boolean }) {
+function VolumeInputs({
+  useNutrients,
+  disabled,
+}: {
+  useNutrients: () => NutrientType;
+  disabled?: boolean;
+}) {
   const { t } = useTranslation();
   const { inputs } = useNutrients();
   const sgNum = isNaN(parseFloat(inputs.sg.value))

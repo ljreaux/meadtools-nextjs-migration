@@ -14,6 +14,7 @@ interface AuthContextType {
   logout: () => void;
   fetchAuthenticatedData: (endpoint: string) => Promise<any>;
   fetchAuthenticatedPost: (endpoint: string, body: any) => Promise<any>;
+  fetchAuthenticatedPatch: (endpoint: string, body: any) => Promise<any>;
   isLoggedIn: boolean;
   updatePublicUsername: (username: string) => void;
   deleteRecipe: (id: string) => Promise<void>;
@@ -274,6 +275,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const fetchAuthenticatedPatch = async (endpoint: string, body: any) => {
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token || session?.accessToken}`,
+    };
+    const res = await fetch(endpoint, {
+      method: "PATCH",
+      headers,
+      body: JSON.stringify(body),
+    });
+    console.log(res);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch data");
+    }
+    return res.json();
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -311,6 +330,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoggedIn: !!user,
         updatePublicUsername,
         deleteRecipe,
+        fetchAuthenticatedPatch,
       }}
     >
       <SessionProvider>{children}</SessionProvider>

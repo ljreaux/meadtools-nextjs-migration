@@ -1,15 +1,15 @@
 import React from "react";
 import { Textarea } from "../ui/textarea";
-import { useRecipe } from "../providers/RecipeProvider";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
+import { Recipe } from "@/types/recipeDataTypes";
 
 type TextAreaProps = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 };
 
-function Notes() {
+function Notes({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
   const {
     notes,

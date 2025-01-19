@@ -1,10 +1,16 @@
 import React from "react";
 import PrintableIframe from "./PrintableIframe";
 import RecipeView from "./RecipeView";
-import { useRecipe } from "../providers/RecipeProvider";
-import { useNutrients } from "../providers/NutrientProvider";
+import { Recipe } from "@/types/recipeDataTypes";
+import { NutrientType } from "@/types/nutrientTypes";
 
-function PDF() {
+function PDF({
+  useRecipe,
+  useNutrients,
+}: {
+  useNutrients: () => NutrientType;
+  useRecipe: () => Recipe;
+}) {
   const nutrientData = useNutrients();
   const recipeData = useRecipe();
   return (

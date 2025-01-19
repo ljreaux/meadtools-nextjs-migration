@@ -1,11 +1,11 @@
 import { FormEvent, useState } from "react";
-import { useRecipe } from "../providers/RecipeProvider";
 import { isValidNumber } from "@/lib/utils/validateInput";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
+import { Recipe } from "@/types/recipeDataTypes";
 
-function ScaleRecipeForm() {
+function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
   const {
     scaleRecipe,

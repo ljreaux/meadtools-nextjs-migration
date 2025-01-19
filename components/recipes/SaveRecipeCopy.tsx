@@ -8,7 +8,6 @@ import { Switch } from "../ui/switch";
 import { useRouter } from "next/navigation";
 import { useRecipe } from "../providers/SavedRecipeProvider";
 import { useNutrients } from "../providers/SavedNutrientProvider";
-import { resetRecipe } from "@/lib/utils/resetRecipe";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -23,7 +22,7 @@ import { Save } from "lucide-react";
 import { LoadingButton } from "../ui/LoadingButton";
 import { Button } from "../ui/button";
 
-function SaveRecipe() {
+function SaveRecipeCopy() {
   const { t } = useTranslation();
   const router = useRouter();
 
@@ -50,6 +49,7 @@ function SaveRecipe() {
   const [checked, setChecked] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
   const { toast } = useToast();
+  const [recipeName, setRecipeName] = useState(recipeNameProps.value);
 
   const createRecipe = async () => {
     setIsSubmitting(true); // Start loading
@@ -72,9 +72,8 @@ function SaveRecipe() {
     const primaryNotes = notes.primary.flat();
     const secondaryNotes = notes.secondary.flat();
     const advanced = false;
-
     const body = {
-      name: recipeNameProps.value,
+      name: recipeName,
       recipeData,
       yanFromSource: null,
       yanContribution,
@@ -83,13 +82,13 @@ function SaveRecipe() {
       nuteInfo: null,
       primaryNotes,
       secondaryNotes,
-      privateRecipe: checked,
+      private: checked,
     };
 
     try {
       const response = await fetchAuthenticatedPost("/api/recipes", body);
       console.log("Recipe created successfully:", response.recipe);
-      resetRecipe();
+
       toast({
         description: "Recipe created successfully.",
       });
@@ -120,7 +119,10 @@ function SaveRecipe() {
             <div className="space-y-4">
               <label>
                 {t("recipeForm.subtitle")}
-                <Input {...recipeNameProps} />
+                <Input
+                  value={recipeName}
+                  onChange={(e) => setRecipeName(e.target.value)}
+                />
               </label>
               <label className="grid">
                 {t("private")}
@@ -152,4 +154,4 @@ function SaveRecipe() {
   );
 }
 
-export default SaveRecipe;
+export default SaveRecipeCopy;

@@ -1,4 +1,5 @@
 "use client";
+
 import useCards from "@/hooks/useCards";
 import VolumeInputs from "./VolumeInputs";
 import YeastDetails from "./YeastDetails";
@@ -8,9 +9,39 @@ import { useTranslation } from "react-i18next";
 import AdditionalDetails from "./AdditionalDetails";
 import Results from "./Results";
 import { CardWrapper } from "../CardWrapper";
+import { useNutrients } from "../providers/NutrientProvider";
+
+const cardConfig = [
+  {
+    key: "card 1",
+    heading: "nutesHeading",
+    components: [
+      <VolumeInputs key="volumeInputs" useNutrients={useNutrients} />,
+      <YeastDetails key="yeastDetails" useNutrients={useNutrients} />,
+      <AdditionalDetails key="additionalDetails" useNutrients={useNutrients} />,
+    ],
+  },
+  {
+    key: "card 2",
+    heading: "nuteResults.label",
+    components: [
+      <NutrientSelector key="nutrientSelector" useNutrients={useNutrients} />,
+      <Results key="results" useNutrients={useNutrients} />,
+    ],
+  },
+];
+
 function NutrientCalculator() {
+  const cards = cardConfig.map(({ key, heading, components }) => (
+    <CardWrapper key={key}>
+      <Heading text={heading} />
+      {components}
+    </CardWrapper>
+  ));
+
   const { card, currentStepIndex, back, next } = useCards(cards);
   const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">
       {card}
@@ -43,17 +74,3 @@ const Heading = ({ text }: { text: string }) => {
   const { t } = useTranslation();
   return <h1 className="text-3xl text-center">{t(text)}</h1>;
 };
-
-const cards = [
-  <CardWrapper>
-    <Heading text="nutesHeading" />
-    <VolumeInputs />
-    <YeastDetails />
-    <AdditionalDetails />
-  </CardWrapper>,
-  <CardWrapper>
-    <Heading text="nuteResults.label" />
-    <NutrientSelector />
-    <Results />
-  </CardWrapper>,
-];

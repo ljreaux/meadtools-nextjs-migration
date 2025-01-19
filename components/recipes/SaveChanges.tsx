@@ -1,14 +1,13 @@
 "use client";
+
 import React, { useState } from "react";
 import { useAuth } from "../providers/AuthProvider";
 import { useTranslation } from "react-i18next";
-import Link from "next/link";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
-import { useRouter } from "next/navigation";
-import { useRecipe } from "../providers/RecipeProvider";
-import { useNutrients } from "../providers/NutrientProvider";
-import { resetRecipe } from "@/lib/utils/resetRecipe";
+import { useRouter, useParams } from "next/navigation";
+import { useRecipe } from "../providers/SavedRecipeProvider";
+import { useNutrients } from "../providers/SavedNutrientProvider";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -22,9 +21,11 @@ import {
 import { Save } from "lucide-react";
 import { LoadingButton } from "../ui/LoadingButton";
 
-function SaveRecipe() {
+function SaveChanges() {
   const { t } = useTranslation();
   const router = useRouter();
+  const params = useParams(); // Get URL parameters
+  const recipeId = params?.id; // Extract recipeId from URL
 
   const {
     ingredients,
@@ -44,14 +45,23 @@ function SaveRecipe() {
 
   const { fullData, yanContributions } = useNutrients();
 
-  const { isLoggedIn, fetchAuthenticatedPost } = useAuth();
+  const { fetchAuthenticatedPatch } = useAuth();
 
   const [checked, setChecked] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const createRecipe = async () => {
-    setIsSubmitting(true); // Start loading
+  const updateRecipe = async () => {
+    if (!recipeId) {
+      toast({
+        title: "Error",
+        description: "Recipe ID is missing.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     const recipeData = JSON.stringify({
       ingredients,
       OG,
@@ -86,22 +96,25 @@ function SaveRecipe() {
     };
 
     try {
-      const response = await fetchAuthenticatedPost("/api/recipes", body);
-      console.log("Recipe created successfully:", response.recipe);
-      resetRecipe();
+      const response = await fetchAuthenticatedPatch(
+        `/api/recipes/${recipeId}`,
+        body
+      );
+      console.log("Recipe updated successfully:", response.recipe);
+
       toast({
-        description: "Recipe created successfully.",
+        description: "Recipe updated successfully.",
       });
       router.push("/account");
     } catch (error: any) {
-      console.error("Error creating recipe:", error.message);
+      console.error("Error updating recipe:", error.message);
       toast({
         title: "Error",
-        description: "There was an error creating your recipe",
+        description: "There was an error updating your recipe",
         variant: "destructive",
       });
     } finally {
-      setIsSubmitting(false); // End loading
+      setIsSubmitting(false);
     }
   };
 
@@ -113,47 +126,38 @@ function SaveRecipe() {
             <Save />
           </button>
           <span className="absolute top-1/2 -translate-y-1/2 right-16 whitespace-nowrap px-2 py-1 bg-background text-foreground border border-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity">
-            {t("recipeForm.submit")}
+            {t("changesForm.submit")}
           </span>
         </div>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t("recipeForm.title")}</DialogTitle>
-          {isLoggedIn ? (
-            <div className="space-y-4">
-              <label>
-                {t("recipeForm.subtitle")}
-                <Input {...recipeNameProps} />
-              </label>
-              <label className="grid">
-                {t("private")}
-                <Switch checked={checked} onCheckedChange={setChecked} />
-              </label>
-            </div>
-          ) : (
-            <Link
-              href={"/login"}
-              className="flex items-center justify-center gap-4 px-8 py-2 my-4 text-lg border border-solid rounded-lg bg-background text-foreground hover:bg-foreground hover:border-background hover:text-background sm:gap-8 group"
-            >
-              {t("recipeForm.login")}
-            </Link>
-          )}
+          <DialogTitle>{t("changesForm.submit")}</DialogTitle>
+
+          <div className="space-y-4">
+            <label>
+              {t("changesForm.subtitle")}
+              <Input {...recipeNameProps} />
+            </label>
+            <label className="grid">
+              {t("private")}
+              <Switch checked={checked} onCheckedChange={setChecked} />
+            </label>
+          </div>
         </DialogHeader>
-        {isLoggedIn && (
-          <DialogFooter>
-            <LoadingButton
-              onClick={createRecipe}
-              loading={isSubmitting}
-              variant="secondary"
-            >
-              {t("SUBMIT")}
-            </LoadingButton>
-          </DialogFooter>
-        )}
+
+        <DialogFooter>
+          <LoadingButton
+            onClick={updateRecipe}
+            loading={isSubmitting}
+            variant="secondary"
+          >
+            {t("SUBMIT")}
+          </LoadingButton>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-export default SaveRecipe;
+export default SaveChanges;

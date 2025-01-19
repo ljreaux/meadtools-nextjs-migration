@@ -1,5 +1,4 @@
 import React from "react";
-import { useRecipe } from "../providers/RecipeProvider";
 import {
   Select,
   SelectContent,
@@ -8,8 +7,9 @@ import {
   SelectValue,
 } from "../ui/select";
 import { useTranslation } from "react-i18next";
+import { Recipe } from "@/types/recipeDataTypes";
 
-function Units() {
+function Units({ useRecipe }: { useRecipe: () => Recipe }) {
   const { units, changeVolumeUnits, changeWeightUnits } = useRecipe();
   const { t } = useTranslation();
   return (

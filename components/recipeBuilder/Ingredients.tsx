@@ -1,5 +1,4 @@
-import { Ingredient, IngredientDetails } from "@/types/recipeDataTypes";
-import { useRecipe } from "../providers/RecipeProvider";
+import { Ingredient, IngredientDetails, Recipe } from "@/types/recipeDataTypes";
 import { Input } from "../ui/input";
 import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
@@ -8,7 +7,7 @@ import SearchableInput from "../ui/SearchableInput";
 import { useTranslation } from "react-i18next";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
 
-function Ingredients() {
+function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
   const {
     ingredients,
@@ -20,6 +19,8 @@ function Ingredients() {
     updateBrix,
     toggleSecondaryChecked,
     addIngredient,
+    ingredientList,
+    units,
   } = useRecipe();
 
   if (loadingIngredients) {
@@ -43,6 +44,8 @@ function Ingredients() {
                   key={i}
                 >
                   <IngredientLine
+                    units={units}
+                    ingredientList={ingredientList}
                     ing={ing}
                     deleteFn={() => removeIngredient(i)}
                     changeIng={(val) => changeIngredient(i, val)}
@@ -77,6 +80,8 @@ function Ingredients() {
 export default Ingredients;
 
 const IngredientLine = ({
+  units,
+  ingredientList,
   ing,
   deleteFn,
   changeIng,
@@ -92,10 +97,10 @@ const IngredientLine = ({
   updateVolume: (val: string) => void;
   updateBrix: (val: string) => void;
   toggleChecked: (val: boolean) => void;
+  ingredientList: Ingredient[];
+  units: { weight: string; volume: string };
 }) => {
-  const { ingredientList } = useRecipe();
   const { t } = useTranslation();
-  const { units } = useRecipe();
 
   const handleIngredientSelect = (selectedIngredient: Ingredient) => {
     changeIng(selectedIngredient.name);

@@ -25,6 +25,7 @@ const NutrientContext = createContext<NutrientType | undefined>(undefined);
 export const NutrientProvider = ({
   children,
   recipeData,
+  storeData,
 }: {
   children: ReactNode;
   recipeData?: {
@@ -33,6 +34,7 @@ export const NutrientProvider = ({
     offset: string;
     numberOfAdditions: string;
   };
+  storeData?: boolean;
 }) => {
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
@@ -311,7 +313,7 @@ export const NutrientProvider = ({
       }
     };
 
-    getStoredData();
+    if (storeData) getStoredData();
     fetchYeasts();
   }, []);
 
@@ -529,19 +531,22 @@ export const NutrientProvider = ({
   }, [recipeData]);
 
   useEffect(() => {
-    localStorage.setItem("nutrientData", JSON.stringify(fullData));
+    if (storeData)
+      localStorage.setItem("nutrientData", JSON.stringify(fullData));
   }, [fullData]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "yanContribution",
-      JSON.stringify(yanContributions.map(parseFloat))
-    );
-    localStorage.setItem("selectedGpl", JSON.stringify(selectedGpl));
+    if (storeData) {
+      localStorage.setItem(
+        "yanContribution",
+        JSON.stringify(yanContributions.map(parseFloat))
+      );
+      localStorage.setItem("selectedGpl", JSON.stringify(selectedGpl));
+    }
   }, [yanContributions, selectedGpl]);
 
   useEffect(() => {
-    localStorage.setItem("otherNutrientName", otherNutrientName);
+    if (storeData) localStorage.setItem("otherNutrientName", otherNutrientName);
   }, [otherNutrientName]);
 
   // Expose only the necessary state to the UI

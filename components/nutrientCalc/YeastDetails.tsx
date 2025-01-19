@@ -6,13 +6,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNutrients } from "../providers/NutrientProvider";
 import InputWithUnits from "./InputWithUnits";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 import { Input } from "../ui/input";
+import { NutrientType } from "@/types/nutrientTypes";
 
-function YeastDetails() {
+function YeastDetails({ useNutrients }: { useNutrients: () => NutrientType }) {
   const { t } = useTranslation();
   const {
     selected,

@@ -733,6 +733,7 @@ export default function RecipeProvider({
           offset: recipeData.offset,
           numberOfAdditions: "1",
         }}
+        storeData
       >
         {children}
       </NutrientProvider>

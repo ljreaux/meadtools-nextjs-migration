@@ -1,8 +1,7 @@
 import SearchableInput from "../ui/SearchableInput";
-import { useRecipe } from "../providers/RecipeProvider";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
-import { Additive, AdditiveType } from "@/types/recipeDataTypes";
+import { Additive, AdditiveType, Recipe } from "@/types/recipeDataTypes";
 import { Input } from "../ui/input";
 import {
   Select,
@@ -29,7 +28,7 @@ const units = [
   { value: "units", label: "UNITS" },
 ];
 
-function Additives() {
+function Additives({ useRecipe }: { useRecipe: () => Recipe }) {
   const {
     additives,
     changeAdditive,
@@ -37,6 +36,7 @@ function Additives() {
     changeAdditiveAmount,
     addAdditive,
     removeAdditive,
+    additiveList,
   } = useRecipe();
   const { t } = useTranslation();
   return (
@@ -53,6 +53,7 @@ function Additives() {
                   key={i}
                 >
                   <AdditiveLine
+                    additiveList={additiveList}
                     add={add}
                     changeAdditive={(add) => {
                       changeAdditive(i, add);
@@ -84,12 +85,14 @@ function Additives() {
 export default Additives;
 
 const AdditiveLine = ({
+  additiveList,
   add,
   changeAdditive,
   changeUnit,
   changeAmount,
   remove,
 }: {
+  additiveList: Additive[];
   add: AdditiveType;
   changeAdditive: (val: string) => void;
   changeUnit: (val: string) => void;
@@ -97,7 +100,6 @@ const AdditiveLine = ({
   remove: () => void;
 }) => {
   const { t } = useTranslation();
-  const { additiveList } = useRecipe();
 
   const handleAdditiveSelect = (selectedIngredient: Additive) => {
     changeAdditive(selectedIngredient.name);

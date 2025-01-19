@@ -6,9 +6,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
-import { useNutrients } from "../providers/NutrientProvider";
 import InputWithUnits from "./InputWithUnits";
 import Tooltip from "../Tooltips";
+import { NutrientType } from "@/types/nutrientTypes";
 
 const gfOptions = [
   { value: "Go-Ferm", label: "nuteResults.gfTypes.gf" },
@@ -16,7 +16,11 @@ const gfOptions = [
   { value: "sterol-flash", label: "nuteResults.gfTypes.gfSterol" },
   { value: "none", label: "nuteResults.gfTypes.none" },
 ];
-function AdditionalDetails() {
+function AdditionalDetails({
+  useNutrients,
+}: {
+  useNutrients: () => NutrientType;
+}) {
   const { t } = useTranslation();
   const { goFermType, yeastAmount, changeYeastAmount } = useNutrients();
   return (

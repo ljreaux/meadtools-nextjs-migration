@@ -107,9 +107,7 @@ const RecipePage = ({ id }: { id: string }) => {
     <SavedRecipeProvider
       recipe={{ ...recipe, recipeData, nutrientData, yanContribution }}
     >
-      <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">
-        {isOwner ? <OwnerRecipe recipe={recipe} /> : <PublicRecipe />}
-      </div>
+      <>{isOwner ? <OwnerRecipe /> : <PublicRecipe />}</>
     </SavedRecipeProvider>
   );
 };
