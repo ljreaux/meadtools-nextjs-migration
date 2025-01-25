@@ -1,10 +1,12 @@
+import { parseNumber } from "./validateInput";
+
 export type blendingArr = [value: string, volume: string][];
 
 export function blendValues(arr: blendingArr) {
   const { numerator, denominator } = arr.reduce(
     (acc, [val, vol]) => {
-      const value = parseFloat(val);
-      const volume = parseFloat(vol);
+      const value = parseNumber(val);
+      const volume = parseNumber(vol);
       return {
         numerator: acc.numerator + (volume > 0 ? value * volume : 0),
         denominator: acc.denominator + volume,

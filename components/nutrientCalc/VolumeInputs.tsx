@@ -11,6 +11,7 @@ import { toBrix } from "@/lib/utils/unitConverter";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 import { NutrientType } from "@/types/nutrientTypes";
+import { parseNumber } from "@/lib/utils/validateInput";
 
 function VolumeInputs({
   useNutrients,
@@ -19,12 +20,15 @@ function VolumeInputs({
   useNutrients: () => NutrientType;
   disabled?: boolean;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const { inputs } = useNutrients();
-  const sgNum = isNaN(parseFloat(inputs.sg.value))
+  const sgNum = isNaN(parseNumber(inputs.sg.value))
     ? 1
-    : parseFloat(inputs.sg.value);
-  const brixString = toBrix(sgNum).toFixed(2);
+    : parseNumber(inputs.sg.value);
+  const brixString = toBrix(sgNum).toLocaleString(currentLocale, {
+    maximumFractionDigits: 2,
+  }); //
   return (
     <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <div>

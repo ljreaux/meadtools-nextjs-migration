@@ -1,12 +1,13 @@
 import { FormEvent, useState } from "react";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
 import { Recipe } from "@/types/recipeDataTypes";
 
 function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.language;
   const {
     scaleRecipe,
     totalVolume,
@@ -16,7 +17,7 @@ function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
 
   const scale = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    scaleRecipe(totalVolume, parseFloat(scaled));
+    scaleRecipe(totalVolume, parseNumber(scaled));
   };
 
   return (
@@ -24,7 +25,11 @@ function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
       <h3 className="col-span-full">{t("scale.title")}</h3>
       <label>
         {t("scale.current")}
-        <InputWithUnits value={totalVolume} disabled text={volume} />
+        <InputWithUnits
+          value={totalVolume.toLocaleString(currentLocale)}
+          disabled
+          text={volume}
+        />
       </label>
       <label>
         {t("scale.target")}

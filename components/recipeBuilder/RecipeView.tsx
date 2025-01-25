@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { toBrix, calcSb } from "@/lib/utils/unitConverter";
 import { NutrientType } from "@/types/nutrientTypes";
 import { Recipe } from "@/types/recipeDataTypes";
+import { parseNumber } from "@/lib/utils/validateInput";
 function RecipeView({
   nutrientData,
   recipeData,
@@ -46,28 +47,29 @@ function RecipeView({
     `g ${otherNutrientName.value}`,
   ];
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const isMetric = units?.weight === "kg" || units?.volume === "liter";
   function toC(num?: number) {
     if (!num) return "";
     return isMetric ? Math.round((num - 32) * (5 / 9)) : num;
   }
-  const lowTemp = toC(parseFloat(selected.yeastDetails.low_temp));
-  const highTemp = toC(parseFloat(selected?.yeastDetails.high_temp));
+  const lowTemp = toC(parseNumber(selected.yeastDetails.low_temp));
+  const highTemp = toC(parseNumber(selected?.yeastDetails.high_temp));
   const tempString = `${t("PDF.tempRange")} ${lowTemp}-${highTemp}°${
     isMetric ? "C" : "F"
   }`;
 
   const primary = ingredients.filter(
-    (item) => !item.secondary && parseFloat(item.details[0]) > 0
+    (item) => !item.secondary && parseNumber(item.details[0]) > 0
   );
   const secondary =
     ingredients?.filter(
-      (item) => item.secondary && parseFloat(item.details[0]) > 0
+      (item) => item.secondary && parseNumber(item.details[0]) > 0
     ) || [];
   const filteredAdditives =
     additives?.filter((item) => {
-      return parseFloat(item.amount) > 0 && item.name.length > 0;
+      return parseNumber(item.amount) > 0 && item.name.length > 0;
     }) || [];
 
   const secondaryNotesExist =
@@ -139,25 +141,47 @@ function RecipeView({
             <tbody>
               <tr>
                 <td>
-                  <p>{OG.toFixed(3)}</p>
-                  <p>{toBrix(OG).toFixed(2)}</p>
+                  <p>
+                    {OG.toLocaleString(currentLocale, {
+                      maximumFractionDigits: 3,
+                    })}
+                  </p>
+                  <p>
+                    {toBrix(OG).toLocaleString(currentLocale, {
+                      maximumFractionDigits: 2,
+                    })}
+                  </p>
                 </td>
                 <td>
-                  <p>{parseFloat(FG).toFixed(3)}</p>
-                  <p>{`${toBrix(parseFloat(FG)).toFixed(3)} ${t("BRIX")}`}</p>
+                  <p>
+                    {parseNumber(FG).toLocaleString(currentLocale, {
+                      maximumFractionDigits: 3,
+                    })}
+                  </p>
+                  <p>{`${toBrix(parseNumber(FG)).toLocaleString(currentLocale, {
+                    maximumFractionDigits: 3,
+                  })} ${t("BRIX")}`}</p>
                 </td>
                 <td>
                   <p>{`${selected?.yeastDetails.tolerance}%`}</p>
                   <p>
                     {OG !== undefined
-                      ? `${t("PDF.sugarBreak")} ${calcSb(OG).toFixed(3)}`
+                      ? `${t("PDF.sugarBreak")} ${calcSb(OG).toLocaleString(
+                          currentLocale,
+                          { maximumFractionDigits: 3 }
+                        )}`
                       : ""}
                   </p>
                 </td>
                 <td>
-                  <p>{ABV.toFixed(2)}%</p>
                   <p>
-                    {delle.toFixed()} {t("DU")}
+                    {ABV.toLocaleString(currentLocale, {
+                      maximumFractionDigits: 2,
+                    })}
+                    %
+                  </p>
+                  <p>
+                    {delle.toLocaleString(currentLocale)} {t("DU")}
                   </p>
                 </td>
               </tr>
@@ -180,7 +204,9 @@ function RecipeView({
                   {nutrientAdditions.perAddition.map((nute, i) =>
                     nute > 0 ? (
                       <p key={`nute ${i}`}>
-                        {nute.toFixed(3)}
+                        {nute.toLocaleString(currentLocale, {
+                          maximumFractionDigits: 3,
+                        })}
                         {nuteNames[i]}
                       </p>
                     ) : null
@@ -190,7 +216,9 @@ function RecipeView({
                   {nutrientAdditions.totalGrams.map((nute, i) =>
                     nute > 0 ? (
                       <p key={`nute ${i}`}>
-                        {nute.toFixed(3)}
+                        {nute.toLocaleString(currentLocale, {
+                          maximumFractionDigits: 3,
+                        })}
                         {nuteNames[i]}
                       </p>
                     ) : null
@@ -214,12 +242,17 @@ function RecipeView({
                 {addingStabilizers && (
                   <td>
                     <p>
-                      {`${sulfite.toFixed(3)}g ${t("PDF.kmeta")} ${t(
+                      {`${sulfite.toLocaleString(currentLocale, {
+                        maximumFractionDigits: 3,
+                      })}g ${t("PDF.kmeta")} ${t(
                         "accountPage.or"
-                      )} ${campden.toFixed(3)}
-                        } ${t("campden")}`}
+                      )} ${campden.toLocaleString(currentLocale, {
+                        maximumFractionDigits: 3,
+                      })} ${t("campden")}`}
                     </p>
-                    <p>{`${sorbate.toFixed(3)}g ${t("PDF.ksorb")}`}</p>
+                    <p>{`${sorbate.toLocaleString(currentLocale, {
+                      maximumFractionDigits: 3,
+                    })}g ${t("PDF.ksorb")}`}</p>
                   </td>
                 )}
                 <td>{`${remainingYan}PPM`}</td>

@@ -15,17 +15,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function Sulfite() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
 
   const [sulfite, setSulfite] = useState({
-    batchSize: "1",
+    batchSize: (1).toLocaleString(currentLocale),
     units: "gallons",
-    ppm: "50",
+    ppm: (50).toLocaleString(currentLocale),
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isValidNumber(e.target.value))
@@ -37,13 +38,15 @@ function Sulfite() {
 
   const sulfiteAmount =
     sulfite.units === "gallons"
-      ? (parseFloat(sulfite.batchSize) * 3.785 * parseFloat(sulfite.ppm)) / 570
-      : (parseFloat(sulfite.batchSize) * parseFloat(sulfite.ppm)) / 570;
+      ? (parseNumber(sulfite.batchSize) * 3.785 * parseNumber(sulfite.ppm)) /
+        570
+      : (parseNumber(sulfite.batchSize) * parseNumber(sulfite.ppm)) / 570;
 
   const campden =
     sulfite.units !== "gallons"
-      ? (parseFloat(sulfite.ppm) / 75) * (parseFloat(sulfite.batchSize) / 3.785)
-      : (parseFloat(sulfite.ppm) / 75) * parseFloat(sulfite.batchSize);
+      ? (parseNumber(sulfite.ppm) / 75) *
+        (parseNumber(sulfite.batchSize) / 3.785)
+      : (parseNumber(sulfite.ppm) / 75) * parseNumber(sulfite.batchSize);
   return (
     <Table>
       <TableHeader>
@@ -102,11 +105,14 @@ function Sulfite() {
           <TableCell colSpan={3}>
             <span className="grid items-center justify-center gap-2 sm:text-2xl text-center">
               <p>
-                {sulfiteAmount.toFixed(3)}g {t("kMeta")}
+                {sulfiteAmount.toLocaleString(currentLocale, {
+                  maximumFractionDigits: 3,
+                })}
+                g {t("kMeta")}
               </p>
               <p>{t("accountPage.or")}</p>
               <p className="flex item-center justify-center gap-2">
-                {campden.toFixed(1)} {t("campden")}
+                {campden.toLocaleString(currentLocale)} {t("campden")}
                 <Tooltip body={t("tipText.campden")} />
               </p>
             </span>

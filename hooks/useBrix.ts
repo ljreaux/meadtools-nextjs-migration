@@ -1,21 +1,37 @@
 import { toBrix, toSG } from "@/lib/utils/unitConverter";
+import { parseNumber } from "@/lib/utils/validateInput";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const useBrix = (initialVal?: string) => {
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const [mount, setMount] = useState(true);
   const [brix, setBrix] = useState({
-    gravity: initialVal || "1.1",
+    gravity: initialVal || (1.1).toLocaleString(currentLocale),
     units: "SG",
-    brix: toBrix(parseFloat(initialVal || "1.1")).toString(),
-    sg: parseFloat(initialVal || "1.1").toString(),
+    brix: toBrix(parseNumber(initialVal || "1.1")).toLocaleString(
+      currentLocale
+    ),
+    sg: parseNumber(initialVal || "1.1").toLocaleString(currentLocale),
   });
 
   useEffect(() => {
     if (!mount) {
       if (brix.units === "Brix") {
-        setBrix({ ...brix, gravity: parseFloat(brix.brix).toFixed(2) });
+        setBrix({
+          ...brix,
+          gravity: parseNumber(brix.brix).toLocaleString(currentLocale, {
+            maximumFractionDigits: 2,
+          }),
+        });
       } else {
-        setBrix({ ...brix, gravity: parseFloat(brix.sg).toFixed(3) });
+        setBrix({
+          ...brix,
+          gravity: parseNumber(brix.sg).toLocaleString(currentLocale, {
+            maximumFractionDigits: 3,
+          }),
+        });
       }
     }
     setMount(false);
@@ -26,13 +42,13 @@ const useBrix = (initialVal?: string) => {
       setBrix({
         ...brix,
         sg: brix.gravity,
-        brix: toBrix(parseFloat(brix.gravity)).toString(),
+        brix: toBrix(parseNumber(brix.gravity)).toLocaleString(currentLocale),
       });
     } else {
       setBrix({
         ...brix,
         brix: brix.gravity,
-        sg: toSG(parseFloat(brix.gravity)).toString(),
+        sg: toSG(parseNumber(brix.gravity)).toLocaleString(currentLocale),
       });
     }
   }, [brix.gravity]);

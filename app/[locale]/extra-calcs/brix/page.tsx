@@ -8,17 +8,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import useBrix from "@/hooks/useBrix";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { useTranslation } from "react-i18next";
 
 function Brix() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const { gravity, sg, brix, units, setGravity, setUnits } = useBrix();
 
   const displayString =
     units === "SG"
-      ? `${parseFloat(brix).toFixed(2)} ${t("BRIX")}`
-      : parseFloat(sg).toFixed(3);
+      ? `${parseNumber(brix).toLocaleString(currentLocale, {
+          maximumFractionDigits: 2,
+        })} ${t("BRIX")}`
+      : parseNumber(sg).toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        });
   return (
     <>
       <h1 className="sm:text-3xl text-xl text-center">{t("brixHeading")} </h1>

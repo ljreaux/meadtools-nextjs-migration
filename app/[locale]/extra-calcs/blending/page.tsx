@@ -1,6 +1,6 @@
 "use client";
 import { blendingArr, blendValues } from "@/lib/utils/blendValues";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,7 +13,8 @@ import {
 import { isValidNumber } from "@/lib/utils/validateInput";
 
 function Blending() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const [input, setInput] = useState<blendingArr>([
     ["0", "0"],
     ["0", "0"],
@@ -81,13 +82,17 @@ function Blending() {
             <TableCell className="sm:p-4">
               <span className="grid gap-1 sm:text-lg">
                 <p>{t("totalVol")}</p>
-                <p> {totalVolume}</p>
+                <p> {totalVolume.toLocaleString(currentLocale)}</p>
               </span>
             </TableCell>
             <TableCell className="sm:p-4">
               <span className="grid gap-1 sm:text-lg">
                 <p>{t("blendedVal")}</p>
-                <p>{blendedValue.toFixed(3)}</p>
+                <p>
+                  {blendedValue.toLocaleString(currentLocale, {
+                    maximumFractionDigits: 3,
+                  })}
+                </p>
               </span>
             </TableCell>
           </TableRow>

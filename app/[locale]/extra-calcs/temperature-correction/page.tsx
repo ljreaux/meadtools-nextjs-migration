@@ -16,12 +16,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { temperatureCorrection, toFahrenheit } from "@/lib/utils/temperature";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { toBrix } from "@/lib/utils/unitConverter";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 
 function TempCorrection() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const { tempObj, handleChange, setTempUnits, result, resultBrix } =
     useTempCorrection();
   return (
@@ -43,7 +44,11 @@ function TempCorrection() {
               />
             </TableCell>
             <TableCell>
-              {toBrix(parseFloat(tempObj.measured)).toFixed(2)} {t("Brix")}
+              {toBrix(parseNumber(tempObj.measured)).toLocaleString(
+                currentLocale,
+                { maximumFractionDigits: 2 }
+              )}{" "}
+              {t("Brix")}
             </TableCell>
           </TableRow>
           <TableRow>
@@ -90,7 +95,13 @@ function TempCorrection() {
           <TableRow>
             <TableCell colSpan={3}>
               <span className="flex items-center justify-center text-lg">
-                {result.toFixed(3)}, {resultBrix.toFixed(2)} {t("Brix")}
+                {result.toLocaleString(currentLocale, {
+                  maximumFractionDigits: 3,
+                })}{" "}
+                {resultBrix.toLocaleString(currentLocale, {
+                  maximumFractionDigits: 3,
+                })}
+                {t("Brix")}
               </span>
             </TableCell>
           </TableRow>
@@ -121,14 +132,14 @@ const useTempCorrection = () => {
   const result =
     tempObj.tempUnits === "F"
       ? temperatureCorrection(
-          parseFloat(tempObj.measured),
-          parseFloat(tempObj.curTemp),
-          parseFloat(tempObj.calTemp)
+          parseNumber(tempObj.measured),
+          parseNumber(tempObj.curTemp),
+          parseNumber(tempObj.calTemp)
         )
       : temperatureCorrection(
-          parseFloat(tempObj.measured),
-          toFahrenheit(parseFloat(tempObj.curTemp)),
-          toFahrenheit(parseFloat(tempObj.calTemp))
+          parseNumber(tempObj.measured),
+          toFahrenheit(parseNumber(tempObj.curTemp)),
+          toFahrenheit(parseNumber(tempObj.calTemp))
         );
   const resultBrix = toBrix(result);
 

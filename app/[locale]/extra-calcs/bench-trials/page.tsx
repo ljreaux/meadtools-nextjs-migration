@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Trials from "../../../../components/extraCalcs/Trials";
 import { isValidNumber } from "@/lib/utils/validateInput";
 

@@ -5,12 +5,18 @@ import { Input } from "@/components/ui/input";
 import useAbv from "@/hooks/useAbv";
 import AbvLine from "@/components/extraCalcs/AbvLine";
 import { toBrix } from "@/lib/utils/unitConverter";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 
 export default function AbvCalculator() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
 
-  const [inputValues, setInputValues] = useState(["1.105", "1"]);
+  const [inputValues, setInputValues] = useState([
+    (1.105).toLocaleString(currentLocale, {
+      maximumFractionDigits: 3,
+    }),
+    (1).toLocaleString(currentLocale),
+  ]);
   const [OG, FG] = inputValues;
   const abv = useAbv(OG, FG);
   const inputArr = [t("OG"), t("FG")];
@@ -20,7 +26,7 @@ export default function AbvCalculator() {
       <h1 className="sm:text-3xl text-xl text-center">{t("abvHeading")}</h1>
       <div className="flex flex-col gap-6">
         {inputArr.map((label, index) => {
-          const brix = toBrix(parseFloat(inputValues[index]));
+          const brix = toBrix(parseNumber(inputValues[index]));
           return (
             <span
               key={index}
@@ -44,7 +50,10 @@ export default function AbvCalculator() {
                 className="sm:col-span-4"
               />
               <p className="self-end sm:self-auto">
-                {Math.round(brix * 100) / 100} {t("BRIX")}
+                {brix.toLocaleString(currentLocale, {
+                  maximumFractionDigits: 2,
+                })}
+                {t("BRIX")}
               </p>
             </span>
           );

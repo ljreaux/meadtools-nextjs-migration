@@ -12,7 +12,7 @@ interface AuthContextType {
   loginWithCredentials: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  fetchAuthenticatedData: (endpoint: string) => Promise<any>;
+  fetchAuthenticatedData: (endpoint: string, method?: string) => Promise<any>;
   fetchAuthenticatedPost: (endpoint: string, body: any) => Promise<any>;
   fetchAuthenticatedPatch: (endpoint: string, body: any) => Promise<any>;
   isLoggedIn: boolean;
@@ -302,8 +302,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         loginWithCredentials,
         register,
         logout,
-        fetchAuthenticatedData: async (endpoint: string) => {
+        fetchAuthenticatedData: async (endpoint: string, method?: string) => {
           const headers: Record<string, string> = {
+            method: method ? method : "GET",
             Authorization: `Bearer ${token || session?.accessToken}`,
           };
           const res = await fetch(endpoint, { headers });

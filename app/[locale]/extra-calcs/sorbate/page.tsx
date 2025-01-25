@@ -14,25 +14,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 function Sorbate() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const [sorbate, setSorbate] = useState({
-    batchSize: "1",
+    batchSize: (1).toLocaleString(currentLocale),
     units: "gallons",
-    abv: "12",
+    abv: (12).toLocaleString(currentLocale),
   });
 
   const sorbateAmount =
     sorbate.units === "gallons"
-      ? ((-parseFloat(sorbate.abv) * 25 + 400) / 0.75) *
-        parseFloat(sorbate.batchSize) *
+      ? ((-parseNumber(sorbate.abv) * 25 + 400) / 0.75) *
+        parseNumber(sorbate.batchSize) *
         0.003785411784
-      : (((-parseFloat(sorbate.abv) * 25 + 400) / 0.75) *
-          parseFloat(sorbate.batchSize)) /
+      : (((-parseNumber(sorbate.abv) * 25 + 400) / 0.75) *
+          parseNumber(sorbate.batchSize)) /
         1000;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,7 +100,10 @@ function Sorbate() {
 
         <TableRow>
           <TableCell className="my-4 text-lg text-center" colSpan={3}>
-            {sorbateAmount.toFixed(3)}g {t("kSorb")}
+            {sorbateAmount.toLocaleString(currentLocale, {
+              maximumFractionDigits: 3,
+            })}
+            g {t("kSorb")}
           </TableCell>
         </TableRow>
       </TableBody>

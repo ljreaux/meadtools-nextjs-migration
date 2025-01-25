@@ -20,7 +20,7 @@ import {
   UnitType,
 } from "@/types/recipeDataTypes";
 import { calcABV, toBrix, toSG } from "@/lib/utils/unitConverter";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { blendValues } from "@/lib/utils/blendValues";
 import lodash from "lodash";
 import { useTranslation } from "react-i18next";
@@ -37,7 +37,8 @@ export default function RecipeProvider({
 
   recipeName?: string;
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const [firstMount, setFirstMount] = useState(true);
   const [preferredUnits, setPreferredUnits] = useState("US");
 
@@ -84,7 +85,10 @@ export default function RecipeProvider({
       const changed = {
         id: foundIng.id,
         name: translatedName, // Use the translated name
-        brix: parseFloat(foundIng.sugar_content).toFixed(2) || "0",
+        brix:
+          parseNumber(foundIng.sugar_content).toLocaleString(currentLocale, {
+            maximumFractionDigits: 2,
+          }) || "0",
         secondary: false,
         category: foundIng.category || "water",
       } as IngredientDetails;
@@ -98,9 +102,11 @@ export default function RecipeProvider({
               details: [
                 ing.details[0],
                 weightToVolume(
-                  parseFloat(ing.details[0]),
-                  parseFloat(changed.brix)
-                ).toFixed(3),
+                  parseNumber(ing.details[0]),
+                  parseNumber(changed.brix)
+                ).toLocaleString(currentLocale, {
+                  maximumFractionDigits: 3,
+                }),
               ],
             };
           }
@@ -133,10 +139,12 @@ export default function RecipeProvider({
       const changed = {
         name: translatedName,
         amount: (
-          parseFloat(foundAdd.dosage) *
+          parseNumber(foundAdd.dosage) *
           multiplier *
           totalVolume
-        ).toFixed(3),
+        ).toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
         unit: foundAdd.unit,
       };
 
@@ -242,7 +250,12 @@ export default function RecipeProvider({
         ...ing,
         details: [
           weight,
-          weightToVolume(parseFloat(weight), parseFloat(ing.brix)).toFixed(3),
+          weightToVolume(
+            parseNumber(weight),
+            parseNumber(ing.brix)
+          ).toLocaleString(currentLocale, {
+            maximumFractionDigits: 3,
+          }),
         ] as [string, string],
       };
       setRecipeData((prev) => ({
@@ -263,7 +276,12 @@ export default function RecipeProvider({
       const updatedIngredient = {
         ...ing,
         details: [
-          volumeToWeight(parseFloat(volume), parseFloat(ing.brix)).toFixed(3),
+          volumeToWeight(
+            parseNumber(volume),
+            parseNumber(ing.brix)
+          ).toLocaleString(currentLocale, {
+            maximumFractionDigits: 3,
+          }),
           volume,
         ] as [string, string],
       };
@@ -287,9 +305,11 @@ export default function RecipeProvider({
                 details: [
                   ing.details[0],
                   weightToVolume(
-                    parseFloat(ing.details[0]),
-                    parseFloat(brix)
-                  ).toFixed(3),
+                    parseNumber(ing.details[0]),
+                    parseNumber(brix)
+                  ).toLocaleString(currentLocale, {
+                    maximumFractionDigits: 3,
+                  }),
                 ] as [string, string],
               }
             : ing
@@ -333,14 +353,21 @@ export default function RecipeProvider({
 
     const newIngredients = recipeData.ingredients.map((ing) => {
       const newDetails = ing.details.map((det) =>
-        (parseFloat(det || "0") * scale).toFixed(3)
+        (parseNumber(det || "0") * scale).toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        })
       ) as [string, string];
       return { ...ing, details: newDetails };
     });
     setRecipeData((prev) => {
       const newAdditives = prev.additives.map((add) => ({
         ...add,
-        amount: (parseFloat(add.amount || "0") * scale * 1000).toFixed(3),
+        amount: (parseNumber(add.amount || "0") * scale * 1000).toLocaleString(
+          currentLocale,
+          {
+            maximumFractionDigits: 3,
+          }
+        ),
       }));
 
       return { ...prev, ingredients: newIngredients, additives: newAdditives };
@@ -467,7 +494,7 @@ export default function RecipeProvider({
     const secondaryBlendArr = recipeData.ingredients
       .filter((ing) => ing.secondary)
       .map((ing) => {
-        return [toSG(parseFloat(ing.brix)).toPrecision(6), ing.details[1]] as [
+        return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
           string
         ];
@@ -475,7 +502,7 @@ export default function RecipeProvider({
     const primaryBlendArr = recipeData.ingredients
       .filter((ing) => !ing.secondary)
       .map((ing) => {
-        return [toSG(parseFloat(ing.brix)).toPrecision(6), ing.details[1]] as [
+        return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
           string
         ];
@@ -489,8 +516,20 @@ export default function RecipeProvider({
     const { blendedValue: primaryVal, totalVolume: primaryVol } =
       blendValues(primaryBlendArr);
     const { blendedValue: backFG, totalVolume } = blendValues([
-      [recipeData.FG, primaryVol.toFixed(3)],
-      [secondaryVal.toFixed(3), secondaryVol.toFixed(3)],
+      [
+        recipeData.FG,
+        primaryVol.toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
+      ],
+      [
+        secondaryVal.toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
+        secondaryVol.toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
+      ],
     ]);
 
     setBacksweetenedFG(backFG);
@@ -499,14 +538,18 @@ export default function RecipeProvider({
     const offset = recipeData.ingredients
       .filter((ing) => !ing.secondary && ing.category === "fruit")
       .map((ing) => {
-        return parseFloat(ing.details[0]) * 25;
+        return parseNumber(ing.details[0]) * 25;
       })
       .reduce((prev, curr) => {
         return curr / primaryVol + prev;
       }, 0)
-      .toFixed();
+      .toLocaleString(currentLocale, {
+        maximumFractionDigits: 0,
+      });
 
-    const volume = primaryVol.toFixed(3);
+    const volume = primaryVol.toLocaleString(currentLocale, {
+      maximumFractionDigits: 3,
+    });
     const OG = Math.round(primaryVal * 1000) / 1000;
 
     setRecipeData((prev) => ({
@@ -534,13 +577,15 @@ export default function RecipeProvider({
         scaler = 0.453592;
       }
       const updatedIngredients = recipeData.ingredients.map((ing) => {
-        const updatedWeight = parseFloat(ing.details[0]) * scaler;
+        const updatedWeight = parseNumber(ing.details[0]) * scaler;
         return {
           ...ing,
-          details: [updatedWeight.toFixed(3), ing.details[1]] as [
-            string,
-            string
-          ],
+          details: [
+            updatedWeight.toLocaleString(currentLocale, {
+              maximumFractionDigits: 3,
+            }),
+            ing.details[1],
+          ] as [string, string],
         };
       });
       setRecipeData({ ...recipeData, ingredients: updatedIngredients });
@@ -557,13 +602,15 @@ export default function RecipeProvider({
         scaler = 3.78541;
       }
       const updatedIngredients = recipeData.ingredients.map((ing) => {
-        const updatedVolume = parseFloat(ing.details[1]) * scaler;
+        const updatedVolume = parseNumber(ing.details[1]) * scaler;
         return {
           ...ing,
-          details: [ing.details[0], updatedVolume.toFixed(3)] as [
-            string,
-            string
-          ],
+          details: [
+            ing.details[0],
+            updatedVolume.toLocaleString(currentLocale, {
+              maximumFractionDigits: 3,
+            }),
+          ] as [string, string],
         };
       });
       setRecipeData({ ...recipeData, ingredients: updatedIngredients });
@@ -578,9 +625,9 @@ export default function RecipeProvider({
 
   useEffect(() => {
     if (addingStabilizers) {
-      const volume = parseFloat(recipeData.volume);
+      const volume = parseNumber(recipeData.volume);
       const { volume: volumeUnits } = recipeData.units;
-      const ph = parseFloat(phReading);
+      const ph = parseNumber(phReading);
       const vol =
         volumeUnits == "gal" ? volume * 0.003785411784 : volume / 1000;
       const sorbate = ((-recipeData.ABV * 25 + 400) / 0.75) * vol;
@@ -729,7 +776,12 @@ export default function RecipeProvider({
       <NutrientProvider
         recipeData={{
           volume: recipeData.volume,
-          sg: (1 + recipeData.OG - parseFloat(recipeData.FG)).toFixed(3),
+          sg: (1 + recipeData.OG - parseNumber(recipeData.FG)).toLocaleString(
+            currentLocale,
+            {
+              maximumFractionDigits: 3,
+            }
+          ),
           offset: recipeData.offset,
           numberOfAdditions: "1",
         }}

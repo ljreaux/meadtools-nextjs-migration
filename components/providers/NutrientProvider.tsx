@@ -1,5 +1,6 @@
 "use client";
 import { toBrix } from "@/lib/utils/unitConverter";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import {
   FullNutrientData,
   GoFermType,
@@ -19,6 +20,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
+import { useTranslation } from "react-i18next";
 
 const NutrientContext = createContext<NutrientType | undefined>(undefined);
 
@@ -36,6 +38,8 @@ export const NutrientProvider = ({
   };
   storeData?: boolean;
 }) => {
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   // state variables
   const [yeastList, setYeastList] = useState<Yeast[]>([]);
   const [loadingYeasts, setLoadingYeasts] = useState(true);
@@ -99,7 +103,7 @@ export const NutrientProvider = ({
   // Setters for handling input change
   const setVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+    if (isValidNumber(value)) {
       setFullData((prev) => ({
         ...prev,
         inputs: { ...prev.inputs, volume: value },
@@ -109,7 +113,7 @@ export const NutrientProvider = ({
 
   const setSG = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+    if (isValidNumber(value)) {
       setFullData((prev) => ({
         ...prev,
         inputs: { ...prev.inputs, sg: value },
@@ -119,7 +123,7 @@ export const NutrientProvider = ({
 
   const setOffset = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+    if (isValidNumber(value)) {
       setFullData((prev) => ({
         ...prev,
         inputs: { ...prev.inputs, offset: value },
@@ -128,7 +132,7 @@ export const NutrientProvider = ({
   };
   const setOtherYanContribution = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+    if (isValidNumber(value)) {
       setYanContributions((prev) => {
         const newArr = [...prev];
         newArr[3] = value;
@@ -139,7 +143,7 @@ export const NutrientProvider = ({
 
   const changeYeastAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (value === "" || /^-?\d*\.?\d*$/.test(value)) {
+    if (isValidNumber(value)) {
       setYeastAmount(value);
     }
   };
@@ -333,8 +337,8 @@ export const NutrientProvider = ({
   // determine yeast and go-ferm amounts
   useEffect(() => {
     const units = fullData.selected.volumeUnits;
-    const volume = parseFloat(fullData.inputs.volume);
-    const sg = parseFloat(fullData.inputs.sg);
+    const volume = parseNumber(fullData.inputs.volume);
+    const sg = parseNumber(fullData.inputs.sg);
 
     let multiplier = 1;
     if (units === "liter") {
@@ -353,18 +357,22 @@ export const NutrientProvider = ({
     const gf = calculateGoFerm(goFerm.type, yeastAmount);
 
     setGoFerm((prev) => ({ ...prev, ...gf }));
-    setYeastAmount(yeastAmount.toFixed(2));
+    setYeastAmount(
+      yeastAmount.toLocaleString(currentLocale, {
+        maximumFractionDigits: 2,
+      })
+    );
   }, [fullData.inputs, fullData.selected, goFerm.type]);
   useEffect(() => {
-    const gf = calculateGoFerm(goFerm.type, parseFloat(yeastAmount));
+    const gf = calculateGoFerm(goFerm.type, parseNumber(yeastAmount));
 
     setGoFerm((prev) => ({ ...prev, ...gf }));
   }, [yeastAmount]);
 
   // Calculate target YAN
   const calculateYAN = () => {
-    const sg = parseFloat(fullData.inputs.sg);
-    const offset = parseFloat(fullData.inputs.offset || "0");
+    const sg = parseNumber(fullData.inputs.sg);
+    const offset = parseNumber(fullData.inputs.offset || "0");
     const nitrogen = fullData.selected.n2Requirement;
 
     const multiplier =
@@ -388,8 +396,10 @@ export const NutrientProvider = ({
         currentYanContribution = [40, 100, 210, 0]
       ) => {
         const units = fullData.selected.volumeUnits;
-        const volume = parseFloat(fullData.inputs.volume);
-        const numberOfAdditions = parseFloat(fullData.inputs.numberOfAdditions);
+        const volume = parseNumber(fullData.inputs.volume);
+        const numberOfAdditions = parseNumber(
+          fullData.inputs.numberOfAdditions
+        );
 
         let remainingYan = totalYan;
         const yanContribution = [...currentYanContribution];
@@ -401,7 +411,7 @@ export const NutrientProvider = ({
         const ppmYan = [0, 0, 0, 0];
 
         for (let i = 0; i < yanContribution.length; i++) {
-          const totalYan = yanContribution[i] * parseFloat(selectedGpl[i]);
+          const totalYan = yanContribution[i] * parseNumber(selectedGpl[i]);
           if (totalYan >= remainingYan) {
             ppmYan[i] = remainingYan;
             remainingYan = 0;
@@ -423,7 +433,7 @@ export const NutrientProvider = ({
         const perAddition = totalGrams.map((num) => num / numberOfAdditions);
 
         setRemainingYan(remainingYan);
-        setProvidedYan(ppmYan.map((num) => num.toString()));
+        setProvidedYan(ppmYan.map((num) => num.toLocaleString(currentLocale)));
         return { totalGrams, perAddition };
       };
 
@@ -431,7 +441,7 @@ export const NutrientProvider = ({
       const yan = calculateYAN();
       const additions = calculateNutrientAdditions(
         yan,
-        yanContributions.map(parseFloat)
+        yanContributions.map(parseNumber)
       );
 
       setNutrientAdditions(additions);
@@ -455,11 +465,11 @@ export const NutrientProvider = ({
   useEffect(() => {
     if (adjustAllowed) {
       let totalYan = targetYAN;
-      const yanContribution = yanContributions.map(parseFloat);
+      const yanContribution = yanContributions.map(parseNumber);
       const units = fullData.selected.volumeUnits;
-      const volume = parseFloat(fullData.inputs.volume);
-      const numberOfAdditions = parseFloat(fullData.inputs.numberOfAdditions);
-      const ppmYan = providedYan.map(parseFloat);
+      const volume = parseNumber(fullData.inputs.volume);
+      const numberOfAdditions = parseNumber(fullData.inputs.numberOfAdditions);
+      const ppmYan = providedYan.map(parseNumber);
 
       ppmYan.forEach((num) => (totalYan -= num));
 
@@ -484,7 +494,7 @@ export const NutrientProvider = ({
     const { schedule } = fullData.selected;
     const value = maxGpl[schedule].value;
     const { sg } = fullData.inputs;
-    const og = parseFloat(sg);
+    const og = parseNumber(sg);
 
     if (schedule !== "other") {
       if (typeof value[0] === "string") {
@@ -539,7 +549,7 @@ export const NutrientProvider = ({
     if (storeData) {
       localStorage.setItem(
         "yanContribution",
-        JSON.stringify(yanContributions.map(parseFloat))
+        JSON.stringify(yanContributions.map(parseNumber))
       );
       localStorage.setItem("selectedGpl", JSON.stringify(selectedGpl));
     }

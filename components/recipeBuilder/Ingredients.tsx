@@ -154,7 +154,7 @@ const IngredientLine = ({
       </label>
 
       <Button onClick={deleteFn} variant="destructive">
-        Remove
+        {t("desktop.delete")}
       </Button>
     </div>
   );

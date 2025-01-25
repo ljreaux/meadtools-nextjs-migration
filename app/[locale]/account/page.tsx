@@ -61,7 +61,8 @@ type UserData = {
 
 function Account() {
   const { t } = useTranslation();
-  const { fetchAuthenticatedData, logout, deleteRecipe } = useAuth();
+  const { fetchAuthenticatedData, logout, deleteRecipe, isLoggedIn } =
+    useAuth();
   const [data, setData] = useState<UserData | null>(null);
   const [isUsernameDialogOpen, setUsernameDialogOpen] = useState(false);
 
@@ -82,12 +83,14 @@ function Account() {
   };
 
   useEffect(() => {
-    fetchAuthenticatedData("/api/auth/account-info")
-      .then((data) => {
-        setData(data);
-        setUsernameDialogOpen(data.user.public_username === null);
-      })
-      .catch((error) => console.error(error));
+    if (isLoggedIn) {
+      fetchAuthenticatedData("/api/auth/account-info")
+        .then((data) => {
+          setData(data);
+          setUsernameDialogOpen(data.user.public_username === null);
+        })
+        .catch((error) => console.error(error));
+    }
   }, []);
 
   if (!data) return <Loading />;

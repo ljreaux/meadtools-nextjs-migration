@@ -1,35 +1,44 @@
 import { toBrix, toSG } from "@/lib/utils/unitConverter";
-import { isValidNumber } from "@/lib/utils/validateInput";
+import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const useRefrac = () => {
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   const [refrac, setRefrac] = useState({
-    cf: "1",
-    og: "1.1",
+    cf: (1).toLocaleString(currentLocale),
+    og: (1.1).toLocaleString(currentLocale),
     units: "SG",
-    fgInBrix: "8.5",
-    fgInSg: toSG(8.5).toFixed(2),
+    fgInBrix: (8.5).toLocaleString(currentLocale),
+    fgInSg: toSG(8.5).toLocaleString(currentLocale, {
+      maximumFractionDigits: 2,
+    }),
     calcBrix: "0",
-    calcSg: toSG(0).toFixed(2),
+    calcSg: toSG(0).toLocaleString(currentLocale, { maximumFractionDigits: 2 }),
   });
 
   const og =
     refrac.units === "SG"
-      ? parseFloat(refrac.og)
-      : toBrix(parseFloat(refrac.og));
+      ? parseNumber(refrac.og)
+      : toBrix(parseNumber(refrac.og));
   useEffect(() => {
     const { cf: corFac, fgInBrix: fgBr, units } = refrac;
 
-    const FGBR = parseFloat(fgBr);
-    const CORFAC = parseFloat(corFac);
+    const FGBR = parseNumber(fgBr);
+    const CORFAC = parseNumber(corFac);
 
     let actualFg = refracCalc(og, FGBR, CORFAC);
     if (units == "SG") actualFg = refracCalc(toBrix(og), FGBR, CORFAC);
 
     setRefrac((prev) => ({
       ...prev,
-      calcSg: actualFg.toFixed(3),
-      calcBrix: toBrix(actualFg).toFixed(2),
+      calcSg: actualFg.toLocaleString(currentLocale, {
+        maximumFractionDigits: 3,
+      }),
+      calcBrix: toBrix(actualFg).toLocaleString(currentLocale, {
+        maximumFractionDigits: 2,
+      }),
     }));
   }, [refrac.cf, refrac.og, refrac.fgInBrix, refrac.units]);
 

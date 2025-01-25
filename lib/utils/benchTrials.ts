@@ -1,4 +1,5 @@
 import { BatchDetails } from "../../components/extraCalcs/Trials";
+import { parseNumber } from "./validateInput";
 
 function calculateAdjunctAmount(
   volume: number,
@@ -35,17 +36,17 @@ export function calculateAdjunctValues(
     batchDetails;
 
   const adjunctAmount = calculateAdjunctAmount(
-    parseFloat(volume),
-    parseFloat(stockSolutionConcentration)
+    parseNumber(volume),
+    parseNumber(stockSolutionConcentration)
   );
   const adjunctConcentration = calculateAdjunctConcentration(
     adjunctAmount,
-    parseFloat(sampleSize) + parseFloat(volume)
+    parseNumber(sampleSize) + parseNumber(volume)
   );
   const scaledAdjunct = scaleAdjunctConcentration(adjunctConcentration, units);
   const scaledBatch = calculateScaledBatch(
     scaledAdjunct,
-    parseFloat(batchSize)
+    parseNumber(batchSize)
   );
 
   return {

@@ -19,13 +19,14 @@ export type BatchDetails = {
 };
 
 export default function Trials({ batchDetails }: TrialsProps) {
-  const { t } = useTranslation();
+  const { i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
 
   const [stockVolume, setStockVolume] = useState<string[]>([
-    "0.5",
-    "1",
-    "1.5",
-    "2",
+    (0.5).toLocaleString(currentLocale),
+    (1).toLocaleString(currentLocale),
+    (1.5).toLocaleString(currentLocale),
+    (2).toLocaleString(currentLocale),
   ]);
 
   const handleStockVolumeChange = (index: number, value: string) => {
@@ -65,7 +66,8 @@ function StockVolumeRow({
   const { adjunctAmount, adjunctConcentration, scaledAdjunct, scaledBatch } =
     calculateAdjunctValues(volume, batchDetails);
 
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
   return (
     <>
       <TableRow className="border-none">
@@ -94,7 +96,7 @@ function StockVolumeRow({
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
             <label>{t("adjunctAmount")}</label>
-            <span>{adjunctAmount}</span>
+            <span>{adjunctAmount.toLocaleString(currentLocale)}</span>
           </div>
         </TableCell>
         <TableCell className="flex flex-col items-center sm:table-cell">
@@ -106,13 +108,13 @@ function StockVolumeRow({
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
             <label>{t(`${batchDetails.units}ScaledAdjunct`)}</label>
-            <span>{scaledAdjunct}</span>
+            <span>{scaledAdjunct.toLocaleString(currentLocale)}</span>
           </div>
         </TableCell>
         <TableCell className="flex flex-col items-center sm:table-cell">
           <div className="grid">
             <label>{t("scaledBatch")}</label>
-            <span>{scaledBatch}</span>
+            <span>{scaledBatch.toLocaleString(currentLocale)}</span>
           </div>{" "}
         </TableCell>
       </TableRow>
