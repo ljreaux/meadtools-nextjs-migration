@@ -75,12 +75,12 @@ function NutrientSelector({
         ))}
         <label className="flex items-center gap-2">
           <Switch
-            checked={selected.selectedNutrients.includes("Other")}
+            checked={selected.selectedNutrients?.includes("Other")}
             onCheckedChange={() => handleNutrientChange("Other")}
           />
           {t("other.label")}
         </label>
-        {selected.selectedNutrients.includes("Other") && (
+        {selected.selectedNutrients?.includes("Other") && (
           <div className="grid grid-cols-2 gap-2 w-full col-span-2 py-6">
             <h3 className="col-span-2"> Other Nutrient Details</h3>
             <label className="space-y-2 col-span-2">
@@ -274,7 +274,7 @@ const LabeledCheckbox = ({
   return (
     <label className="flex items-center gap-2">
       <Switch
-        checked={selected.selectedNutrients.includes(label.value)}
+        checked={selected.selectedNutrients?.includes(label.value)}
         onCheckedChange={() => handleNutrientChange(label.value)}
       />
       {t(label.label)}

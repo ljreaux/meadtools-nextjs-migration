@@ -12,7 +12,7 @@ function useSuggestions<T extends { [key: string]: any }>(
 
   const getMatchingItems = (query: string) => {
     if (query.length === 0) return [];
-    return items.filter((item) =>
+    return items?.filter((item) =>
       t(lodash.camelCase(item[key]?.toString()))
         .toLowerCase()
         .includes(query.toLowerCase())
