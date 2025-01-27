@@ -9,6 +9,7 @@ function NuteCalc() {
         sg: "1.000",
         offset: "0",
         numberOfAdditions: "1",
+        units: "gal",
       }}
     >
       <NutrientCalculator />
