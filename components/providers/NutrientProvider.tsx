@@ -32,6 +32,7 @@ export const NutrientProvider = ({
   children: ReactNode;
   recipeData?: {
     volume: string;
+    units: string;
     sg: string;
     offset: string;
     numberOfAdditions: string;
@@ -537,6 +538,10 @@ export const NutrientProvider = ({
       setFullData((prev) => ({
         ...prev,
         inputs: { ...prev.inputs, ...recipeData },
+        selected: {
+          ...prev.selected,
+          volumeUnits: recipeData.units as VolumeUnits,
+        },
       }));
   }, [recipeData]);
 
