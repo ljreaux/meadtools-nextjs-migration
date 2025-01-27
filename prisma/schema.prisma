@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -65,10 +65,10 @@ model logs {
 model recipes {
   id              Int       @id @default(autoincrement())
   user_id         Int?
-  name            String    @db.VarChar(255)
+  name            String
   recipeData      String
-  yanFromSource   String?   @db.VarChar(255)
-  yanContribution String    @db.VarChar(255)
+  yanFromSource   String?
+  yanContribution String
   nutrientData    String
   advanced        Boolean
   nuteInfo        String?
@@ -94,13 +94,13 @@ model users {
 }
 
 model User {
-  id            String    @id @default(cuid()) // Add cuid() as the default
+  id            String    @id @default(cuid())
   email         String?   @unique
   name          String?
   emailVerified DateTime?
   image         String?
-  accounts      Account[] // Use accounts as relation name
-  sessions      Session[] // Use sessions as relation name
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model yeasts {

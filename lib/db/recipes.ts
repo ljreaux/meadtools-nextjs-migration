@@ -48,17 +48,19 @@ export async function getAllRecipesForUser(userId: number) {
 export async function getAllRecipes() {
   try {
     const recipes = await prisma.recipes.findMany({
-      include: { users: { select: { public_username: true } } },
+      include: {
+        users: { select: { public_username: true } },
+      },
     });
 
     const parsedRecipes = recipes.map((rec) => {
-      const primaryNotes = concatNotes(rec.primaryNotes);
-      const secondaryNotes = concatNotes(rec.secondaryNotes);
+      const primaryNotes = concatNotes(rec.primaryNotes || []); // Handle null arrays
+      const secondaryNotes = concatNotes(rec.secondaryNotes || []); // Handle null arrays
       return {
         ...rec,
         primaryNotes,
         secondaryNotes,
-        public_username: rec.users?.public_username || null,
+        public_username: rec.users?.public_username || "", // Fallback for null
       };
     });
 

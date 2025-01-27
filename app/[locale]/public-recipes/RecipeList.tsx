@@ -27,8 +27,8 @@ function parseRecipeData(recipeData: string) {
   try {
     const parsedData = JSON.parse(recipeData);
     return {
-      OG: parsedData.OG || "N/A",
-      FG: parsedData.FG || "N/A",
+      OG: parsedData.OG.toFixed(3) || "N/A",
+      FG: parsedData.FG.toFixed(3) || "N/A",
     };
   } catch (error) {
     console.error("Error parsing recipeData:", error);

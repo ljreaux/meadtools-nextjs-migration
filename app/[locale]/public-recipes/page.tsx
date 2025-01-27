@@ -3,11 +3,11 @@ import RecipeList from "./RecipeList";
 import initTranslations from "@/lib/i18n";
 
 async function fetchRecipes() {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   const endpoint = `${baseUrl}/api/recipes`;
 
   const res = await fetch(endpoint, { cache: "no-store" });
+
   if (!res.ok) {
     throw new Error("Failed to fetch recipes");
   }
