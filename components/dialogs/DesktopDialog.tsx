@@ -51,9 +51,7 @@ function DesktopDialog() {
       <AlertDialogContent className="z-[1000] overflow-scroll max-h-screen">
         <AlertDialogHeader>
           <AlertDialogTitle>{t("desktop.dialog.title")}</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-2">
-            {t("desktop.dialog.description")}
-          </AlertDialogDescription>
+          <AlertDialogDescription className="flex flex-col gap-2"></AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
