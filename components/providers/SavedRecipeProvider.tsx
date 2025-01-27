@@ -626,6 +626,83 @@ export default function SavedRecipeProvider({
     recipeData.volume,
     addingStabilizers,
   ]);
+  function calculateHoneyAndWater(
+    desiredOG: number,
+    totalVolume: number
+  ): { honeyVolume: number; waterVolume: number } {
+    const honeyOG = toSG(79.6); // OG for honey
+    const waterOG = toSG(0); // OG for water
+
+    if (desiredOG < waterOG || desiredOG > honeyOG) {
+      throw new Error(
+        `The desired OG (${desiredOG}) must be between ${waterOG} and ${honeyOG}.`
+      );
+    }
+
+    // Solve the equations:
+    // totalVolume = honeyVolume + waterVolume
+    // desiredOG = (honeyOG * honeyVolume + waterOG * waterVolume) / totalVolume
+
+    // Rearrange to find honeyVolume:
+    const honeyVolume =
+      ((desiredOG - waterOG) * totalVolume) / (honeyOG - waterOG);
+    const waterVolume = totalVolume - honeyVolume;
+
+    return { honeyVolume, waterVolume };
+  }
+
+  const setIngredientsToTarget = (og: number, volume: number) => {
+    const target = calculateHoneyAndWater(og, volume);
+
+    const honey = {
+      ...blankIngredient,
+      details: [
+        volumeToWeight(
+          target.honeyVolume,
+          parseNumber(blankIngredient.brix)
+        ).toFixed(3),
+        target.honeyVolume.toFixed(3),
+      ] as [string, string],
+    };
+    const water = {
+      id: 4,
+      name: "Water",
+      brix: "0",
+      secondary: false,
+      category: "water",
+      details: [
+        volumeToWeight(
+          target.waterVolume,
+          parseNumber(blankIngredient.brix)
+        ).toFixed(3),
+        target.waterVolume.toFixed(3),
+      ] as [string, string],
+    };
+    setRecipeData((prev) => ({
+      ...prev,
+      ingredients: [water, honey],
+    }));
+  };
+  const fillToNearest = (i: number) => {
+    const ingredient = recipeData.ingredients[i];
+    const currentIngredientVolume = parseNumber(ingredient.details[1]);
+    const targetVolume = Math.ceil(totalVolume);
+
+    // Calculate the additional volume needed, accounting for the current ingredient's contribution
+    const targetIngredientVolume =
+      targetVolume - (totalVolume - currentIngredientVolume);
+
+    if (targetIngredientVolume > 0) {
+      updateIngredientVolume(ingredient, i, targetIngredientVolume.toFixed(3));
+    }
+
+    console.log(
+      targetVolume,
+      totalVolume,
+      currentIngredientVolume,
+      targetIngredientVolume
+    );
+  };
 
   return (
     <RecipeContext.Provider
@@ -682,6 +759,8 @@ export default function SavedRecipeProvider({
             setRecipeName(e.target.value),
         },
         public_username: recipe.users.public_username,
+        fillToNearest,
+        setIngredientsToTarget,
       }}
     >
       <SavedNutrientProvider

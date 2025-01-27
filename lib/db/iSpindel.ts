@@ -81,6 +81,7 @@ export async function registerDevice({
       data: { device_name, user_id: userId },
     });
   } catch (error) {
+    console.error("Error registering device:", error);
     throw new Error("Failed to register device");
   }
 }
@@ -95,6 +96,7 @@ export async function updateBrewGravity(brewId: string, gravity: number) {
       data: { latest_gravity: gravity },
     });
   } catch (error) {
+    console.error("Error updating gravity:", error);
     throw new Error("Error updating gravity.");
   }
 }
@@ -117,6 +119,7 @@ export async function createLog(log: LogType) {
       data,
     });
   } catch (error) {
+    console.error("Error creating log:", error);
     throw new Error("Error creating log.");
   }
 }
@@ -137,6 +140,7 @@ export async function getLogs(
       },
     });
   } catch (error) {
+    console.error("Error fetching logs:", error);
     throw new Error("Error fetching logs.");
   }
 }
@@ -163,6 +167,7 @@ export async function getLogsForBrew(brew_id: string, userId?: number) {
 
     return brewWithLogs.logs;
   } catch (error) {
+    console.error("Error fetching logs for brew:", error);
     throw new Error("Error fetching logs for brew.");
   }
 }
@@ -178,6 +183,7 @@ export async function updateLog(
       data,
     });
   } catch (error) {
+    console.error("Error updating log:", error);
     throw new Error("Error updating log.");
   }
 }
@@ -216,6 +222,7 @@ export async function deleteLogsInRange(
       where: { id: { in: logIdsToDelete } },
     });
   } catch (error) {
+    console.error("Error deleting logs in range:", error);
     throw new Error("Error deleting logs.");
   }
 }
@@ -230,6 +237,7 @@ export async function createHydrometerToken(userId: number) {
     });
     return { token };
   } catch (err) {
+    console.error("Error creating hydrometer token:", err);
     throw new Error("Failed to create hydrometer token.");
   }
 }
@@ -251,6 +259,7 @@ export async function getBrews(user_id: number) {
       return a.start_date < b.start_date ? -1 : 1;
     });
   } catch (error) {
+    console.error("Error fetching brews:", error);
     throw new Error("Error fetching brews.");
   }
 }
@@ -276,6 +285,7 @@ export async function startBrew(
 
     return [brew, device];
   } catch (error) {
+    console.error(error);
     throw new Error("Error starting brew.");
   }
 }
@@ -294,6 +304,7 @@ export async function endBrew(id: string, brew_id: string, user_id: number) {
 
     return [brew, device];
   } catch (error) {
+    console.error(error);
     throw new Error("Error ending brew.");
   }
 }
@@ -305,6 +316,7 @@ export async function setBrewName(id: string, name: string, user_id: number) {
       data: { name },
     });
   } catch (error) {
+    console.error(error);
     throw new Error("Error setting brew name.");
   }
 }
@@ -320,6 +332,7 @@ export async function addRecipeToBrew(
       data: { recipe_id },
     });
   } catch (error) {
+    console.error(error);
     throw new Error("Error adding recipe to brew.");
   }
 }

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  {}: { params: Promise<{ id: string }> }
 ) {
   const userOrResponse = await verifyUser(req);
   if (userOrResponse instanceof NextResponse) {

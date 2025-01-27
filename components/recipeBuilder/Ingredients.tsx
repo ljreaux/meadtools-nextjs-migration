@@ -21,6 +21,7 @@ function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
     addIngredient,
     ingredientList,
     units,
+    fillToNearest,
   } = useRecipe();
 
   if (loadingIngredients) {
@@ -61,6 +62,7 @@ function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
                     toggleChecked={(val) => {
                       toggleSecondaryChecked(i, val);
                     }}
+                    fillToNearest={() => fillToNearest(i)}
                   />
                 </div>
               );
@@ -89,6 +91,7 @@ const IngredientLine = ({
   updateVolume,
   updateBrix,
   toggleChecked,
+  fillToNearest,
 }: {
   ing: IngredientDetails;
   deleteFn: () => void;
@@ -99,6 +102,7 @@ const IngredientLine = ({
   toggleChecked: (val: boolean) => void;
   ingredientList: Ingredient[];
   units: { weight: string; volume: string };
+  fillToNearest: () => void;
 }) => {
   const { t } = useTranslation();
 
@@ -155,6 +159,9 @@ const IngredientLine = ({
 
       <Button onClick={deleteFn} variant="destructive">
         {t("desktop.delete")}
+      </Button>
+      <Button onClick={fillToNearest} className="col-span-2">
+        {t("toNextVolume", { volumeUnit: units.volume })}
       </Button>
     </div>
   );

@@ -30,7 +30,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { HydrometerData } from "@/components/ispindel/HydrometerData";
 import { calcABV } from "@/lib/utils/unitConverter";
-export const transformData = (logs: any[]) => {
+const transformData = (logs: any[]) => {
   const og = logs[0]?.calculated_gravity || logs[0]?.gravity;
   return logs.map((log) => {
     const sg = log.calculated_gravity || log.gravity;

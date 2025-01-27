@@ -13,8 +13,13 @@ const goFermKeys = {
 
 function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
   const { t } = useTranslation();
-  const { nutrientAdditions, goFerm, goFermType, remainingYan } =
-    useNutrients();
+  const {
+    nutrientAdditions,
+    goFerm,
+    goFermType,
+    remainingYan,
+    otherNutrientName,
+  } = useNutrients();
 
   const labels = [
     "nutrients.fermO",
@@ -34,7 +39,9 @@ function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
           if (isInvalid) return null;
           return (
             <label key={labels[i]} className="space-y-2">
-              {t(labels[i])}
+              {labels[i] !== "other.label"
+                ? t(labels[i])
+                : otherNutrientName.value}
               <InputWithUnits value={add.toFixed(3)} text="g total" disabled />
               <InputWithUnits value={perAdd.toFixed(3)} text="g" disabled />
             </label>

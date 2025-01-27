@@ -49,10 +49,10 @@ export default function AbvCalculator() {
                 onFocus={(e) => e.target.select()}
                 className="sm:col-span-4"
               />
-              <p className="self-end sm:self-auto">
+              <p className="self-end sm:self-auto flex">
                 {brix.toLocaleString(currentLocale, {
                   maximumFractionDigits: 2,
-                })}
+                })}{" "}
                 {t("BRIX")}
               </p>
             </span>
@@ -60,7 +60,6 @@ export default function AbvCalculator() {
         })}
       </div>
 
-      {/* ABV Display */}
       <div className="grid items-center justify-center mt-auto">
         <AbvLine {...abv} textSize="sm:text-2xl text-lg" />
       </div>

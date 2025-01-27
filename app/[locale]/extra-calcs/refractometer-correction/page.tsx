@@ -1,5 +1,6 @@
 "use client";
 import AbvLine from "@/components/extraCalcs/AbvLine";
+import Tooltip from "@/components/Tooltips";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,13 +12,15 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import useAbv from "@/hooks/useAbv";
 import useRefrac from "@/hooks/useRefrac";
-("react");
+import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 function RefractometerCorrection() {
   const { t } = useTranslation();
   const { refrac, handleChange, handleUnitChange } = useRefrac();
   const abv = useAbv(refrac.og.toString(), refrac.fg.toString());
+
+  const warn = refrac.cf !== "1";
 
   return (
     <>
@@ -26,9 +29,15 @@ function RefractometerCorrection() {
       </h1>
       <Table>
         <TableBody>
-          <TableRow>
-            <TableCell className="text-foreground">
-              {t("correctionFactor")}{" "}
+          <TableRow className={cn(warn && "bg-[rgb(255,204,0)] text-black")}>
+            <TableCell className={cn(warn ? "text-black" : "text-foreground")}>
+              <span className="flex items-center">
+                {t("correctionFactor")}
+                <Tooltip
+                  body={t("tiptext.refractometerWarning")}
+                  link="https://www.brewersfriend.com/how-to-determine-your-refractometers-wort-correction-factor/"
+                />
+              </span>
             </TableCell>
             <TableCell colSpan={2}>
               <Input

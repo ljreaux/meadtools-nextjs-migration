@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { getUserById } from "@/lib/db/users";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../app/api/auth/[...nextauth]/route";
+import { authOptions } from "./auth";
 
 const { ACCESS_TOKEN_SECRET = "" } = process.env;
 
@@ -80,6 +80,7 @@ export async function verifyUser(req: NextRequest) {
       // If Google profile.sub is stored as google_id
       if (session?.user?.id) {
         const user = await prisma.users.findUnique({
+          // @ts-expect-error Works fine, but throws a ts error
           where: { google_id: session.user.id as string }, // Assuming profile.sub is mapped to google_id
         });
 

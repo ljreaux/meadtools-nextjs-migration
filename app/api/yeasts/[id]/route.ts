@@ -5,10 +5,11 @@ import { verifyAdmin } from "@/lib/middleware";
 // GET /api/yeasts/:id
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const yeast = await getYeastById(Number(params.id));
+    const { id } = await params;
+    const yeast = await getYeastById(Number(id));
     return NextResponse.json(yeast);
   } catch (error: any) {
     console.error("Error fetching yeast by ID:", error);
@@ -22,7 +23,7 @@ export async function GET(
 // PATCH /api/yeasts/:id - Admin-only route
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const adminOrResponse = await verifyAdmin(req);
   if (adminOrResponse instanceof NextResponse) {
@@ -31,7 +32,8 @@ export async function PATCH(
 
   try {
     const updateData = await req.json();
-    const updatedYeast = await updateYeast(params.id, updateData);
+    const { id } = await params;
+    const updatedYeast = await updateYeast(id, updateData);
     return NextResponse.json(updatedYeast);
   } catch (error: any) {
     console.error("Error updating yeast:", error);
@@ -45,7 +47,7 @@ export async function PATCH(
 // DELETE /api/yeasts/:id - Admin-only route
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const adminOrResponse = await verifyAdmin(req);
   if (adminOrResponse instanceof NextResponse) {
@@ -53,7 +55,8 @@ export async function DELETE(
   }
 
   try {
-    const deletedYeast = await deleteYeast(params.id);
+    const { id } = await params;
+    const deletedYeast = await deleteYeast(id);
     return NextResponse.json({
       message: `${deletedYeast.name} has been deleted.`,
     });

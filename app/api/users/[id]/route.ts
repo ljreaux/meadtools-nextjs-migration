@@ -4,7 +4,7 @@ import { requireAdmin, verifyUser } from "@/lib/middleware";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await verifyUser(req);
@@ -17,7 +17,7 @@ export async function GET(
         { status: 403 }
       );
     }
-    const { id } = params;
+    const { id } = await params;
 
     const user = await getUserById(parseInt(id, 10));
     if (!user) {
@@ -35,7 +35,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await verifyUser(req);
@@ -49,7 +49,7 @@ export async function PATCH(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
     const updates = await req.json();
 
     const updatedUser = await updateUser(Number(id), updates);
@@ -65,7 +65,7 @@ export async function PATCH(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const userId = await verifyUser(req);
@@ -79,7 +79,9 @@ export async function DELETE(
       );
     }
 
-    await deleteUser(Number(params.id));
+    const { id } = await params;
+
+    await deleteUser(Number(id));
     return NextResponse.json({ message: "User deleted successfully" });
   } catch (error: any) {
     console.error("Error deleting user:", error);

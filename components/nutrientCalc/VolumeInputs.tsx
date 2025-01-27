@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
-import { toBrix } from "@/lib/utils/unitConverter";
+import { calcSb, toBrix } from "@/lib/utils/unitConverter";
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 import { NutrientType } from "@/types/nutrientTypes";
@@ -28,7 +28,14 @@ function VolumeInputs({
     : parseNumber(inputs.sg.value);
   const brixString = toBrix(sgNum).toLocaleString(currentLocale, {
     maximumFractionDigits: 2,
-  }); //
+  });
+  const sugarBreak =
+    t("nuteResults.sb") +
+    ": " +
+    calcSb(parseNumber(inputs.sg.value)).toLocaleString(currentLocale, {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3,
+    });
   return (
     <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <div>
@@ -72,7 +79,9 @@ function VolumeInputs({
             onFocus={(e) => e.target.select()}
           />
         </label>
-        <p>{brixString + " Brix"}</p>
+        <span className="sm:flex grid sm:gap-2 sm:justify-evenly w-full">
+          <p>{brixString + " Brix"}</p> <p>{sugarBreak}</p>
+        </span>
       </div>
       <div className="col-span-2 sm:col-span-1">
         <label className="grid gap-1">

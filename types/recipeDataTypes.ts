@@ -148,6 +148,8 @@ export interface Recipe extends RecipeData {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
   public_username?: string | null;
+  setIngredientsToTarget: (og: number, volume: number) => void;
+  fillToNearest: (i: number) => void;
 }
 
 export const blankIngredient: IngredientDetails = {

@@ -99,8 +99,8 @@ function TempCorrection() {
                   maximumFractionDigits: 3,
                 })}{" "}
                 {resultBrix.toLocaleString(currentLocale, {
-                  maximumFractionDigits: 3,
-                })}
+                  maximumFractionDigits: 2,
+                })}{" "}
                 {t("Brix")}
               </span>
             </TableCell>

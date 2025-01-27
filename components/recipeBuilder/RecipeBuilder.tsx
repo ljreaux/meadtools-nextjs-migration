@@ -24,6 +24,7 @@ import SaveRecipe from "./SaveRecipe";
 import ResetButton from "./ResetButton";
 import { useRecipe } from "../providers/RecipeProvider";
 import { useNutrients } from "../providers/NutrientProvider";
+import DesiredBatchDetails from "./DesiredBatchDetails";
 
 const cardConfig = [
   {
@@ -31,6 +32,7 @@ const cardConfig = [
     heading: "recipeBuilder.homeHeading",
     components: [
       <Units key="units" useRecipe={useRecipe} />,
+      <DesiredBatchDetails key="batch details" />,
       <Ingredients key="ingredients" useRecipe={useRecipe} />,
       <IngredientResults key="ingredientResults" useRecipe={useRecipe} />,
       <ScaleRecipeForm key="scaleRecipeForm" useRecipe={useRecipe} />,
