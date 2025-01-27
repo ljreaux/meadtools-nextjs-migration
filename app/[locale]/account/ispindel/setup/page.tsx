@@ -10,7 +10,8 @@ import TokenGen from "@/components/ispindel/TokenGen";
 
 function Setup() {
   const { t } = useTranslation();
-  const displayUrl = "https://meadtools.com";
+  const displayUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
   return (
     <div className="flex flex-col items-center justify-center gap-6">
