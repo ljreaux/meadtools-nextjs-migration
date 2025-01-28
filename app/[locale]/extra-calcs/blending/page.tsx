@@ -81,18 +81,18 @@ function Blending() {
           <TableRow>
             <TableCell className="sm:p-4">
               <span className="grid gap-1 sm:text-lg">
-                <p>{t("totalVol")}</p>
-                <p> {totalVolume.toLocaleString(currentLocale)}</p>
-              </span>
-            </TableCell>
-            <TableCell className="sm:p-4">
-              <span className="grid gap-1 sm:text-lg">
                 <p>{t("blendedVal")}</p>
                 <p>
                   {blendedValue.toLocaleString(currentLocale, {
                     maximumFractionDigits: 3,
                   })}
                 </p>
+              </span>
+            </TableCell>
+            <TableCell className="sm:p-4">
+              <span className="grid gap-1 sm:text-lg">
+                <p>{t("totalVol")}</p>
+                <p> {totalVolume.toLocaleString(currentLocale)}</p>
               </span>
             </TableCell>
           </TableRow>
