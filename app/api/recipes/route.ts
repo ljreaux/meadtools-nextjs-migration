@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
     if (typeof userId === "number") isAdmin = await requireAdmin(userId);
 
     let recipes = await getAllRecipes();
-    console.log("recipes:", recipes);
     if (!isAdmin) recipes = recipes.filter((rec) => !rec.private);
 
     return NextResponse.json({ recipes });

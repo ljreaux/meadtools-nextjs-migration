@@ -494,10 +494,6 @@ export const SavedNutrientProvider = ({
     yanContributions,
     nuteArr,
   ]);
-  useEffect(
-    () => console.log(fullData.selected.selectedNutrients),
-    [fullData.selected]
-  );
 
   // Expose only the necessary state to the UI
   const uiState = {

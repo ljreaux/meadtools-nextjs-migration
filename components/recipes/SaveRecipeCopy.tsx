@@ -86,8 +86,7 @@ function SaveRecipeCopy() {
     };
 
     try {
-      const response = await fetchAuthenticatedPost("/api/recipes", body);
-      console.log("Recipe created successfully:", response.recipe);
+      await fetchAuthenticatedPost("/api/recipes", body);
 
       toast({
         description: "Recipe created successfully.",

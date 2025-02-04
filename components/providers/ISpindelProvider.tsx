@@ -277,7 +277,6 @@ export const ISpindelProvider = ({
         `/api/ispindel/logs?start_date=${start_date}&end_date=${end_date}&device_id=${device_id}`
       );
 
-      console.log(response);
       return response || [];
     } catch (error) {
       console.error("Failed to get logs:", error);

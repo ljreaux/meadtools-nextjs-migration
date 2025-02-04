@@ -123,8 +123,6 @@ const RecipePage = ({ id }: { id: string }) => {
     }
   };
 
-  console.log(nutrientData);
-
   return (
     <SavedRecipeProvider
       recipe={{

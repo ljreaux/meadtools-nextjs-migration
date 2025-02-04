@@ -521,13 +521,6 @@ export default function RecipeProvider({
     if (targetIngredientVolume > 0) {
       updateIngredientVolume(ingredient, i, targetIngredientVolume.toFixed(3));
     }
-
-    console.log(
-      targetVolume,
-      totalVolume,
-      currentIngredientVolume,
-      targetIngredientVolume
-    );
   };
 
   // fetch initial ingredient data

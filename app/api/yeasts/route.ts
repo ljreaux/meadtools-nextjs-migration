@@ -18,13 +18,11 @@ export async function GET(req: NextRequest) {
 
   try {
     if (brand) {
-      console.log("Fetching yeasts by brand:", brand);
       const yeasts = await getYeastByBrand(brand);
       return NextResponse.json(yeasts);
     }
 
     if (name) {
-      console.log("Fetching yeast by name:", name);
       const yeast = await getYeastByName(name);
       if (!yeast) {
         return NextResponse.json(
@@ -36,7 +34,6 @@ export async function GET(req: NextRequest) {
     }
 
     if (id) {
-      console.log("Fetching yeast by ID:", id);
       const yeast = await getYeastById(parseInt(id, 10));
       if (!yeast) {
         return NextResponse.json(
@@ -47,7 +44,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json(yeast);
     }
 
-    console.log("Fetching all yeasts");
     const yeasts = await getAllYeasts();
     return NextResponse.json(yeasts);
   } catch (error) {

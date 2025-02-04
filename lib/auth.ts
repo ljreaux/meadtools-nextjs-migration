@@ -45,17 +45,12 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log("signIn callback:", { user, account, profile });
-
       const existingUser = await prisma.users.findUnique({
         where: { email: user.email },
       });
 
-      console.log("Existing user from DB:", existingUser);
-
       if (existingUser) {
         if (account?.provider === "google" && !existingUser.google_id) {
-          console.log("Updating google_id...");
           await prisma.users.update({
             where: { email: user.email },
             data: { google_id: profile?.sub },

@@ -269,8 +269,6 @@ const LabeledCheckbox = ({
     }
   };
 
-  console.log(maxGpl);
-
   return (
     <label className="flex items-center gap-2">
       <Switch

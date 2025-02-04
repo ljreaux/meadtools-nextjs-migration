@@ -29,14 +29,17 @@ export async function POST(req: NextRequest) {
         expiresIn: "2w",
       });
 
-      return NextResponse.json({
-        message: "Successfully logged in!",
-        accessToken,
-        refreshToken,
-        role: user.role,
-        email: user.email,
-        id: user.id,
-      });
+      return NextResponse.json(
+        {
+          message: "Successfully logged in!",
+          accessToken,
+          refreshToken,
+          role: user.role,
+          email: user.email,
+          id: user.id,
+        },
+        { status: 200 }
+      );
     } else {
       return NextResponse.json(
         { error: "Invalid email or password" },

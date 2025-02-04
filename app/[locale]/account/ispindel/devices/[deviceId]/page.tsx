@@ -77,8 +77,6 @@ function Device() {
     });
   }, []);
 
-  useEffect(() => console.log(logs), [logs]);
-
   // Update coefficients locally
   const updateCoefficients = (index: number, value: string) => {
     const newCoefficients = [...coefficients];

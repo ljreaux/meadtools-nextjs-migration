@@ -1,0 +1,980 @@
+{
+  "name": "MeadTools API",
+  "version": "1.0",
+  "description": "Welcome to the MeadTools API. Below are the available endpoints.",
+  "authentication": {
+    "type": "JWT",
+    "header": "Authorization: Bearer <your_token_here>",
+    "description": "All protected routes require a valid JWT token. Obtain a token via the login route."
+  },
+  "endpoints": {
+    "Authentication": [
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "description": "User Login - Authenticate a user and return an access token.",
+        "request": {
+          "email": "string (required) - User's email address",
+          "password": "string (required) - User's password"
+        },
+        "response": {
+          "200": {
+            "message": "Successfully logged in!",
+            "accessToken": "string - JWT access token",
+            "refreshToken": "string - JWT refresh token",
+            "role": "string - User role",
+            "email": "string - User email",
+            "id": "integer - User ID"
+          },
+          "400": { "error": "Please provide email and password" },
+          "401": { "error": "Invalid email or password" },
+          "500": { "error": "Failed to log in user" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/register",
+        "description": "User Registration - Create a new user account and return an access token.",
+        "request": {
+          "email": "string (required) - User's email address",
+          "password": "string (required) - User's password",
+          "public_username": "string (optional) - Public display name"
+        },
+        "response": {
+          "200": {
+            "message": "Thank you for signing up!",
+            "accessToken": "string - JWT access token",
+            "refreshToken": "string - JWT refresh token",
+            "role": "string - User role",
+            "email": "string - User email"
+          },
+          "400": [
+            { "error": "Email and password are required." },
+            { "error": "A user by that email already exists" }
+          ],
+          "500": { "error": "Failed to register user" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/refresh",
+        "description": "Refresh Access Token - Generate a new access token using a valid refresh token.",
+        "request": {
+          "email": "string (required) - User's email address",
+          "refreshToken": "string (required) - Valid refresh token"
+        },
+        "response": {
+          "200": {
+            "accessToken": "string - New JWT access token"
+          },
+          "400": { "error": "Email and refreshToken are required" },
+          "401": { "error": "Invalid email" },
+          "500": [
+            { "error": "Invalid refresh token" },
+            { "error": "Failed to refresh token" }
+          ]
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/account-info",
+        "description": "Get Account Info - Retrieve the authenticated user's account details and their recipes.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": {
+            "user": {
+              "id": 1,
+              "email": "user@example.com",
+              "role": "user",
+              "public_username": "mead_maker"
+            },
+            "recipes": [
+              {
+                "id": 94,
+                "user_id": 1,
+                "name": "Blackberry Apple Cyser",
+                "private": false
+              }
+            ]
+          },
+          "401": { "error": "Unauthorized" },
+          "404": { "error": "User not found" },
+          "500": { "error": "Failed to fetch account info" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/auth/account-info",
+        "description": "Update Account Info - Modify the authenticated user's account details.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "email": "string (optional) - Updated user email",
+          "password": "string (optional) - New password (hashed before storage)",
+          "public_username": "string (optional) - Updated public display name"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "email": "updated@example.com",
+            "role": "user",
+            "public_username": "updated_username"
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to update account info" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/auth/create-username",
+        "description": "Create or Update Public Username - Allows an authenticated user to set or update their public display name.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "public_username": "string (required) - The new public username"
+        },
+        "response": {
+          "200": {
+            "message": "Public username successfully updated.",
+            "public_username": "new_username"
+          },
+          "400": { "error": "Public username is required." },
+          "401": { "error": "Unauthorized access" },
+          "500": { "error": "Failed to update public username." }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/[...nextauth]",
+        "description": "Session Information - Retrieve the user's session details if authenticated.",
+        "response": {
+          "200": {
+            "user": {
+              "id": "string - User ID",
+              "email": "string - User email",
+              "role": "string - User role"
+            },
+            "accessToken": "string (optional) - JWT access token"
+          },
+          "401": { "error": "Unauthorized" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/[...nextauth]",
+        "description": "User Authentication - Handle authentication via NextAuth.js, including social login (Google).",
+        "request": {
+          "provider": "string (required) - Authentication provider (e.g., google)",
+          "id_token": "string (optional) - ID token if using OAuth"
+        },
+        "response": {
+          "200": {
+            "user": {
+              "id": "string - User ID",
+              "email": "string - User email",
+              "role": "string - User role"
+            },
+            "accessToken": "string (optional) - JWT access token"
+          },
+          "401": { "error": "Unauthorized" }
+        }
+      }
+    ],
+    "Users": [
+      {
+        "method": "GET",
+        "path": "/api/users",
+        "description": "Get Users - Retrieve a list of all users (Admin only).",
+        "auth": "Required (Admin only)",
+        "response": {
+          "200": {
+            "users": [
+              {
+                "id": 1,
+                "email": "user@example.com",
+                "role": "user"
+              },
+              {
+                "id": 2,
+                "email": "admin@example.com",
+                "role": "admin"
+              }
+            ]
+          },
+          "403": { "error": "Unauthorized access" },
+          "500": { "error": "Failed to fetch users" }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/:id",
+        "description": "Get User by ID - Retrieve a specific user by their unique ID (Admin only).",
+        "auth": "Required (Admin only)",
+        "response": {
+          "200": {
+            "id": 1,
+            "email": "user@example.com",
+            "role": "user",
+            "public_username": "mead_maker"
+          },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "User not found" },
+          "500": { "error": "Failed to fetch user" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/users/:id",
+        "description": "Update User - Modify an existing user's information (Admin only).",
+        "auth": "Required (Admin only)",
+        "request": {
+          "email": "string (optional) - Updated user email",
+          "password": "string (optional) - Updated password",
+          "role": "string (optional) - Updated user role",
+          "public_username": "string (optional) - Updated public display name"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "email": "updated@example.com",
+            "role": "admin",
+            "public_username": "updated_username"
+          },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "User not found" },
+          "500": { "error": "Failed to update user" }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/users/:id",
+        "description": "Delete User - Remove a user from the database (Admin only).",
+        "auth": "Required (Admin only)",
+        "response": {
+          "200": { "message": "User deleted successfully" },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "User not found" },
+          "500": { "error": "Failed to delete user" }
+        }
+      }
+    ],
+    "Contact": [
+      {
+        "method": "POST",
+        "path": "/api/contact",
+        "description": "Send Contact Message - Sends a contact message via email.",
+        "request": {
+          "user_name": "string (required) - Sender's name",
+          "user_email": "string (required) - Sender's email address",
+          "message": "string (required) - Message content"
+        },
+        "response": {
+          "200": { "message": "Email sent successfully" },
+          "400": { "message": "All fields are required" },
+          "500": { "message": "Failed to send email" }
+        }
+      }
+    ],
+    "Ingredients": [
+      {
+        "method": "GET",
+        "path": "/api/ingredients",
+        "description": "Get Ingredients - Retrieve a list of all ingredients.",
+        "query_params": {
+          "category": "string (optional) - Filter ingredients by category",
+          "name": "string (optional) - Search for a specific ingredient by name"
+        },
+        "response": {
+          "200": {
+            "ingredients": [
+              {
+                "id": 1,
+                "name": "Honey",
+                "sugar_content": "79.6",
+                "water_content": "15.5",
+                "category": "sugar"
+              }
+            ]
+          },
+          "500": { "error": "Failed to fetch ingredients" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/ingredients",
+        "description": "Create Ingredient - Add a new ingredient to the database.",
+        "auth": "Required (Admin only)",
+        "request": {
+          "name": "string (required) - Name of the ingredient",
+          "category": "string (required) - Ingredient category",
+          "sugar_content": "string (optional) - Percentage of sugar content",
+          "water_content": "string (optional) - Percentage of water content"
+        },
+        "response": {
+          "201": {
+            "id": 1,
+            "name": "New Ingredient",
+            "sugar_content": "79.6",
+            "water_content": "15.5",
+            "category": "sugar"
+          },
+          "403": { "error": "Unauthorized access" },
+          "500": { "error": "Failed to create ingredient" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/ingredients/:id",
+        "description": "Update Ingredient - Modify an existing ingredient.",
+        "auth": "Required (Admin only)",
+        "request": {
+          "name": "string (optional) - Updated name of the ingredient",
+          "category": "string (optional) - Updated category",
+          "sugar_content": "string (optional) - Updated sugar content",
+          "water_content": "string (optional) - Updated water content"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "name": "Updated Ingredient",
+            "sugar_content": "80.0",
+            "water_content": "15.0",
+            "category": "sugar"
+          },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "Ingredient not found" },
+          "500": { "error": "Failed to update ingredient" }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/ingredients/:id",
+        "description": "Delete Ingredient - Remove an ingredient from the database.",
+        "auth": "Required (Admin only)",
+        "response": {
+          "200": { "message": "Ingredient has been deleted" },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "Ingredient not found" },
+          "500": { "error": "Failed to delete ingredient" }
+        }
+      }
+    ],
+    "Yeasts": [
+      {
+        "method": "GET",
+        "path": "/api/yeasts",
+        "description": "Get Yeasts - Retrieve a list of all yeasts.",
+        "query_params": {
+          "brand": "string (optional) - Filter yeasts by brand",
+          "name": "string (optional) - Search for a specific yeast by name",
+          "id": "integer (optional) - Retrieve a yeast by ID"
+        },
+        "response": {
+          "200": {
+            "yeasts": [
+              {
+                "id": 1,
+                "brand": "Lalvin",
+                "name": "18-2007",
+                "nitrogen_requirement": "Low",
+                "tolerance": "15",
+                "low_temp": "50",
+                "high_temp": "90"
+              }
+            ]
+          },
+          "404": { "error": "Yeast not found" },
+          "500": { "error": "Failed to fetch yeasts" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/yeasts",
+        "description": "Create Yeast - Add a new yeast to the database.",
+        "auth": "Required (Admin only)",
+        "request": {
+          "brand": "string (required) - Yeast brand",
+          "name": "string (required) - Yeast strain identifier",
+          "nitrogen_requirement": "string (optional) - Nitrogen requirement level",
+          "tolerance": "string (optional) - Alcohol tolerance percentage",
+          "low_temp": "string (optional) - Minimum fermentation temperature",
+          "high_temp": "string (optional) - Maximum fermentation temperature"
+        },
+        "response": {
+          "201": {
+            "id": 2,
+            "brand": "Lalvin",
+            "name": "K1-V1116",
+            "nitrogen_requirement": "Medium",
+            "tolerance": "18",
+            "low_temp": "50",
+            "high_temp": "85"
+          },
+          "400": { "error": "Yeast name is required" },
+          "403": { "error": "Unauthorized access" },
+          "500": { "error": "Failed to create yeast" }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/yeasts/:id",
+        "description": "Get Yeast by ID - Retrieve a yeast strain by its unique ID.",
+        "response": {
+          "200": {
+            "id": 1,
+            "brand": "Lalvin",
+            "name": "18-2007",
+            "nitrogen_requirement": "Low",
+            "tolerance": "15",
+            "low_temp": "50",
+            "high_temp": "90"
+          },
+          "404": { "error": "Yeast not found" },
+          "500": { "error": "Failed to fetch yeast by ID" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/yeasts/:id",
+        "description": "Update Yeast - Modify an existing yeast strain.",
+        "auth": "Required (Admin only)",
+        "request": {
+          "brand": "string (optional) - Updated yeast brand",
+          "name": "string (optional) - Updated yeast strain identifier",
+          "nitrogen_requirement": "string (optional) - Updated nitrogen requirement",
+          "tolerance": "string (optional) - Updated alcohol tolerance percentage",
+          "low_temp": "string (optional) - Updated minimum fermentation temperature",
+          "high_temp": "string (optional) - Updated maximum fermentation temperature"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "brand": "Lalvin",
+            "name": "Updated Yeast",
+            "nitrogen_requirement": "Medium",
+            "tolerance": "18",
+            "low_temp": "55",
+            "high_temp": "85"
+          },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "Yeast not found" },
+          "500": { "error": "Failed to update yeast" }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/yeasts/:id",
+        "description": "Delete Yeast - Remove a yeast strain from the database.",
+        "auth": "Required (Admin only)",
+        "response": {
+          "200": { "message": "Yeast has been deleted." },
+          "403": { "error": "Unauthorized access" },
+          "404": { "error": "Yeast not found" },
+          "500": { "error": "Failed to delete yeast" }
+        }
+      }
+    ],
+    "Additives": [
+      {
+        "method": "GET",
+        "path": "/api/additives",
+        "description": "Get Additives - Retrieve a list of additives and their recommended dosages.",
+        "query_params": {
+          "name": "string (optional) - Search for a specific additive by name (case-insensitive)"
+        },
+        "response": {
+          "200": {
+            "additives": [
+              {
+                "name": "FT Rouge",
+                "dosage": "1.3",
+                "unit": "g"
+              },
+              {
+                "name": "Opti-Red",
+                "dosage": "1",
+                "unit": "g"
+              },
+              {
+                "name": "Oak Chips",
+                "dosage": "0.25",
+                "unit": "oz"
+              }
+            ]
+          }
+        }
+      }
+    ],
+
+    "Recipes": [
+      {
+        "method": "GET",
+        "path": "/api/recipes",
+        "description": "Get Recipes - Retrieve a list of all recipes. Private recipes are only visible to admins.",
+        "response": {
+          "200": {
+            "recipes": [
+              {
+                "id": 94,
+                "user_id": 68,
+                "name": "POmme",
+                "recipeData": "{...}",
+                "yanFromSource": "[0,0,0]",
+                "yanContribution": "[14,100,210]",
+                "nutrientData": "{...}",
+                "advanced": true,
+                "nuteInfo": "{...}",
+                "primaryNotes": [
+                  ["Création du mout.", "26/07/2024\n1.115"],
+                  ["mesure", "01/08/2024\n1.084\n24°C"],
+                  ["temperature", "03/08/2024\n24°c"]
+                ],
+                "secondaryNotes": [[]],
+                "private": false,
+                "public_username": ""
+              }
+            ]
+          },
+          "500": { "error": "Failed to fetch recipes" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/recipes",
+        "description": "Create Recipe - Add a new recipe to the database.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "name": "string (required) - Recipe name",
+          "recipeData": "JSON (required) - Recipe details",
+          "yanFromSource": "string (optional) - YAN values from source",
+          "yanContribution": "string (optional) - YAN contribution values",
+          "nutrientData": "JSON (optional) - Nutrient-related data",
+          "advanced": "boolean (optional) - Whether advanced nutrient tracking is enabled",
+          "nuteInfo": "JSON (optional) - Additional nutrient-related information",
+          "primaryNotes": "array (optional) - Notes about primary fermentation",
+          "secondaryNotes": "array (optional) - Notes about secondary fermentation",
+          "privateRecipe": "boolean (optional) - Whether the recipe is private"
+        },
+        "response": {
+          "201": {
+            "recipe": {
+              "id": 117,
+              "user_id": 85,
+              "name": "New Recipe",
+              "recipeData": "{...}",
+              "yanFromSource": "null",
+              "yanContribution": "[40,100,210]",
+              "nutrientData": "{...}",
+              "advanced": false,
+              "nuteInfo": "{...}",
+              "primaryNotes": [],
+              "secondaryNotes": [],
+              "private": false,
+              "public_username": ""
+            }
+          },
+          "400": { "error": "Name and recipe data are required." },
+          "500": { "error": "Failed to create recipe" }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/recipes/:id",
+        "description": "Get Recipe by ID - Retrieve a specific recipe by its unique ID.",
+        "response": {
+          "200": {
+            "recipe": {
+              "id": 94,
+              "user_id": 68,
+              "name": "POmme",
+              "recipeData": "{...}",
+              "yanFromSource": "[0,0,0]",
+              "yanContribution": "[14,100,210]",
+              "nutrientData": "{...}",
+              "advanced": true,
+              "nuteInfo": "{...}",
+              "primaryNotes": [
+                ["Création du mout.", "26/07/2024\n1.115"],
+                ["mesure", "01/08/2024\n1.084\n24°C"],
+                ["temperature", "03/08/2024\n24°c"]
+              ],
+              "secondaryNotes": [[]],
+              "private": false,
+              "public_username": ""
+            }
+          },
+          "403": { "error": "You are not authorized to view this recipe" },
+          "404": { "error": "Recipe not found" },
+          "500": { "error": "An error occurred while fetching the recipe" }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/recipes/:id",
+        "description": "Update Recipe - Modify an existing recipe.",
+        "auth": "Required (Recipe owner or Admin only)",
+        "request": {
+          "name": "string (optional) - Updated recipe name",
+          "recipeData": "JSON (optional) - Updated recipe details",
+          "yanFromSource": "string (optional) - Updated YAN values from source",
+          "yanContribution": "string (optional) - Updated YAN contribution values",
+          "nutrientData": "JSON (optional) - Updated nutrient-related data",
+          "advanced": "boolean (optional) - Enable or disable advanced nutrient tracking",
+          "nuteInfo": "JSON (optional) - Additional nutrient-related information",
+          "primaryNotes": "array (optional) - Updated primary fermentation notes",
+          "secondaryNotes": "array (optional) - Updated secondary fermentation notes",
+          "private": "boolean (optional) - Whether the recipe is private"
+        },
+        "response": {
+          "200": {
+            "id": 94,
+            "user_id": 68,
+            "name": "Updated Recipe",
+            "recipeData": "{...}",
+            "yanFromSource": "null",
+            "yanContribution": "[40,100,210]",
+            "nutrientData": "{...}",
+            "advanced": false,
+            "nuteInfo": "{...}",
+            "primaryNotes": [],
+            "secondaryNotes": [],
+            "private": false,
+            "public_username": ""
+          },
+          "400": { "error": "Invalid recipe ID" },
+          "403": { "error": "You are not authorized to update this recipe" },
+          "404": { "error": "Recipe not found" },
+          "500": { "error": "Failed to update recipe" }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/recipes/:id",
+        "description": "Delete Recipe - Remove a recipe from the database.",
+        "auth": "Required (Recipe owner or Admin only)",
+        "response": {
+          "200": { "message": "Recipe has been deleted." },
+          "400": { "error": "Invalid recipe ID" },
+          "403": { "error": "You are not authorized to delete this recipe" },
+          "404": { "error": "Recipe not found" },
+          "500": { "error": "Failed to delete recipe" }
+        }
+      }
+    ],
+    "iSpindel": [
+      {
+        "method": "GET",
+        "path": "/api/ispindel",
+        "description": "Get iSpindel Token & Devices - Retrieve the user's iSpindel hydrometer token and registered devices.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": {
+            "token": "string - Hydrometer token",
+            "devices": [
+              {
+                "id": 1,
+                "userId": 5,
+                "device_name": "MySpindel",
+                "coefficients": "[c0, c1, c2]",
+                "brew_id": 10
+              }
+            ]
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to fetch hydro_token" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/ispindel",
+        "description": "Log iSpindel Data - Submit a data log from an iSpindel device.",
+        "request": {
+          "token": "string (required) - Hydrometer token",
+          "name": "string (required) - Name of the iSpindel device",
+          "angle": "number (optional) - Tilt angle of the device",
+          "gravity": "number (optional) - Measured gravity",
+          "temp": "number (optional) - Temperature reading",
+          "battery": "number (optional) - Battery voltage"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "device_id": 3,
+            "brew_id": 10,
+            "gravity": 1.045,
+            "calculated_gravity": 1.046,
+            "temp": 20.1,
+            "battery": 3.9
+          },
+          "400": { "error": "Missing token" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to log" }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/ispindel/register",
+        "description": "Register iSpindel Token - Generate a new hydrometer token for the authenticated user.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": {
+            "token": "string - Hydrometer token"
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to create hydro_token" }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/ispindel/brew",
+        "description": "Get Brews - Retrieve a list of the user's active and past brews.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": {
+            "brews": [
+              {
+                "id": 1,
+                "device_id": 3,
+                "user_id": 5,
+                "brew_name": "Summer Mead",
+                "start_date": "2024-02-01T12:00:00Z",
+                "end_date": null
+              }
+            ]
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to get brews." }
+        }
+      },
+      {
+        "method": "POST",
+        "path": "/api/ispindel/brew",
+        "description": "Start a New Brew - Register a new brew session for a device.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "device_id": "integer (required) - ID of the iSpindel device",
+          "brew_name": "string (required) - Name of the brew"
+        },
+        "response": {
+          "200": {
+            "id": 2,
+            "device_id": 3,
+            "user_id": 5,
+            "brew_name": "Blackberry Cyser",
+            "start_date": "2024-02-05T10:30:00Z"
+          },
+          "400": { "error": "Missing device_id or brew_name" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to create brew." }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/ispindel/brew",
+        "description": "Update or End a Brew - Modify the brew name or mark it as completed.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "device_id": "integer (required) - ID of the iSpindel device",
+          "brew_id": "integer (required) - ID of the brew session",
+          "brew_name": "string (optional) - New name for the brew (if renaming)"
+        },
+        "response": {
+          "200": {
+            "id": 2,
+            "device_id": 3,
+            "user_id": 5,
+            "brew_name": "Updated Brew Name",
+            "start_date": "2024-02-05T10:30:00Z",
+            "end_date": null
+          },
+          "400": { "error": "Missing device_id, brew_id, or brew_name" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to update brew." }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/ispindel/brew/:brew_id",
+        "description": "Attach Recipe to Brew - Link a recipe to an active brew session.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "recipe_id": "integer (required) - ID of the recipe to attach"
+        },
+        "response": {
+          "200": {
+            "id": 2,
+            "device_id": 3,
+            "user_id": 5,
+            "brew_name": "Updated Brew Name",
+            "recipe_id": 10,
+            "start_date": "2024-02-05T10:30:00Z",
+            "end_date": null
+          },
+          "400": { "error": "Missing brew_id or recipe_id" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to update brew." }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/ispindel/brew/:brew_id",
+        "description": "Delete Brew - Remove an active or past brew session.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": { "message": "Brew deleted successfully." },
+          "400": { "error": "Missing brew_id" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to delete brew." }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/ispindel/device/:device_id",
+        "description": "Update iSpindel Device - Modify the calibration coefficients for an iSpindel device.",
+        "auth": "Required (Authenticated users only)",
+        "request": {
+          "coefficients": "array (required) - Updated calibration coefficients for gravity calculation"
+        },
+        "response": {
+          "200": {
+            "id": 3,
+            "user_id": 5,
+            "device_name": "MySpindel",
+            "coefficients": "[c0, c1, c2]"
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to update device." }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/ispindel/device/:device_id",
+        "description": "Delete iSpindel Device - Remove an iSpindel device from the user's account.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": { "message": "Device deleted successfully." },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to delete device." }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/ispindel/logs",
+        "description": "Retrieve iSpindel Logs - Fetch device logs within a specified date range.",
+        "auth": "Required (Authenticated users only)",
+        "queryParams": {
+          "device_id": "integer (required) - ID of the iSpindel device",
+          "start_date": "string (required) - Start date in ISO format (YYYY-MM-DD)",
+          "end_date": "string (optional) - End date in ISO format (defaults to current date)"
+        },
+        "response": {
+          "200": {
+            "logs": [
+              {
+                "id": 1,
+                "device_id": 3,
+                "timestamp": "2024-02-05T10:30:00Z",
+                "gravity": 1.045,
+                "temp": 20.1,
+                "battery": 3.9
+              }
+            ]
+          },
+          "400": { "error": "Date or Device Id error" }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/ispindel/logs/range",
+        "description": "Delete iSpindel Logs in a Date Range - Remove logs for a device within a specified time range.",
+        "auth": "Required (Authenticated users only)",
+        "queryParams": {
+          "device_id": "integer (required) - ID of the iSpindel device",
+          "start_date": "string (required) - Start date in ISO format (YYYY-MM-DD)",
+          "end_date": "string (required) - End date in ISO format (YYYY-MM-DD)"
+        },
+        "response": {
+          "200": {
+            "message": "Logs from 2024-02-01T00:00:00.000Z to 2024-02-05T23:59:59.999Z were deleted successfully."
+          },
+          "400": {
+            "error": "Missing device_id, start_date, or end_date parameters"
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Error deleting log." }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/api/ispindel/logs/:id",
+        "description": "Retrieve Logs for a Brew - Fetch all iSpindel logs associated with a specific brew.",
+        "auth": "Required (Authenticated users only)",
+        "response": {
+          "200": {
+            "logs": [
+              {
+                "id": 1,
+                "device_id": 3,
+                "brew_id": 10,
+                "timestamp": "2024-02-05T10:30:00Z",
+                "gravity": 1.045,
+                "temp": 20.1,
+                "battery": 3.9
+              }
+            ]
+          },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to fetch logs." }
+        }
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/ispindel/logs/:id",
+        "description": "Update a Specific Log - Modify an existing log entry for an iSpindel device.",
+        "auth": "Required (Authenticated users only)",
+        "queryParams": {
+          "device_id": "integer (required) - ID of the iSpindel device"
+        },
+        "request": {
+          "gravity": "number (optional) - Updated gravity reading",
+          "temp": "number (optional) - Updated temperature reading",
+          "battery": "number (optional) - Updated battery voltage"
+        },
+        "response": {
+          "200": {
+            "id": 1,
+            "device_id": 3,
+            "brew_id": 10,
+            "timestamp": "2024-02-05T10:30:00Z",
+            "gravity": 1.047,
+            "temp": 20.3,
+            "battery": 3.8
+          },
+          "400": { "error": "Missing device_id parameter" },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to update log." }
+        }
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/ispindel/logs/:id",
+        "description": "Delete a Specific Log - Remove a log entry from an iSpindel device.",
+        "auth": "Required (Authenticated users only)",
+        "queryParams": {
+          "device_id": "integer (required) - ID of the iSpindel device"
+        },
+        "response": {
+          "200": { "message": "Log deleted successfully." },
+          "400": { "error": "Must provide a device id." },
+          "401": { "error": "Unauthorized" },
+          "500": { "error": "Failed to delete log." }
+        }
+      }
+    ]
+  },
+  "errors": {
+    "400": "Bad Request (e.g., missing required fields)",
+    "401": "Unauthorized (e.g., missing/invalid token)",
+    "403": "Forbidden (e.g., insufficient permissions)",
+    "404": "Not Found (e.g., invalid endpoint)",
+    "500": "Server Error (e.g., database failure)"
+  }
+}

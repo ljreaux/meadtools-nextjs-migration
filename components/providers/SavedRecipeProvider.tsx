@@ -695,13 +695,6 @@ export default function SavedRecipeProvider({
     if (targetIngredientVolume > 0) {
       updateIngredientVolume(ingredient, i, targetIngredientVolume.toFixed(3));
     }
-
-    console.log(
-      targetVolume,
-      totalVolume,
-      currentIngredientVolume,
-      targetIngredientVolume
-    );
   };
 
   return (

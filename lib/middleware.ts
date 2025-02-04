@@ -12,11 +12,8 @@ export async function requireAdmin(userId: number): Promise<boolean> {
   return user?.role === "admin";
 }
 export async function verifyUser(req: NextRequest) {
-  console.log("Verifying user...");
-
   try {
     const authHeader = req.headers.get("Authorization");
-    console.log("Authorization header:", authHeader);
 
     if (!authHeader) {
       console.error("Authorization header missing");
@@ -27,7 +24,6 @@ export async function verifyUser(req: NextRequest) {
     }
 
     const token = authHeader.split(" ")[1];
-    console.log("Extracted token:", token);
 
     if (!token) {
       console.error("Token missing");
@@ -39,15 +35,12 @@ export async function verifyUser(req: NextRequest) {
     // Try verifying as a custom token
     try {
       const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as { id: number };
-      console.log("Decoded custom token:", decoded);
       userId = decoded?.id;
 
       // Fetch the user by custom ID
       const user = await prisma.users.findUnique({
         where: { id: userId },
       });
-
-      console.log("User fetched by custom token:", user);
 
       if (!user) {
         console.error("User not found for custom token");
@@ -61,16 +54,12 @@ export async function verifyUser(req: NextRequest) {
 
     // If not a custom token, try getting the user from the session
     if (!userId) {
-      console.log("Trying to verify user via session...");
       const session = await getServerSession(authOptions);
-      console.log("Session fetched:", session);
 
       if (session?.user?.email) {
         const user = await prisma.users.findUnique({
           where: { email: session.user.email },
         });
-
-        console.log("User fetched by session email:", user);
 
         if (user) {
           return user.id;
@@ -83,8 +72,6 @@ export async function verifyUser(req: NextRequest) {
           // @ts-expect-error Works fine, but throws a ts error
           where: { google_id: session.user.id as string }, // Assuming profile.sub is mapped to google_id
         });
-
-        console.log("User fetched by google_id:", user);
 
         if (user) {
           return user.id;

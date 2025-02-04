@@ -2,7 +2,7 @@ import { POST } from "@/app/api/auth/login/route";
 import { getUserByEmail } from "@/lib/db/users";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { createRequest } from "node-mocks-http";
+import { NextRequest } from "next/server";
 
 // Mock necessary imports
 jest.mock("@/lib/db/users", () => ({
@@ -17,24 +17,27 @@ jest.mock("jsonwebtoken", () => ({
   sign: jest.fn(),
 }));
 
-describe("/api/auth/login", () => {
-  const mockHeaders = {
-    get: jest.fn(),
-  };
+jest.mock("next/server", () => ({
+  NextResponse: {
+    json: jest.fn((data, options) => ({ ...data, status: options?.status })),
+  },
+}));
 
+// Ensure environment variables exist
+process.env.ACCESS_TOKEN_SECRET = "test-secret";
+process.env.REFRESH_TOKEN_SECRET = "test-secret";
+
+describe("/api/auth/login", () => {
   describe("POST", () => {
     it("should return 400 if email or password is missing", async () => {
-      const req = createRequest({
-        method: "POST",
-        body: {},
-      });
-      req.json = async () => req.body;
+      const req = { json: async () => ({}) } as NextRequest;
 
-      const res = await POST(req as any);
+      const res = await POST(req);
 
       expect(res.status).toBe(400);
-      expect(await res.json()).toEqual({
+      expect(res).toEqual({
         error: "Please provide email and password",
+        status: 400,
       });
     });
 
@@ -50,17 +53,14 @@ describe("/api/auth/login", () => {
       });
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      const req = createRequest({
-        method: "POST",
-        body: { email, password },
-      });
-      req.json = async () => req.body;
+      const req = { json: async () => ({ email, password }) } as NextRequest;
 
-      const res = await POST(req as any);
+      const res = await POST(req);
 
       expect(res.status).toBe(401);
-      expect(await res.json()).toEqual({
+      expect(res).toEqual({
         error: "Invalid email or password",
+        status: 401,
       });
     });
 
@@ -75,23 +75,21 @@ describe("/api/auth/login", () => {
         role: "user",
       });
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
-      (jwt.sign as jest.Mock).mockReturnValue("access-token");
+      (jwt.sign as jest.Mock).mockReturnValue("mock-token");
 
-      const req = createRequest({
-        method: "POST",
-        body: { email, password },
-      });
-      req.json = async () => req.body;
+      const req = { json: async () => ({ email, password }) } as NextRequest;
 
-      const res = await POST(req as any);
+      const res = await POST(req);
 
       expect(res.status).toBe(200);
-      expect(await res.json()).toEqual({
+      expect(res).toEqual({
         message: "Successfully logged in!",
-        accessToken: "access-token",
-        refreshToken: "access-token", // Assuming refreshToken is also mocked as access-token
+        accessToken: "mock-token",
+        refreshToken: "mock-token",
         role: "user",
         email: "test@example.com",
+        id: 1,
+        status: 200,
       });
     });
 
@@ -103,17 +101,14 @@ describe("/api/auth/login", () => {
         new Error("Database error")
       );
 
-      const req = createRequest({
-        method: "POST",
-        body: { email, password },
-      });
-      req.json = async () => req.body;
+      const req = { json: async () => ({ email, password }) } as NextRequest;
 
-      const res = await POST(req as any);
+      const res = await POST(req);
 
       expect(res.status).toBe(500);
-      expect(await res.json()).toEqual({
+      expect(res).toEqual({
         error: "Failed to log in user",
+        status: 500,
       });
     });
 
@@ -131,17 +126,14 @@ describe("/api/auth/login", () => {
         new Error("Bcrypt error")
       );
 
-      const req = createRequest({
-        method: "POST",
-        body: { email, password },
-      });
-      req.json = async () => req.body;
+      const req = { json: async () => ({ email, password }) } as NextRequest;
 
-      const res = await POST(req as any);
+      const res = await POST(req);
 
       expect(res.status).toBe(500);
-      expect(await res.json()).toEqual({
+      expect(res).toEqual({
         error: "Failed to log in user",
+        status: 500,
       });
     });
   });

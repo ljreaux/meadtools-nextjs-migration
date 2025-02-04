@@ -96,11 +96,7 @@ function SaveChanges() {
     };
 
     try {
-      const response = await fetchAuthenticatedPatch(
-        `/api/recipes/${recipeId}`,
-        body
-      );
-      console.log("Recipe updated successfully:", response.recipe);
+      await fetchAuthenticatedPatch(`/api/recipes/${recipeId}`, body);
 
       toast({
         description: "Recipe updated successfully.",

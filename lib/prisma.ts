@@ -16,7 +16,6 @@ const prisma = new PrismaClient({
   datasources: {
     db: { url: dbUrl },
   },
-  log: ["query", "info", "warn", "error"],
 });
 
 export default prisma;

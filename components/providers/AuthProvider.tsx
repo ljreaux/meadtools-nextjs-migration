@@ -52,7 +52,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         const data = await res.json();
-        console.log("Fetched user data on init:", data);
 
         setUser({
           id: data.user.id,
@@ -285,7 +284,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       headers,
       body: JSON.stringify(body),
     });
-    console.log(res);
 
     if (!res.ok) {
       throw new Error("Failed to fetch data");

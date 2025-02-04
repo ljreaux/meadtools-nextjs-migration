@@ -71,7 +71,6 @@ function Brew() {
 
       if (brewId) {
         const logsData = await getBrewLogs(brewId as string);
-        console.log(logsData);
         setLogs(logsData);
       }
     };
