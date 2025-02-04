@@ -32,7 +32,7 @@ export default function ApiNav({
   };
 
   return (
-    <aside className="fixed top-0 left-0 h-screen w-64 bg-background shadow-md border-r border-border z-50 p-4 overflow-hidden">
+    <aside className="fixed hidden sm:block top-0 left-0 h-screen w-64 bg-background shadow-md border-r border-border z-50 p-4 overflow-hidden">
       <span className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-primary">MeadTools API</h2>
         <ModeToggle />

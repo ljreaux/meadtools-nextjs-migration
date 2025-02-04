@@ -20,15 +20,17 @@ export default function EndpointCard({ endpoint }: { endpoint: Endpoint }) {
   const { resolvedTheme } = useTheme();
   return (
     <div className="bg-card p-6 rounded-lg border border-border shadow-sm space-y-2 max-w-full">
-      <h3 className="text-xl font-semibold text-foreground">
+      <h3 className="sm:text-xl text-lg font-semibold text-foreground mb-6">
         {endpoint.description}
       </h3>
-      <p className="mt-2 text-primary">
+      <p className="text-primary">
         <strong>Method:</strong> <span>{endpoint.method}</span>
       </p>
       <p>
         <strong className="text-primary">Path:</strong>{" "}
-        <code className="bg-muted px-2 py-1 rounded">{endpoint.path}</code>
+        <code className="bg-muted text-background px-2 py-1 rounded">
+          {endpoint.path}
+        </code>
       </p>
       {endpoint.auth && (
         <p className="text-destructive">

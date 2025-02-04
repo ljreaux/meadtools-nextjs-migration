@@ -47,7 +47,7 @@ export default async function APIDocs({
           <ApiNav categories={categories} />
 
           {/* Main Content */}
-          <main className="flex-1 ml-64 p-10 bg-background max-w-screen-lg mx-auto overflow-x-hidden">
+          <main className="flex-1 sm:ml-64 p-10 bg-background max-w-screen-lg mx-auto overflow-x-hidden">
             <section id="overview">
               <h1 className="text-3xl font-bold text-foreground">
                 {docData.name}
