@@ -363,12 +363,16 @@ export const NutrientProvider = ({
         maximumFractionDigits: 2,
       })
     );
-  }, [fullData.inputs, fullData.selected, goFerm.type]);
+  }, [
+    fullData.inputs.volume,
+    fullData.inputs.sg,
+    fullData.selected.volumeUnits,
+  ]);
   useEffect(() => {
     const gf = calculateGoFerm(goFerm.type, parseNumber(yeastAmount));
 
     setGoFerm((prev) => ({ ...prev, ...gf }));
-  }, [yeastAmount]);
+  }, [yeastAmount, goFerm.type]);
 
   // Calculate target YAN
   const calculateYAN = () => {
@@ -380,10 +384,10 @@ export const NutrientProvider = ({
       nitrogen == "Low"
         ? 0.75
         : nitrogen == "Medium"
-        ? 0.9
-        : nitrogen == "High"
-        ? 1.25
-        : 1.8;
+          ? 0.9
+          : nitrogen == "High"
+            ? 1.25
+            : 1.8;
     const gpl = toBrix(sg) * sg * 10;
     const targetYan = gpl * multiplier;
     return Math.round(targetYan - offset);
