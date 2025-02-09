@@ -63,27 +63,6 @@ async function main() {
 
   await prisma.yeasts.createMany({ data: yeasts });
   console.log("Yeasts seeded");
-
-  // Seed recipes
-  const recipes = [
-    {
-      user_id: 1,
-      name: "Traditional Mead",
-      recipeData: JSON.stringify({
-        ingredients: [
-          { name: "Water", amount: 8.3451 },
-          { name: "Honey", amount: 3 },
-        ],
-      }),
-      nutrientData: JSON.stringify({ nitrogen: "Low" }),
-      advanced: false,
-      yanContribution: JSON.stringify([40, 100, 210]),
-    },
-    // Add more recipes as needed
-  ];
-
-  await prisma.recipes.createMany({ data: recipes });
-  console.log("Recipes seeded");
 }
 
 main()

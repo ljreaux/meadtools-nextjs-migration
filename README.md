@@ -6,8 +6,8 @@ MeadTools is an all-in-one mead, wine, and cider recipe-building calculator. It 
   - [Features](#features)
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
-    - [Database Setup](#database-setup)
     - [Setup](#setup)
+    - [Database Setup](#database-setup)
   - [Tech Stack](#tech-stack)
   - [Contributing](#contributing)
     - [Contribution Guidelines](#contribution-guidelines)
@@ -25,7 +25,7 @@ MeadTools is an all-in-one mead, wine, and cider recipe-building calculator. It 
 
 ## Installation
 
-You can install MeadTools locally. Because the entire app is now built in Next.js 15 and uses React 19, some dependencies require special handling.
+You can install MeadTools locally. Because the entire app is now built in Next.js 15 and uses React 19, some dependencies require special handling. Support for these will likely improve in the future.
 
 You also may want to remove i18nexus pull from the start scripts for local development. By default, i18nexus is included in the dev, build, and start scripts to sync translations from the external service. However, if you’re using the translations already included in the repository, you can remove it. To modify the scripts section, open the package.json at the root of the project and change the scripts to match the following.
 
@@ -44,6 +44,38 @@ You also may want to remove i18nexus pull from the start scripts for local devel
 - Node.js (latest LTS recommended)
 - PostgreSQL (You will need to set up a local database to use MeadTools Locally)
 - npm
+
+### Setup
+
+1. Clone the repository:
+
+```sh
+git clone https://github.com/ljreaux/meadtools-nextjs-migration
+cd meadtools
+```
+
+2. Install dependencies
+   **important: use the --legacy-peer-deps flag to ensure ShadCN components install correctly, this is hopefully a temporary requirement while React 19 continues to gain support**
+
+```sh
+npm install --legacy-peer-deps
+```
+
+1. Set up the environment variables by copying .env.example to .env and updating the values:
+
+```sh
+cp .env.example .env
+```
+
+4. Start the development server:
+
+```sh
+npm run dev
+```
+
+**Note that this will probably fail if you haven't completed the database setup already.**
+
+5. Access the application at http://localhost:3000
 
 ### Database Setup
 
@@ -67,17 +99,16 @@ CREATE USER meadtools_user WITH ENCRYPTED PASSWORD 'password';
 GRANT ALL PRIVILEGES ON DATABASE meadtools TO meadtools_user;
 ```
 
-4. Update .env.local
+4. Update .env
    Add the database credentials:
 
 ```sh
 DATABASE_URL=postgresql://meadtools_user:password@localhost:5432/meadtools
 ```
 
-5. Install Prisma & Generate Client
+1. Generate Prisma Client
 
 ```sh
-npm install @prisma/client
 npx prisma generate
 ```
 
@@ -99,40 +130,11 @@ npx prisma studio
 ```
 
 This opens a GUI where you can inspect your tables and relationships. 8. Seeding the database
-If you want to pre-fill the database with sample data (e.g., default ingredients, yeast strains, or test users), you can run:
+To fill your database with yeast, ingredient, and test users you can run:
 
 ```sh
 npx prisma db seed
 ```
-
-### Setup
-
-1. Clone the repository:
-
-```sh
-git clone https://github.com/ljreaux/meadtools-nextjs-migration
-cd meadtools
-```
-
-2. Install dependencies (important: use the --legacy-peer-deps flag to ensure ShadCN components install correctly):
-
-```sh
-npm install --legacy-peer-deps
-```
-
-3. Set up the environment variables by copying .env.example to .env.local and updating the values:
-
-```sh
-cp .env.example .env.local
-```
-
-4. Start the development server:
-
-```sh
-npm run dev
-```
-
-5. Access the application at http://localhost:3000
 
 ## Tech Stack
 
@@ -144,7 +146,7 @@ npm run dev
 
 ## Contributing
 
-We welcome contributions! To contribute:
+MeadTools welcome contributions! To contribute:
 
 1. Fork the repository.
 2. Create a new branch for your feature or bug fix.
@@ -153,7 +155,7 @@ We welcome contributions! To contribute:
 
 ### Contribution Guidelines
 
-- Follow the existing code style.
+- Follow the existing code style (I use the default Prettier config to maintain consistency).
 - Ensure all new features are documented.
 - Test your changes before submitting a pull request.
 
@@ -163,7 +165,7 @@ This project is licensed under the MIT License.
 
 ## Community & Support
 
-Join our [Discord server](#) to discuss features, get support, and contribute to the project.
+Join our [Discord server](#https://discord.gg/Wbx9DWWqFC) to discuss features, get support, and contribute to the project.
 
 ---
 
