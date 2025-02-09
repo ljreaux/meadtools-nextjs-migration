@@ -11,9 +11,12 @@ async function main() {
   // Drop and recreate tables is unnecessary; Prisma migrations handle this.
 
   // Seed users
+  const adminEmail = process.env.ADMIN_EMAIL || "";
   const adminPassword = process.env.ADMIN_PASSWORD
     ? await bcrypt.hash(process.env.ADMIN_PASSWORD, 10)
     : null;
+
+  const userEmail = process.env.USER_EMAIL || "";
   const userPassword = process.env.USER_PASSWORD
     ? await bcrypt.hash(process.env.USER_PASSWORD, 10)
     : null;
@@ -21,12 +24,12 @@ async function main() {
   await prisma.users.createMany({
     data: [
       {
-        email: "larryreaux@gmail.com",
+        email: adminEmail,
         password: adminPassword,
         role: "admin",
       },
       {
-        email: "contact@meadtools.com",
+        email: userEmail,
         password: userPassword,
         role: "user",
       },

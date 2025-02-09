@@ -16,7 +16,6 @@ export async function verifyUser(req: NextRequest) {
     const authHeader = req.headers.get("Authorization");
 
     if (!authHeader) {
-      console.error("Authorization header missing");
       return NextResponse.json(
         { error: "Authorization header missing" },
         { status: 401 }
