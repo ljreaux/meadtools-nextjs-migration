@@ -25,6 +25,7 @@ import { useNutrients } from "../providers/SavedNutrientProvider";
 import SaveChanges from "./SaveChanges";
 import SaveNew from "./SaveNew";
 import DeleteRecipe from "./DeleteRecipe";
+import { useEffect } from "react";
 
 const cardConfig = [
   {
@@ -82,7 +83,7 @@ const cardConfig = [
   },
 ];
 
-function OwnerRecipe() {
+function OwnerRecipe({ pdfRedirect }: { pdfRedirect: boolean }) {
   const recipe = useRecipe();
   const cards = cardConfig.map(({ key, heading, components, tooltip }) => (
     <CardWrapper key={key}>
@@ -94,6 +95,12 @@ function OwnerRecipe() {
 
   const { card, currentStepIndex, back, next, goTo } = useCards(cards);
   const { t } = useTranslation();
+
+  useEffect(() => {
+    if (pdfRedirect) {
+      goTo(cards.length - 1);
+    }
+  }, [pdfRedirect]);
 
   return (
     <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">

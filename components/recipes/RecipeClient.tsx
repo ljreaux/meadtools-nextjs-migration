@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/providers/AuthProvider";
 
 import { useToast } from "@/hooks/use-toast";
@@ -18,6 +18,8 @@ const RecipePage = ({ id }: { id: string }) => {
   const [redirected, setRedirected] = useState(false); // Track if redirected
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const pdfRedirect: boolean = JSON.parse(searchParams.get("pdf") || "false");
 
   // Extract normalized user ID
   const getUserId = (): string | null => {
@@ -140,7 +142,9 @@ const RecipePage = ({ id }: { id: string }) => {
         yanContribution,
       }}
     >
-      <>{isOwner ? <OwnerRecipe /> : <PublicRecipe />}</>
+      <>
+        {isOwner ? <OwnerRecipe pdfRedirect={pdfRedirect} /> : <PublicRecipe />}
+      </>
     </SavedRecipeProvider>
   );
 };

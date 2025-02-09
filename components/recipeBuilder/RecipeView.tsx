@@ -272,15 +272,23 @@ function RecipeView({
               </tr>
             </thead>
             <tbody>
-              {primary?.map((item, i) => (
-                <tr key={item.name + i}>
-                  <td>
-                    {i + 1}. {t(`${lodash.camelCase(item.name)}`)}
-                  </td>
-                  <td>{item.details[0]}</td>
-                  <td>{item.details[1]}</td>
-                </tr>
-              ))}
+              {primary?.map((item, i) => {
+                const camelKey = lodash.camelCase(item.name);
+
+                // Check if the key exists in translations
+                const translatedText = i18n.exists(camelKey)
+                  ? t(camelKey)
+                  : item.name;
+                return (
+                  <tr key={item.name + i}>
+                    <td>
+                      {i + 1}. {translatedText}
+                    </td>
+                    <td>{item.details[0]}</td>
+                    <td>{item.details[1]}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </section>
@@ -329,15 +337,23 @@ function RecipeView({
                   </tr>
                 </thead>
                 <tbody>
-                  {secondary.map((item, i) => (
-                    <tr key={item.name + i}>
-                      <td>
-                        {i + 1}. {t(`${lodash.camelCase(item.name)}`)}
-                      </td>
-                      <td>{item.details[0]}</td>
-                      <td>{item.details[1]}</td>
-                    </tr>
-                  ))}
+                  {secondary.map((item, i) => {
+                    const camelKey = lodash.camelCase(item.name);
+
+                    // Check if the key exists in translations
+                    const translatedText = i18n.exists(camelKey)
+                      ? t(camelKey)
+                      : item.name;
+                    return (
+                      <tr key={item.name + i}>
+                        <td>
+                          {i + 1}. {translatedText}
+                        </td>
+                        <td>{item.details[0]}</td>
+                        <td>{item.details[1]}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             )}
