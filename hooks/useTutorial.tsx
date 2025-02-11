@@ -9,6 +9,7 @@ interface UseTutorialReturn {
   run: boolean;
   setRun: React.Dispatch<React.SetStateAction<boolean>>;
   TutorialComponent: React.FC;
+  sidebarOpen: boolean;
 }
 
 /**
@@ -19,6 +20,7 @@ interface UseTutorialReturn {
 export function useTutorial(steps: Step[]): UseTutorialReturn {
   // Run the tutorial immediately by default.
   const [run, setRun] = useState<boolean>(true);
+  const [sidebarOpen] = useState<boolean>(run);
 
   // Callback to handle Joyride events.
   const handleJoyrideCallback = (data: CallBackProps): void => {
@@ -117,5 +119,5 @@ export function useTutorial(steps: Step[]): UseTutorialReturn {
     );
   };
 
-  return { run, setRun, TutorialComponent };
+  return { run, setRun, TutorialComponent, sidebarOpen };
 }

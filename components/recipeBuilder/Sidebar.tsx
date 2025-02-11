@@ -1,6 +1,6 @@
 "use client";
 
-import React, { JSX, useState } from "react";
+import React, { JSX, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronDown,
@@ -12,20 +12,27 @@ import {
   NotebookPen,
   FileText,
 } from "lucide-react";
+import lodash from "lodash";
 
 function RecipeCalculatorSideBar({
   goTo,
   children,
   cardNumber,
+  forceOpen,
 }: {
   goTo: (pageNum: number) => void;
   children: JSX.Element;
   cardNumber: number;
+  forceOpen?: boolean;
 }) {
   const { t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(forceOpen || false);
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
+
+  useEffect(() => {
+    setIsOpen(forceOpen || false);
+  }, [forceOpen]);
 
   const links = [
     {
@@ -62,7 +69,7 @@ function RecipeCalculatorSideBar({
 
   return (
     <div
-      className={`fixed top-28 right-0 transition-transform duration-500 bg-background border border-foreground z-50 px-2 rounded-md ${
+      className={`joyride-sidebar fixed top-28 right-0 transition-transform duration-500 bg-background border border-foreground z-50 px-2 rounded-md ${
         isOpen ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -92,6 +99,7 @@ function RecipeCalculatorSideBar({
             label={link.label}
             isActive={link.pageNumber === cardNumber} // Match active state
             clickFn={() => goTo(link.pageNumber - 1)}
+            tutorialClassName={`joyride-${lodash.camelCase(link.label)}`}
           />
         ))}
         {children}
@@ -105,14 +113,18 @@ function NavItem({
   icon,
   label,
   isActive,
+  tutorialClassName,
 }: {
   clickFn: () => void;
   icon: JSX.Element;
   label: string;
-  isActive: boolean; // Added to highlight active state
+  isActive: boolean;
+  tutorialClassName?: string;
 }) {
   return (
-    <div className="relative group flex flex-col items-center">
+    <div
+      className={`${tutorialClassName} relative group flex flex-col items-center`}
+    >
       {/* Icon Link */}
       <button
         onClick={clickFn}

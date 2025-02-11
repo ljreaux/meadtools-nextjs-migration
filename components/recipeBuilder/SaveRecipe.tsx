@@ -108,7 +108,7 @@ function SaveRecipe() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <div className="relative group flex flex-col items-center">
+        <div className="joyride-saveRecipe relative group flex flex-col items-center">
           <button className="flex items-center justify-center sm:w-12 sm:h-12 w-8 h-8 bg-background text-foreground rounded-full border border-foreground hover:text-background hover:bg-foreground transition-colors">
             <Save />
           </button>
