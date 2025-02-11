@@ -25,6 +25,23 @@ import ResetButton from "./ResetButton";
 import { useRecipe } from "../providers/RecipeProvider";
 import { useNutrients } from "../providers/NutrientProvider";
 import DesiredBatchDetails from "./DesiredBatchDetails";
+import { useTutorial } from "@/hooks/useTutorial";
+import { Step } from "react-joyride-react-19";
+
+const tutorialSteps: Step[] = [
+  {
+    target: "body", // Target the entire page
+    content: "Welcome to the Recipe Builder! Let us show you around.",
+    placement: "center",
+    disableBeacon: true,
+  },
+  {
+    target: ".joyride-units",
+    content:
+      "This section allows you to select the measurement units for weight and volume.",
+    placement: "bottom", // adjust placement as needed (e.g., "bottom", "top", etc.)
+  },
+];
 
 const cardConfig = [
   {
@@ -93,9 +110,11 @@ function RecipeBuilder() {
 
   const { card, currentStepIndex, back, next, goTo } = useCards(cards);
   const { t } = useTranslation();
+  const { TutorialComponent } = useTutorial(tutorialSteps);
 
   return (
     <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">
+      <TutorialComponent />
       <RecipeCalculatorSideBar goTo={goTo} cardNumber={currentStepIndex + 1}>
         <div className="py-2">
           <SaveRecipe />

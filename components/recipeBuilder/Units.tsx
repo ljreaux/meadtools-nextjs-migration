@@ -13,7 +13,7 @@ function Units({ useRecipe }: { useRecipe: () => Recipe }) {
   const { units, changeVolumeUnits, changeWeightUnits } = useRecipe();
   const { t } = useTranslation();
   return (
-    <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+    <div className="joyride-units grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <h2 className="col-span-2">{t("UNITS")}</h2>
 
       <label>
