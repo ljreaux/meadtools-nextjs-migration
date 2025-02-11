@@ -1,4 +1,4 @@
-import { Step } from "react-joyride-react-19";
+import { Step } from "react-joyride";
 
 export const tutorialSteps: Step[] = [
   {

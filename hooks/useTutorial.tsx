@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Joyride, { CallBackProps, Step, STATUS } from "react-joyride-react-19";
+import Joyride, { CallBackProps, Step, STATUS } from "react-joyride";
 import React from "react";
 
 interface UseTutorialReturn {
@@ -30,9 +30,7 @@ export function useTutorial(steps: Step[]): UseTutorialReturn {
       STATUS.SKIPPED,
     ];
     if (finishedStatuses.includes(joyrideStatus)) {
-      setTimeout(() => {
-        setRun(false);
-      }, 100);
+      setRun(false);
     }
   };
 
