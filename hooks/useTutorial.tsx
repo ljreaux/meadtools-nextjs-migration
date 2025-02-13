@@ -1,43 +1,52 @@
-// hooks/useTutorial.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Joyride, { CallBackProps, Step, STATUS } from "react-joyride";
 import React from "react";
 
+export type SpecialStepCallbacks = {
+  [stepIndex: number]: () => void;
+};
+
 interface UseTutorialReturn {
-  run: boolean;
-  setRun: React.Dispatch<React.SetStateAction<boolean>>;
   TutorialComponent: React.FC;
   sidebarOpen: boolean;
 }
 
-/**
- * Custom hook to encapsulate Joyride tutorial logic.
- * @param steps - Array of Joyride step objects.
- * @returns An object containing the run state, a setter for the run state, and a TutorialComponent.
- */
-export function useTutorial(steps: Step[]): UseTutorialReturn {
-  // Run the tutorial immediately by default.
+export function useTutorial(
+  steps: Step[],
+  specialCallbacks?: SpecialStepCallbacks
+): UseTutorialReturn {
+  // Initially, tutorial is off.
   const [run, setRun] = useState<boolean>(true);
-  const [sidebarOpen] = useState<boolean>(run);
+  // We'll use 'run' to force open the sidebar as well.
+  const sidebarOpen = run;
 
   // Callback to handle Joyride events.
   const handleJoyrideCallback = (data: CallBackProps): void => {
-    const { status: joyrideStatus } = data;
+    const { status: joyrideStatus, index } = data;
+
+    // If we have a step index and a corresponding callback, execute it.
+    if (
+      typeof index === "number" &&
+      specialCallbacks &&
+      specialCallbacks[index]
+    ) {
+      specialCallbacks[index]();
+    }
+
+    // When the tutorial finishes or is skipped, stop it.
     const finishedStatuses: (typeof joyrideStatus)[] = [
       STATUS.FINISHED,
       STATUS.SKIPPED,
     ];
     if (finishedStatuses.includes(joyrideStatus)) {
-      setRun(false);
+      setTimeout(() => {
+        setRun(false);
+      }, 100);
     }
   };
 
-  /**
-   * Custom styles for Joyride that use your Tailwind CSS variables.
-   * The tooltip container now has an extra top margin (adjust as needed) to account for the fixed navbar.
-   */
   const customJoyrideStyles = {
     options: {
       zIndex: 10000,
@@ -45,13 +54,11 @@ export function useTutorial(steps: Step[]): UseTutorialReturn {
       textColor: "hsl(var(--foreground))",
       width: 500,
     },
-    // Override the outer tooltip container to remove unwanted white backgrounds.
     tooltip: {
       backgroundColor: "hsl(var(--card))",
       border: "none",
       boxShadow: "none",
     },
-    // Adjust the tooltip container so it doesn't get hidden behind the navbar.
     tooltipContainer: {
       backgroundColor: "transparent",
       borderRadius: "var(--radius)",
@@ -65,7 +72,6 @@ export function useTutorial(steps: Step[]): UseTutorialReturn {
       border: "none",
       boxShadow: "none",
     },
-    // Secondary button styles for Next, Back, and Skip buttons.
     buttonNext: {
       backgroundColor: "hsl(var(--background))",
       color: "hsl(var(--foreground))",
@@ -93,29 +99,33 @@ export function useTutorial(steps: Step[]): UseTutorialReturn {
       fontWeight: 500,
       cursor: "pointer",
     },
+    buttonClose: {
+      display: "none",
+    },
   };
 
-  // The TutorialComponent renders Joyride only on the client.
   const TutorialComponent: React.FC = () => {
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
       setMounted(true);
     }, []);
-    if (!mounted) return null; // Avoid rendering on the server
-
+    if (!mounted) return null;
     return (
       <Joyride
         steps={steps}
         run={run}
         continuous
-        showSkipButton
-        scrollToFirstStep
-        scrollOffset={100} // Adjust scrolling so the target isn't hidden by the navbar
+        scrollOffset={100}
         callback={handleJoyrideCallback}
         styles={customJoyrideStyles}
+        disableCloseOnEsc
+        disableOverlayClose
       />
     );
   };
 
-  return { run, setRun, TutorialComponent, sidebarOpen };
+  return {
+    TutorialComponent,
+    sidebarOpen,
+  };
 }

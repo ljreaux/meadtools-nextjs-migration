@@ -29,12 +29,9 @@ const RecipeContext = createContext<Recipe | undefined>(undefined);
 
 export default function RecipeProvider({
   children,
-
   recipeName: providedName,
 }: {
   children: ReactNode;
-  // for main recipe builder local storage
-
   recipeName?: string;
 }) {
   const { t, i18n } = useTranslation();
@@ -229,10 +226,10 @@ export default function RecipeProvider({
     units.weight === "kg" && units.volume === "liter"
       ? (8.345 * 0.453592) / 3.78541
       : units.weight === "kg"
-      ? 8.345 * 0.453592
-      : units.volume === "liter"
-      ? 8.345 / 3.78541
-      : 8.345;
+        ? 8.345 * 0.453592
+        : units.volume === "liter"
+          ? 8.345 / 3.78541
+          : 8.345;
 
   const volumeToWeight = (value: number, brix: number) =>
     value * converter * toSG(brix);
@@ -567,7 +564,7 @@ export default function RecipeProvider({
       .map((ing) => {
         return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
-          string
+          string,
         ];
       });
     const primaryBlendArr = recipeData.ingredients
@@ -575,7 +572,7 @@ export default function RecipeProvider({
       .map((ing) => {
         return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
-          string
+          string,
         ];
       });
 

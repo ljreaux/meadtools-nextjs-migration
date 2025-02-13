@@ -20,11 +20,14 @@ import Notes from "./Notes";
 import PDF from "./PDF";
 
 import RecipeCalculatorSideBar from "./Sidebar";
-import SaveRecipe from "./SaveRecipe";
 import ResetButton from "./ResetButton";
-import { useRecipe } from "../providers/RecipeProvider";
-import { useNutrients } from "../providers/NutrientProvider";
-import DesiredBatchDetails from "./DesiredBatchDetails";
+import { useRecipe } from "../providers/SavedRecipeProvider";
+import { useNutrients } from "../providers/SavedNutrientProvider";
+import { useTutorial } from "@/hooks/useTutorial";
+import { cardOneSteps, cardTwoSteps } from "@/lib/tutorialSteps";
+import { useEffect, useState } from "react";
+import MockSaveRecipe from "./MockSaveRecipe";
+import MockBatchDetails from "./MockBatchDetails";
 
 const cardConfig = [
   {
@@ -32,7 +35,7 @@ const cardConfig = [
     heading: "recipeBuilder.homeHeading",
     components: [
       <Units key="units" useRecipe={useRecipe} />,
-      <DesiredBatchDetails key="batch details" />,
+      <MockBatchDetails key="batch-details" useRecipe={useRecipe} />,
       <Ingredients key="ingredients" useRecipe={useRecipe} />,
       <IngredientResults key="ingredientResults" useRecipe={useRecipe} />,
       <ScaleRecipeForm key="scaleRecipeForm" useRecipe={useRecipe} />,
@@ -83,7 +86,7 @@ const cardConfig = [
   },
 ];
 
-function RecipeBuilder() {
+function RecipeBuilderTutorial() {
   const cards = cardConfig.map(({ key, heading, components, tooltip }) => (
     <CardWrapper key={key}>
       <Heading text={heading} toolTipProps={tooltip} />
@@ -94,17 +97,53 @@ function RecipeBuilder() {
   const { card, currentStepIndex, back, next, goTo } = useCards(cards);
   const { t } = useTranslation();
 
+  // Define special callbacks.
+  // In this example, when we reach step 3 (index 2), update state and navigate to card 2.
+  const specialCallbacks = {
+    [cardOneSteps.length - 1]: () => {
+      if (currentStepIndex == 0) goTo(1);
+    },
+    [cardTwoSteps.length - 1]: () => {
+      if (currentStepIndex == 1) goTo(2);
+    },
+  };
+
+  const [currentTutorialSteps, setCurrentTutorialSteps] =
+    useState(cardOneSteps);
+  useEffect(() => {
+    switch (currentStepIndex) {
+      case 0:
+        setCurrentTutorialSteps(cardOneSteps);
+        break;
+      case 1:
+        setCurrentTutorialSteps(cardTwoSteps);
+        break;
+      default:
+        setCurrentTutorialSteps(cardOneSteps);
+        break;
+    }
+  }, [currentStepIndex]);
+
+  // Use the tutorial hook with the special callbacks.
+  const { TutorialComponent, sidebarOpen } = useTutorial(
+    currentTutorialSteps,
+    specialCallbacks
+  );
+
   return (
     <div className="w-full flex flex-col justify-center items-center py-[6rem] relative">
-      <RecipeCalculatorSideBar goTo={goTo} cardNumber={currentStepIndex + 1}>
+      <TutorialComponent />
+      <RecipeCalculatorSideBar
+        goTo={goTo}
+        cardNumber={currentStepIndex + 1}
+        forceOpen={sidebarOpen}
+      >
         <div className="py-2">
-          <SaveRecipe />
+          <MockSaveRecipe />
           <ResetButton />
         </div>
       </RecipeCalculatorSideBar>
-
       {card}
-
       <div className="flex py-12 gap-4 w-11/12 max-w-[1000px] items-center justify-center">
         <Button
           variant={"secondary"}
@@ -114,7 +153,6 @@ function RecipeBuilder() {
         >
           {t("buttonLabels.back")}
         </Button>
-
         <Button
           className="w-full"
           variant={"secondary"}
@@ -128,7 +166,7 @@ function RecipeBuilder() {
   );
 }
 
-export default RecipeBuilder;
+export default RecipeBuilderTutorial;
 
 const Heading = ({
   text,

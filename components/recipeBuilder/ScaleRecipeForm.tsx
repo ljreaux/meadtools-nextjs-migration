@@ -21,7 +21,10 @@ function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
   };
 
   return (
-    <form className="grid grid-cols-2 gap-2 py-6" onSubmit={scale}>
+    <form
+      className="joyride-scaleRecipe grid grid-cols-2 gap-2 py-6"
+      onSubmit={scale}
+    >
       <h3 className="col-span-full">{t("scale.title")}</h3>
       <label>
         {t("scale.current")}

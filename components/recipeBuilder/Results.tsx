@@ -33,7 +33,7 @@ function Results({ useRecipe }: { useRecipe: () => Recipe }) {
   if (totalVolume <= 0 || OG <= 1) return null;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-muted-foreground py-6">
+    <div className="joyride-recipeBuilderResults grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-muted-foreground py-6">
       <h3 className="col-span-full">{t("results")}</h3>
       <label
         className={cn("sm:col-span-2 p-4", backgroundColor[ogWarningClass])}
