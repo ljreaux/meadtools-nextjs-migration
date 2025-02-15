@@ -25,7 +25,7 @@ MeadTools is an all-in-one mead, wine, and cider recipe-building calculator. It 
 
 ## Installation
 
-You can install MeadTools locally. Because the entire app is now built in Next.js 15 and uses React 19, some dependencies require special handling. Support for these will likely improve in the future.
+You can install MeadTools locally. Because the entire app is now built in Next.js 15 and uses React 18.
 
 You also may want to remove i18nexus pull from the start scripts for local development. By default, i18nexus is included in the dev, build, and start scripts to sync translations from the external service. However, if you’re using the translations already included in the repository, you can remove it. To modify the scripts section, open the package.json at the root of the project and change the scripts to match the following.
 
@@ -55,10 +55,9 @@ cd meadtools
 ```
 
 2. Install dependencies
-   **important: use the --legacy-peer-deps flag to ensure ShadCN components install correctly, this is hopefully a temporary requirement while React 19 continues to gain support**
 
 ```sh
-npm install --legacy-peer-deps
+npm install
 ```
 
 1. Set up the environment variables by copying .env.example to .env and updating the values:
@@ -139,10 +138,11 @@ npx prisma db seed
 ## Tech Stack
 
 - **Next.js 15**
-- **React 19**
+- **React 18**
 - **ShadCN Components**
 - **TypeScript**
 - **Supabase (or PostgreSQL for local development)**
+- **i18nexus for translation management**
 
 ## Contributing
 
