@@ -44,6 +44,7 @@ export function useTutorial(
       backgroundColor: "hsl(var(--card))",
       border: "none",
       boxShadow: "none",
+      maxWidth: "70vw",
     },
     tooltipContainer: {
       backgroundColor: "transparent",
@@ -108,6 +109,7 @@ export function useTutorial(
           next: t("buttonLabels.next"),
         }}
         hideCloseButton
+        disableScrolling={false}
       />
     );
   };

@@ -82,12 +82,12 @@ const cardTwoSteps: Step[] = [
   {
     target: ".joyride-offset",
     content: "tutorial.cardTwo.step3",
-    placement: "left-start",
+    placement: "left",
   },
   {
     target: ".joyride-yeastDetails",
     content: "tutorial.cardTwo.step4",
-    placement: "left-start",
+    placement: "left",
   },
   {
     target: ".joyride-goFerm",
@@ -213,7 +213,6 @@ const cardSevenSteps: Step[] = [
   {
     target: ".joyride-saveRecipe",
     content: "tutorial.cardSeven.step3",
-    placement: "top-end",
   },
   {
     target: "body",
