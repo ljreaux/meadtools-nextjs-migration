@@ -34,7 +34,7 @@ function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
           text={volume}
         />
       </label>
-      <label>
+      <label className="grid">
         {t("scale.target")}
         <InputWithUnits
           value={scaled}
@@ -42,6 +42,7 @@ function ScaleRecipeForm({ useRecipe }: { useRecipe: () => Recipe }) {
             if (isValidNumber(e.target.value)) setScaled(e.target.value);
           }}
           text={volume}
+          className="mt-auto"
         />
       </label>
       <Button className="col-span-full" variant="secondary" type="submit">
