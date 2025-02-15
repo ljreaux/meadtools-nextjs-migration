@@ -24,7 +24,7 @@ function AdditionalDetails({
   const { t } = useTranslation();
   const { goFermType, yeastAmount, changeYeastAmount } = useNutrients();
   return (
-    <div className="grid grid-cols-2 gap-2">
+    <div className="joyride-goFerm grid grid-cols-2 gap-2">
       <label className="grid gap-1">
         <span className="flex items-center gap-1">
           {t("goFermType")}

@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Joyride, { CallBackProps, Step, STATUS } from "react-joyride";
+import Joyride, { CallBackProps, Step } from "react-joyride";
 import React from "react";
+import { useTranslation } from "react-i18next";
 
 export type SpecialStepCallbacks = {
   [stepIndex: number]: () => void;
@@ -17,33 +18,18 @@ export function useTutorial(
   steps: Step[],
   specialCallbacks?: SpecialStepCallbacks
 ): UseTutorialReturn {
-  // Initially, tutorial is off.
-  const [run, setRun] = useState<boolean>(true);
-  // We'll use 'run' to force open the sidebar as well.
-  const sidebarOpen = run;
+  const { t } = useTranslation();
+  const sidebarOpen = true;
 
-  // Callback to handle Joyride events.
   const handleJoyrideCallback = (data: CallBackProps): void => {
-    const { status: joyrideStatus, index } = data;
+    const { index } = data;
 
-    // If we have a step index and a corresponding callback, execute it.
     if (
       typeof index === "number" &&
       specialCallbacks &&
       specialCallbacks[index]
     ) {
       specialCallbacks[index]();
-    }
-
-    // When the tutorial finishes or is skipped, stop it.
-    const finishedStatuses: (typeof joyrideStatus)[] = [
-      STATUS.FINISHED,
-      STATUS.SKIPPED,
-    ];
-    if (finishedStatuses.includes(joyrideStatus)) {
-      setTimeout(() => {
-        setRun(false);
-      }, 100);
     }
   };
 
@@ -99,9 +85,6 @@ export function useTutorial(
       fontWeight: 500,
       cursor: "pointer",
     },
-    buttonClose: {
-      display: "none",
-    },
   };
 
   const TutorialComponent: React.FC = () => {
@@ -113,13 +96,18 @@ export function useTutorial(
     return (
       <Joyride
         steps={steps}
-        run={run}
+        run={true}
         continuous
         scrollOffset={100}
         callback={handleJoyrideCallback}
         styles={customJoyrideStyles}
         disableCloseOnEsc
         disableOverlayClose
+        locale={{
+          back: t("buttonLabels.back"),
+          next: t("buttonLabels.next"),
+        }}
+        hideCloseButton
       />
     );
   };

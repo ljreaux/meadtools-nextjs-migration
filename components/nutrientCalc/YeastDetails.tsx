@@ -24,7 +24,7 @@ function YeastDetails({ useNutrients }: { useNutrients: () => NutrientType }) {
   } = useNutrients();
 
   return (
-    <div className="grid sm:grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+    <div className="joyride-yeastDetails grid sm:grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <div>
         <label>
           {t("yeastBrand")}

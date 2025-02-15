@@ -12,49 +12,48 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
-function SupportDialog() {
+function TutorialDialog() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [isDialogOpen, setDialogOpen] = useState(false);
 
-  // Check local storage for visibility condition
+  // Check local storage and device type
   useEffect(() => {
-    const hasSeenSupportDialog = localStorage.getItem("hasSeenSupportDialog");
-    if (!hasSeenSupportDialog) {
+    const hasSeenDialog = !!JSON.parse(
+      localStorage.getItem("hasSeenTutorialDialog") || "false"
+    );
+    if (!hasSeenDialog) {
       setDialogOpen(true);
-      localStorage.setItem("hasSeenSupportDialog", "true");
+      localStorage.setItem("hasSeenTutorialDialog", "true");
     }
   }, []);
-
-  const splitText = (text: string) => {
-    const paragraphs = text.split("\n");
-    return paragraphs.map((p, i) => <p key={i}>{p}</p>);
-  };
 
   const handleCancel = () => {
     setDialogOpen(false);
   };
 
-  const handleSupport = () => {
+  const handleNavigation = () => {
     setDialogOpen(false);
-    window.open("https://ko-fi.com/meadtools", "_blank");
+    router.push("/tutorial");
   };
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-      <AlertDialogContent className="z-[1000] overflow-y-scroll max-h-screen">
+      <AlertDialogContent className="z-[1000] max-h-screen">
         <AlertDialogHeader>
-          <AlertDialogTitle>{t("donate.dialog.title")}</AlertDialogTitle>
+          <AlertDialogTitle>{t("tutorial.dialog.title")}</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-2">
-            {splitText(t("donate.dialog.content"))}
+            {t("tutorial.dialog.description")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>
             {t("donate.dialog.cancel")}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={handleSupport}>
-            {t("donate.dialog.support")}
+          <AlertDialogAction onClick={handleNavigation}>
+            {t("tutorial.dialog.viewTutorial")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -62,4 +61,4 @@ function SupportDialog() {
   );
 }
 
-export default SupportDialog;
+export default TutorialDialog;

@@ -24,10 +24,11 @@ import ResetButton from "./ResetButton";
 import { useRecipe } from "../providers/SavedRecipeProvider";
 import { useNutrients } from "../providers/SavedNutrientProvider";
 import { useTutorial } from "@/hooks/useTutorial";
-import { cardOneSteps, cardTwoSteps } from "@/lib/tutorialSteps";
+import { stepCards } from "@/lib/tutorialSteps";
 import { useEffect, useState } from "react";
 import MockSaveRecipe from "./MockSaveRecipe";
 import MockBatchDetails from "./MockBatchDetails";
+import { Step } from "react-joyride";
 
 const cardConfig = [
   {
@@ -97,31 +98,23 @@ function RecipeBuilderTutorial() {
   const { card, currentStepIndex, back, next, goTo } = useCards(cards);
   const { t } = useTranslation();
 
-  // Define special callbacks.
-  // In this example, when we reach step 3 (index 2), update state and navigate to card 2.
+  const [currentTutorialSteps, setCurrentTutorialSteps] = useState<Step[]>([]);
+
+  const transformSteps = (arr: Step[]) =>
+    arr.map((step) => ({
+      ...step,
+      content:
+        typeof step.content === "string" ? t(step.content) : step.content,
+      hideFooter: typeof step.content !== "string" && true,
+    }));
   const specialCallbacks = {
-    [cardOneSteps.length - 1]: () => {
-      if (currentStepIndex == 0) goTo(1);
-    },
-    [cardTwoSteps.length - 1]: () => {
-      if (currentStepIndex == 1) goTo(2);
+    [currentTutorialSteps.length - 1]: () => {
+      const isNextStep = !!stepCards[currentStepIndex + 1];
+      if (isNextStep) next();
     },
   };
-
-  const [currentTutorialSteps, setCurrentTutorialSteps] =
-    useState(cardOneSteps);
   useEffect(() => {
-    switch (currentStepIndex) {
-      case 0:
-        setCurrentTutorialSteps(cardOneSteps);
-        break;
-      case 1:
-        setCurrentTutorialSteps(cardTwoSteps);
-        break;
-      default:
-        setCurrentTutorialSteps(cardOneSteps);
-        break;
-    }
+    setCurrentTutorialSteps(transformSteps(stepCards[currentStepIndex]));
   }, [currentStepIndex]);
 
   // Use the tutorial hook with the special callbacks.

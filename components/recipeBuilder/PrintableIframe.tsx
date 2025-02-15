@@ -156,7 +156,11 @@ const PrintableIframe: React.FC<PrintableIframeProps> = ({ content }) => {
             <Plus />
           </Button>
         </span>
-        <Button onClick={handlePrint} variant="secondary">
+        <Button
+          onClick={handlePrint}
+          variant="secondary"
+          className="joyride-downloadPdf"
+        >
           <Download />
         </Button>
       </div>
