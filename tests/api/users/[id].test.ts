@@ -1,6 +1,6 @@
 import { GET, PATCH, DELETE } from "@/app/api/users/[id]/route";
 import { getUserById, updateUser, deleteUser } from "@/lib/db/users";
-import { verifyUser, requireAdmin } from "@/lib/middleware";
+import { verifyUser, requireAdmin } from "@/lib/userAccessFunctions";
 import { createRequest } from "node-mocks-http";
 
 jest.mock("@/lib/db/users", () => ({
@@ -9,7 +9,7 @@ jest.mock("@/lib/db/users", () => ({
   deleteUser: jest.fn(),
 }));
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
   requireAdmin: jest.fn(),
 }));

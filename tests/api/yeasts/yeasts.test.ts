@@ -7,10 +7,10 @@ import {
   getYeastById,
   createYeast,
 } from "@/lib/db/yeasts";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 
 jest.mock("@/lib/db/yeasts");
-jest.mock("@/lib/middleware");
+jest.mock("@/lib/userAccessFunctions");
 
 describe("/api/yeasts", () => {
   afterEach(() => {

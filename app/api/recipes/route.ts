@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createRecipe, getAllRecipes } from "@/lib/db/recipes";
 
-import { requireAdmin, verifyUser } from "@/lib/middleware";
+import { requireAdmin, verifyUser } from "@/lib/userAccessFunctions";
 
 export async function GET(req: NextRequest) {
   const userId = await verifyUser(req);

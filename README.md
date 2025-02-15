@@ -128,8 +128,10 @@ npx prisma migrate dev --name init
 npx prisma studio
 ```
 
-This opens a GUI where you can inspect your tables and relationships. 8. Seeding the database
-To fill your database with yeast, ingredient, and test users you can run:
+This opens a GUI where you can inspect your tables and relationships.
+
+8. Seeding the database
+   To fill your database with yeast, ingredient, and test users you can run:
 
 ```sh
 npx prisma db seed

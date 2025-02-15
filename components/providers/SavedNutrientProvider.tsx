@@ -197,7 +197,10 @@ export const SavedNutrientProvider = ({
       ...prev,
       selected: {
         ...prev.selected,
-        n2Requirement: req,
+        yeastDetails: {
+          ...prev.selected.yeastDetails,
+          nitrogen_requirement: req,
+        },
       },
     }));
   };

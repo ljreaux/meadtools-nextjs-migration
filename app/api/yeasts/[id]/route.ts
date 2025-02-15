@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getYeastById, updateYeast, deleteYeast } from "@/lib/db/yeasts";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 
 // GET /api/yeasts/:id
 export async function GET(

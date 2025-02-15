@@ -5,7 +5,7 @@ import {
   getIngredientByName,
   createIngredient,
 } from "@/lib/db/ingredients";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 
 // GET /api/ingredients
 export async function GET(req: NextRequest) {

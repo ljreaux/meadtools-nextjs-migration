@@ -1,9 +1,9 @@
 import { PATCH, DELETE } from "@/app/api/ispindel/device/[device_id]/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { updateCoefficients, deleteDevice } from "@/lib/db/iSpindel";
 import { createRequest } from "node-mocks-http";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

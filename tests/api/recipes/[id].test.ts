@@ -1,9 +1,9 @@
 import { GET, PATCH, DELETE } from "@/app/api/recipes/[id]/route";
-import { verifyUser, requireAdmin } from "@/lib/middleware";
+import { verifyUser, requireAdmin } from "@/lib/userAccessFunctions";
 import { getRecipeInfo, updateRecipe, deleteRecipe } from "@/lib/db/recipes";
 import { createRequest } from "node-mocks-http";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
   requireAdmin: jest.fn(),
 }));

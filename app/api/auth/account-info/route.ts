@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { getUserById, updateUser } from "@/lib/db/users";
 import { getAllRecipesForUser } from "@/lib/db/recipes";
 import bcrypt from "bcrypt";
 
 export async function GET(req: NextRequest) {
   const userId = await verifyUser(req);
-  if (!userId)
+  if (!userId || userId instanceof NextResponse)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    if (userId instanceof NextResponse) return userId;
     const user = await getUserById(userId);
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -39,7 +38,7 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const userId = await verifyUser(req);
 
-  if (!userId) {
+  if (!userId || userId instanceof NextResponse) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -50,7 +49,6 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    if (userId instanceof NextResponse) return userId;
     const updatedUser = await updateUser(userId, body);
 
     return NextResponse.json({ ...updatedUser, password: undefined });

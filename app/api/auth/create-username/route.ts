@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { updateUser } from "@/lib/db/users";
 
 export async function PATCH(req: NextRequest) {

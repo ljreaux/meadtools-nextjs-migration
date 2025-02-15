@@ -1,10 +1,10 @@
 import { POST } from "@/app/api/ispindel/register/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { createHydrometerToken } from "@/lib/db/iSpindel";
 import { createRequest } from "node-mocks-http";
 import { NextResponse } from "next/server";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

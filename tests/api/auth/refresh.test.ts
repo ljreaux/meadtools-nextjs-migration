@@ -14,10 +14,6 @@ jest.mock("jsonwebtoken", () => ({
 }));
 
 describe("/api/auth/refresh", () => {
-  const mockHeaders = {
-    get: jest.fn(),
-  };
-
   describe("POST", () => {
     it("should return 400 if email or refreshToken is missing", async () => {
       const req = createRequest({

@@ -1,4 +1,4 @@
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 import { deleteIngredient, updateIngredient } from "@/lib/db/ingredients";
 import { NextRequest, NextResponse } from "next/server";
 

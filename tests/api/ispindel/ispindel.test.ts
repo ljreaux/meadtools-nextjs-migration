@@ -1,5 +1,5 @@
 import { GET, POST } from "@/app/api/ispindel/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import {
   calcGravity,
   createLog,
@@ -11,7 +11,7 @@ import {
 } from "@/lib/db/iSpindel";
 import { createRequest } from "node-mocks-http";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

@@ -6,7 +6,7 @@ import {
   getYeastById,
   createYeast,
 } from "@/lib/db/yeasts";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
