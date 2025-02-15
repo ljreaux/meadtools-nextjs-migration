@@ -77,4 +77,8 @@ export const extraLinks = [
     path: "/juice",
     label: "additionalLinks.juice",
   },
+  {
+    path: "/tutorial",
+    label: "additionalLinks.tutorial",
+  },
 ];

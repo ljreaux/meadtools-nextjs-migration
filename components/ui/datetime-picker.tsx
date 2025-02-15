@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { add, format } from "date-fns";
-import { type Locale, de, enUS } from "date-fns/locale";
+import { de, enUS } from "date-fns/locale";
 import {
   Calendar as CalendarIcon,
   ChevronLeft,
@@ -257,7 +257,7 @@ function Calendar({
   ...props
 }: CalendarProps & { yearRange?: number }) {
   const MONTHS = React.useMemo(() => {
-    let locale: Pick<Locale, "options" | "localize" | "formatLong"> = enUS;
+    let locale = enUS;
     const { options, localize, formatLong } = props.locale || {};
     if (options && localize && formatLong) {
       locale = {

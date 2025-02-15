@@ -63,6 +63,7 @@ function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
                       toggleSecondaryChecked(i, val);
                     }}
                     fillToNearest={() => fillToNearest(i)}
+                    index={i}
                   />
                 </div>
               );
@@ -92,6 +93,7 @@ const IngredientLine = ({
   updateBrix,
   toggleChecked,
   fillToNearest,
+  index,
 }: {
   ing: IngredientDetails;
   deleteFn: () => void;
@@ -103,6 +105,7 @@ const IngredientLine = ({
   ingredientList: Ingredient[];
   units: { weight: string; volume: string };
   fillToNearest: () => void;
+  index: number;
 }) => {
   const { t } = useTranslation();
 
@@ -111,7 +114,9 @@ const IngredientLine = ({
   };
 
   return (
-    <div className="grid grid-cols-2 gap-2 py-6">
+    <div
+      className={`joyride-ingredient-${index + 1} grid grid-cols-2 gap-2 py-6`}
+    >
       <label>
         {t("ingredient")}
         <SearchableInput
@@ -152,7 +157,9 @@ const IngredientLine = ({
         />
       </label>
 
-      <label className="flex gap-1 flex-col sm:flex-row items-center justify-center">
+      <label
+        className={`joyride-secondary-${index + 1} flex gap-1 flex-col sm:flex-row items-center justify-center`}
+      >
         {t("recipeBuilder.labels.secondary")}
         <Switch checked={ing.secondary} onCheckedChange={toggleChecked} />
       </label>
@@ -160,7 +167,10 @@ const IngredientLine = ({
       <Button onClick={deleteFn} variant="destructive">
         {t("desktop.delete")}
       </Button>
-      <Button onClick={fillToNearest} className="col-span-2">
+      <Button
+        onClick={fillToNearest}
+        className={`joyride-fillToNext-${index + 1} col-span-2`}
+      >
         {t("toNextVolume", { volumeUnit: units.volume })}
       </Button>
     </div>

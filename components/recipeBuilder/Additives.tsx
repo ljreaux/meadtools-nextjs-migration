@@ -48,7 +48,9 @@ function Additives({ useRecipe }: { useRecipe: () => Recipe }) {
               return (
                 <div
                   className={`${
-                    i !== additives.length - 1 ? "border-b border-dotted " : ""
+                    i !== additives.length - 1
+                      ? "border-b border-dotted joyride-additiveLine"
+                      : "joyride-additiveLine"
                   }`}
                   key={i}
                 >

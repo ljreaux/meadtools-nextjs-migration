@@ -60,7 +60,7 @@ function NutrientSelector({
           link="https://meadmaking.wiki/en/process/nutrient_schedules"
         />
       </h3>
-      <div className="grid sm:grid-cols-2">
+      <div className="joyride-nutrientSwitches grid sm:grid-cols-2">
         {[
           { value: "Fermaid O", label: "nutrients.fermO" },
           { value: "Fermaid K", label: "nutrients.fermK" },
@@ -112,7 +112,7 @@ function NutrientSelector({
         )}
       </div>
       <div>
-        <label className="grid gap-1">
+        <label className="joyride-numOfAdditions grid gap-1">
           <span className="flex items-center gap-1">
             {t("numberOfAdditions")}
             <Tooltip body={t("tipText.numberOfAdditions")} />
@@ -143,6 +143,7 @@ const SettingsDialog = ({
   providedYan,
   adjustAllowed,
   setAdjustAllowed,
+  tutorialClassFlag,
 }: {
   maxGpl: {
     value: string;
@@ -158,11 +159,14 @@ const SettingsDialog = ({
   };
   adjustAllowed: boolean;
   setAdjustAllowed: (value: boolean) => void;
+  tutorialClassFlag?: boolean;
 }) => {
   const { t } = useTranslation();
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger
+        className={tutorialClassFlag ? "joyride-nutrientSettings" : ""}
+      >
         <Settings />
       </DialogTrigger>
       <DialogContent>
@@ -306,6 +310,7 @@ const LabeledCheckbox = ({
         }}
         adjustAllowed={adjustAllowed}
         setAdjustAllowed={setAdjustAllowed}
+        tutorialClassFlag={index === 0}
       />
     </label>
   );

@@ -37,7 +37,7 @@ function VolumeInputs({
       maximumFractionDigits: 3,
     });
   return (
-    <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+    <div className="joyride-nutrientInputs grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
       <div>
         <label>
           {t("nuteVolume")}
@@ -83,7 +83,7 @@ function VolumeInputs({
           <p>{brixString + " Brix"}</p> <p>{sugarBreak}</p>
         </span>
       </div>
-      <div className="col-span-2 sm:col-span-1">
+      <div className="joyride-offset col-span-2 sm:col-span-1">
         <label className="grid gap-1">
           <span className="flex items-center sm:gap-1">
             {t("offset")}

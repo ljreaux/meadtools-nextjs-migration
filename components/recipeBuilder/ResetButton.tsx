@@ -26,7 +26,7 @@ export default function ResetButton() {
     <>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <div className="relative group flex flex-col items-center my-2">
+          <div className="joyride-deleteRecipe relative group flex flex-col items-center my-2">
             <button className="flex items-center justify-center sm:w-12 sm:h-12 w-8 h-8 bg-destructive text-foreground rounded-full border border-foreground hover:text-destructive hover:bg-foreground transition-colors">
               <Trash />
             </button>

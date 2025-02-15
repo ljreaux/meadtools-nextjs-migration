@@ -66,7 +66,9 @@ export default function SavedRecipeProvider({
   const [totalForAbv, setTotalForAbv] = useState(1);
   const [delle, setDelle] = useState(0);
 
-  const [addingStabilizers, setAddingStabilizers] = useState(false);
+  const [addingStabilizers, setAddingStabilizers] = useState(
+    recipeData.sorbate > 0 || recipeData.sulfite > 0
+  );
   const [takingPh, setTakingPh] = useState(false);
   const [phReading, setPhReading] = useState("3.6");
   const [recipeName, setRecipeName] = useState(recipe.name || "");
@@ -236,10 +238,10 @@ export default function SavedRecipeProvider({
     units.weight === "kg" && units.volume === "liter"
       ? (8.345 * 0.453592) / 3.78541
       : units.weight === "kg"
-      ? 8.345 * 0.453592
-      : units.volume === "liter"
-      ? 8.345 / 3.78541
-      : 8.345;
+        ? 8.345 * 0.453592
+        : units.volume === "liter"
+          ? 8.345 / 3.78541
+          : 8.345;
 
   const volumeToWeight = (value: number, brix: number) =>
     value * converter * toSG(brix);
@@ -450,7 +452,7 @@ export default function SavedRecipeProvider({
       .map((ing) => {
         return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
-          string
+          string,
         ];
       });
     const primaryBlendArr = recipeData.ingredients
@@ -458,7 +460,7 @@ export default function SavedRecipeProvider({
       .map((ing) => {
         return [toSG(parseNumber(ing.brix)).toPrecision(6), ing.details[1]] as [
           string,
-          string
+          string,
         ];
       });
 

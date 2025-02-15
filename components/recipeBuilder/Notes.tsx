@@ -22,7 +22,7 @@ function Notes({ useRecipe }: { useRecipe: () => Recipe }) {
   } = useRecipe();
   return (
     <div>
-      <div className="py-6">
+      <div className="joyride-notesCard py-6">
         <h2>{t("notes.subtitleOne")}</h2>
 
         {notes.primary.length > 0 ? (

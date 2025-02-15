@@ -20,7 +20,7 @@ function Stabilizers({ useRecipe }: { useRecipe: () => Recipe }) {
     campden,
   } = useRecipe();
   return (
-    <div className="grid py-6 gap-2">
+    <div className="joyride-stabilizersCard grid py-6 gap-2">
       <label className="flex items-center gap-1">
         {t("adding")}
         <Switch

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useRecipe } from "../providers/RecipeProvider";
 import { isValidNumber, parseNumber } from "@/lib/utils/validateInput";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -16,8 +15,9 @@ import {
 import { useTranslation } from "react-i18next";
 import Tooltip from "../Tooltips";
 import { ChevronDown } from "lucide-react";
+import { Recipe } from "@/types/recipeDataTypes";
 
-function DesiredBatchDetails() {
+function MockBatchDetails({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
   const { setIngredientsToTarget } = useRecipe();
   const [{ og, volume }, setOgAndVolume] = useState({
@@ -25,7 +25,7 @@ function DesiredBatchDetails() {
     volume: "",
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleSubmit = () => {
     setIngredientsToTarget(parseNumber(og), parseNumber(volume));
@@ -109,4 +109,4 @@ function DesiredBatchDetails() {
   );
 }
 
-export default DesiredBatchDetails;
+export default MockBatchDetails;

@@ -32,7 +32,7 @@ function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
   return (
     <div>
       <h2>{t("nuteAmounts")}</h2>
-      <div className="grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
+      <div className="joyride-nuteResults grid grid-cols-2 gap-2 border-b border-muted-foreground py-6">
         {nutrientAdditions.totalGrams.map((add, i) => {
           const isInvalid = add <= 0 || isNaN(add);
           const perAdd = nutrientAdditions.perAddition[i];
@@ -48,7 +48,7 @@ function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
           );
         })}
         {Math.round(remainingYan) !== 0 && (
-          <div className="col-span-2 bg-destructive p-2">
+          <div className="joyride-warning col-span-2 bg-destructive p-2">
             <span className="flex gap-1 items-center">
               {t("nuteResults.sideLabels.remainingYan")}
               <Tooltip body={t("tipText.remainingYan")} />
@@ -60,7 +60,7 @@ function Results({ useNutrients }: { useNutrients: () => NutrientType }) {
         )}
       </div>
       {goFermType.value !== "none" && (
-        <div className="grid grid-cols-2 gap-2 py-6">
+        <div className="joyride-goFerm grid grid-cols-2 gap-2 py-6">
           <h3 className="col-span-2">{t("gfDetails")}</h3>
           <label className="col-start-1">
             {t("PDF.addAmount")}
