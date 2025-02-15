@@ -88,6 +88,19 @@ const cardConfig = [
 ];
 
 function RecipeBuilderTutorial() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 768);
+
+      const handleResize = () => setIsMobile(window.innerWidth < 768);
+      window.addEventListener("resize", handleResize);
+
+      return () => window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
   const cards = cardConfig.map(({ key, heading, components, tooltip }) => (
     <CardWrapper key={key}>
       <Heading text={heading} toolTipProps={tooltip} />
@@ -101,12 +114,20 @@ function RecipeBuilderTutorial() {
   const [currentTutorialSteps, setCurrentTutorialSteps] = useState<Step[]>([]);
 
   const transformSteps = (arr: Step[]) =>
-    arr.map((step) => ({
-      ...step,
-      content:
-        typeof step.content === "string" ? t(step.content) : step.content,
-      hideFooter: typeof step.content !== "string" && true,
-    }));
+    arr.map((step) => {
+      console.log(isMobile, step.placement);
+
+      return {
+        ...step,
+        placement:
+          isMobile && (step.placement === "left" || step.placement === "right")
+            ? "top"
+            : step.placement,
+        content:
+          typeof step.content === "string" ? t(step.content) : step.content,
+        hideFooter: typeof step.content !== "string" && true,
+      };
+    });
   const specialCallbacks = {
     [currentTutorialSteps.length - 1]: () => {
       const isNextStep = !!stepCards[currentStepIndex + 1];
@@ -114,7 +135,9 @@ function RecipeBuilderTutorial() {
     },
   };
   useEffect(() => {
-    setCurrentTutorialSteps(transformSteps(stepCards[currentStepIndex]));
+    const currentSteps = transformSteps(stepCards[currentStepIndex]);
+    console.log(currentSteps);
+    setCurrentTutorialSteps(currentSteps);
   }, [currentStepIndex]);
 
   // Use the tutorial hook with the special callbacks.
