@@ -12,11 +12,10 @@ import { cn } from "@/lib/utils";
 
 import React from "react";
 import { useTranslation } from "react-i18next";
-import lodash from "lodash";
+import PrimingSugarTable from "@/components/extraCalcs/PrimingSugarTable";
 
 function PrimingSugar() {
-  const { t, i18n } = useTranslation();
-  const currentLocale = i18n.resolvedLanguage;
+  const { t } = useTranslation();
   const {
     tempProps,
     tempUnitProps,
@@ -87,16 +86,8 @@ function PrimingSugar() {
           </Select>
         </label>
         <div className="border-b border-muted-foreground col-span-full" />
-        {primingSugarAmounts?.map((sugar) => (
-          <div key={sugar.label} className="p-2">
-            {t(lodash.camelCase(sugar.label))}:{" "}
-            {sugar.amount.toLocaleString(currentLocale, {
-              maximumFractionDigits: 3,
-            })}
-            g
-          </div>
-        ))}
       </div>
+      <PrimingSugarTable primingSugar={primingSugarAmounts}></PrimingSugarTable>
     </>
   );
 }

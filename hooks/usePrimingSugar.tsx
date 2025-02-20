@@ -9,6 +9,21 @@ type Sugar =
     }[]
   | null;
 
+const ozToGal = 0.0078125;
+
+const bottleSizes = [
+  { size: 12, label: "12 oz" },
+  { size: 22, label: "22 oz" },
+  { size: 25.3605, label: "750 ml" },
+  { size: 11.1586, label: "330 ml" },
+].map((item) => ({
+  ...item,
+  size: item.size * ozToGal,
+}));
+
+const calcAmountPerBottle = (numberOfBottles: number, totalSugar: number) =>
+  numberOfBottles > 0 ? totalSugar / numberOfBottles : 0;
+
 const usePrimingSugar = () => {
   const [sugars, setSugars] = useState<Sugar>(null);
 
@@ -22,7 +37,10 @@ const usePrimingSugar = () => {
   const [volume, setVolume] = useState("0");
   const [volumeUnits, setVolumeUnits] = useState<"gal" | "lit">("gal");
 
-  const [primingSugar, setPrimingSugar] = useState(0);
+  const [primingSugar, setPrimingSugar] = useState({
+    sugar: 0,
+    parsedVolume: 0,
+  });
 
   const calcPrimingSugar = (temp: string, vols: string, volume: string) => {
     const parsedVolume =
@@ -33,14 +51,18 @@ const usePrimingSugar = () => {
     const parsedTemp =
       tempUnits === "F" ? parseNumber(temp) : toFahrenheit(parseNumber(temp));
 
-    return (
+    const sugar =
       15.195 *
       parsedVolume *
       (parseNumber(vols) -
         3.0378 +
         5.0062 * 10 ** -2 * parsedTemp -
-        2.6555 * 10 ** -4 * parsedTemp ** 2)
-    );
+        2.6555 * 10 ** -4 * parsedTemp ** 2);
+
+    return {
+      sugar,
+      parsedVolume,
+    };
   };
 
   const handleTempChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -140,10 +162,22 @@ const usePrimingSugar = () => {
       },
       value: tempUnits,
     },
-    primingSugarAmounts: sugars?.map((sugar) => ({
-      ...sugar,
-      amount: sugar.amount * primingSugar,
-    })),
+    primingSugarAmounts: sugars?.map((sugar) => {
+      const totalSugar = sugar.amount * primingSugar.sugar;
+
+      return {
+        ...sugar,
+        amount: totalSugar,
+        perBottle: bottleSizes.map(({ label, size }) => {
+          const numberOfBottles = primingSugar.parsedVolume / size;
+
+          return {
+            label,
+            amount: calcAmountPerBottle(numberOfBottles, totalSugar),
+          };
+        }),
+      };
+    }),
   };
 };
 
