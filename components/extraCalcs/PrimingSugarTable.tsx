@@ -41,12 +41,17 @@ function PrimingSugarTable({ primingSugar }: { primingSugar: PrimingSugar }) {
           </TableHead>
           <TableHead>
             {t("primingTable.perBottleHeading", {
-              bottleSize: "750ml",
+              bottleSize: "330ml",
             })}
           </TableHead>
           <TableHead>
             {t("primingTable.perBottleHeading", {
-              bottleSize: "330ml",
+              bottleSize: "500ml",
+            })}
+          </TableHead>
+          <TableHead>
+            {t("primingTable.perBottleHeading", {
+              bottleSize: "750ml",
             })}
           </TableHead>
         </TableRow>
