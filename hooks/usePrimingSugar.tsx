@@ -14,8 +14,9 @@ const ozToGal = 0.0078125;
 const bottleSizes = [
   { size: 12, label: "12 oz" },
   { size: 22, label: "22 oz" },
-  { size: 25.3605, label: "750 ml" },
   { size: 11.1586, label: "330 ml" },
+  { size: 16.907, label: "500 ml" },
+  { size: 25.3605, label: "750 ml" },
 ].map((item) => ({
   ...item,
   size: item.size * ozToGal,
