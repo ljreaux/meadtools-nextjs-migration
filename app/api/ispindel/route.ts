@@ -1,4 +1,4 @@
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import {
   calcGravity,
   createLog,

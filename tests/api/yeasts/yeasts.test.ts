@@ -1,6 +1,5 @@
 import { GET, POST } from "@/app/api/yeasts/route";
 import { NextRequest, NextResponse } from "next/server";
-import { createRequest, createResponse } from "node-mocks-http";
 import {
   getAllYeasts,
   getYeastByBrand,
@@ -8,10 +7,10 @@ import {
   getYeastById,
   createYeast,
 } from "@/lib/db/yeasts";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 
 jest.mock("@/lib/db/yeasts");
-jest.mock("@/lib/middleware");
+jest.mock("@/lib/userAccessFunctions");
 
 describe("/api/yeasts", () => {
   afterEach(() => {
@@ -106,6 +105,78 @@ describe("/api/yeasts", () => {
 
       expect(res.status).toBe(200);
       expect(await res.json()).toEqual([{ id: 1, brand: "Lalvin" }]);
+    });
+
+    it("should fetch yeast by name when name query param is provided", async () => {
+      (getYeastByName as jest.Mock).mockResolvedValue({
+        id: 1,
+        name: "EC-1118",
+        brand: "Lalvin",
+      });
+      const req = new NextRequest("http://localhost/api/yeasts?name=EC-1118");
+      const res = await GET(req);
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        id: 1,
+        name: "EC-1118",
+        brand: "Lalvin",
+      });
+    });
+
+    it("should return 404 when yeast with given name is not found", async () => {
+      (getYeastByName as jest.Mock).mockResolvedValue(null);
+      const req = new NextRequest(
+        "http://localhost/api/yeasts?name=NonExistent"
+      );
+      const res = await GET(req);
+
+      expect(res.status).toBe(404);
+      expect(await res.json()).toEqual({
+        error: 'Yeast with name "NonExistent" not found',
+      });
+    });
+
+    it("should fetch yeast by id when id query param is provided", async () => {
+      (getYeastById as jest.Mock).mockResolvedValue({
+        id: 1,
+        name: "EC-1118",
+        brand: "Lalvin",
+      });
+      const req = new NextRequest("http://localhost/api/yeasts?id=1");
+      const res = await GET(req);
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        id: 1,
+        name: "EC-1118",
+        brand: "Lalvin",
+      });
+    });
+
+    it("should return 404 when yeast with given id is not found", async () => {
+      (getYeastById as jest.Mock).mockResolvedValue(null);
+      const req = new NextRequest("http://localhost/api/yeasts?id=999");
+      const res = await GET(req);
+
+      expect(res.status).toBe(404);
+      expect(await res.json()).toEqual({
+        error: 'Yeast with ID "999" not found',
+      });
+    });
+
+    it("should handle invalid id parameter", async () => {
+      const req = new NextRequest("http://localhost/api/yeasts?id=invalid");
+      (getYeastById as jest.Mock).mockResolvedValue(null);
+
+      const res = await GET(req);
+
+      expect(res.status).toBe(404);
+      expect(await res.json()).toEqual({
+        error: 'Yeast with ID "invalid" not found',
+      });
+      // Verify that getYeastById was called with NaN due to parseInt on invalid string
+      expect(getYeastById).toHaveBeenCalledWith(NaN);
     });
 
     it("should return a 500 error on database failure", async () => {

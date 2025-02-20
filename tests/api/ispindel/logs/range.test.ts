@@ -1,5 +1,5 @@
 import { DELETE } from "@/app/api/ispindel/logs/range/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { deleteLogsInRange } from "@/lib/db/iSpindel";
 import { NextResponse } from "next/server"; // Import this to fix the ReferenceError
 import { createRequest } from "node-mocks-http";
@@ -8,7 +8,7 @@ jest.mock("@/lib/db/iSpindel", () => ({
   deleteLogsInRange: jest.fn(),
 }));
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

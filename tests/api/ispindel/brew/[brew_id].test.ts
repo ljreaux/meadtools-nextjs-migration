@@ -1,10 +1,10 @@
 import { PATCH, DELETE } from "@/app/api/ispindel/brew/[brew_id]/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { addRecipeToBrew, deleteBrew } from "@/lib/db/iSpindel";
 import { NextRequest, NextResponse } from "next/server";
 
 // Mock necessary imports
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

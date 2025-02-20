@@ -1,19 +1,22 @@
 import { ChangeEvent } from "react";
 import { Input } from "../ui/input";
+import { cn } from "@/lib/utils";
 
 const InputWithUnits = ({
   value,
   text,
   disabled,
   handleChange,
+  className,
 }: {
   value: number | string;
   text: string;
   disabled?: boolean;
   handleChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+  className?: string;
 }) => {
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <Input
         disabled={disabled}
         value={value}

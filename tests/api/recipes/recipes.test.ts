@@ -1,6 +1,6 @@
 import { GET, POST } from "@/app/api/recipes/route";
 import { getAllRecipes, createRecipe } from "@/lib/db/recipes";
-import { verifyUser, requireAdmin } from "@/lib/middleware";
+import { verifyUser, requireAdmin } from "@/lib/userAccessFunctions";
 import { NextResponse } from "next/server";
 import { createRequest } from "node-mocks-http";
 
@@ -9,7 +9,7 @@ jest.mock("@/lib/db/recipes", () => ({
   createRecipe: jest.fn(),
 }));
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
   requireAdmin: jest.fn(),
 }));

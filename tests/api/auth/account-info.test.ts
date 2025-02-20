@@ -1,12 +1,12 @@
 import { GET, PATCH } from "@/app/api/auth/account-info/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { getUserById, updateUser } from "@/lib/db/users";
 import { getAllRecipesForUser } from "@/lib/db/recipes";
 import bcrypt from "bcrypt";
 import { createRequest } from "node-mocks-http";
 
 // Mock necessary imports
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

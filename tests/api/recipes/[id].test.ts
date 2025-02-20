@@ -1,9 +1,9 @@
 import { GET, PATCH, DELETE } from "@/app/api/recipes/[id]/route";
-import { verifyUser, requireAdmin } from "@/lib/middleware";
+import { verifyUser, requireAdmin } from "@/lib/userAccessFunctions";
 import { getRecipeInfo, updateRecipe, deleteRecipe } from "@/lib/db/recipes";
 import { createRequest } from "node-mocks-http";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
   requireAdmin: jest.fn(),
 }));
@@ -65,6 +65,27 @@ describe("/api/recipes/[id]", () => {
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({
         error: "Invalid recipe ID",
+      });
+    });
+
+    it("should return 403 if a private recipe is requested by an unauthorized user", async () => {
+      (getRecipeInfo as jest.Mock).mockResolvedValue({
+        id: 1,
+        private: true,
+        user_id: "owner-id",
+      });
+      (verifyUser as jest.Mock).mockResolvedValue("random-user-id");
+      (requireAdmin as jest.Mock).mockResolvedValue(false);
+
+      const req = createRequest({ method: "GET" });
+      req.headers = mockHeaders;
+      const params = Promise.resolve({ id: "1" });
+
+      const res = await GET(req as any, { params });
+
+      expect(res.status).toBe(403);
+      expect(await res.json()).toEqual({
+        error: "You are not authorized to view this recipe",
       });
     });
   });
@@ -147,6 +168,25 @@ describe("/api/recipes/[id]", () => {
         error: "You are not authorized to update this recipe",
       });
     });
+
+    it("should return 404 if the recipe does not exist", async () => {
+      (getRecipeInfo as jest.Mock).mockResolvedValue(null);
+      (verifyUser as jest.Mock).mockResolvedValue("user-id");
+      (requireAdmin as jest.Mock).mockResolvedValue(false);
+
+      const req = createRequest({
+        method: "PATCH",
+        body: { name: "Updated Recipe" },
+      });
+      req.json = async () => ({ name: "Updated Recipe" });
+      req.headers = mockHeaders;
+      const params = Promise.resolve({ id: "1" });
+
+      const res = await PATCH(req as any, { params });
+
+      expect(res.status).toBe(404);
+      expect(await res.json()).toEqual({ error: "Recipe not found" });
+    });
   });
 
   describe("DELETE", () => {
@@ -217,6 +257,26 @@ describe("/api/recipes/[id]", () => {
       expect(res.status).toBe(403);
       expect(await res.json()).toEqual({
         error: "You are not authorized to delete this recipe",
+      });
+    });
+    it("should delete a recipe successfully", async () => {
+      (getRecipeInfo as jest.Mock).mockResolvedValue({
+        id: 1,
+        user_id: "user-id",
+      });
+      (verifyUser as jest.Mock).mockResolvedValue("user-id");
+      (requireAdmin as jest.Mock).mockResolvedValue(false);
+      (deleteRecipe as jest.Mock).mockResolvedValue({ name: "Test Recipe" });
+
+      const req = createRequest({ method: "DELETE" });
+      req.headers = mockHeaders;
+      const params = Promise.resolve({ id: "1" });
+
+      const res = await DELETE(req as any, { params });
+
+      expect(res.status).toBe(200);
+      expect(await res.json()).toEqual({
+        message: "Test Recipe has been deleted.",
       });
     });
   });

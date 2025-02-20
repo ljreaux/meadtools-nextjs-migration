@@ -1,6 +1,6 @@
 import { GET, PATCH, DELETE } from "@/app/api/ispindel/logs/[id]/route";
 import { getLogsForBrew, updateLog, deleteLog } from "@/lib/db/iSpindel";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { createRequest } from "node-mocks-http";
 
 jest.mock("@/lib/db/iSpindel", () => ({
@@ -9,7 +9,7 @@ jest.mock("@/lib/db/iSpindel", () => ({
   deleteLog: jest.fn(),
 }));
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

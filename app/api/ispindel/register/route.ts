@@ -1,4 +1,4 @@
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { createHydrometerToken } from "@/lib/db/iSpindel";
 import { NextRequest, NextResponse } from "next/server";
 

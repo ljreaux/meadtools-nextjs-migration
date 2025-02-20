@@ -9,6 +9,7 @@ import OwnerRecipe from "@/components/recipes/OwnerRecipe";
 import PublicRecipe from "@/components/recipes/PublicRecipe";
 import Loading from "@/components/loading";
 import SavedRecipeProvider from "../providers/SavedRecipeProvider";
+import { parseRecipeData } from "@/lib/utils/parseRecipeData";
 
 const RecipePage = ({ id }: { id: string }) => {
   const { fetchAuthenticatedData, user, isLoggedIn } = useAuth();
@@ -100,30 +101,8 @@ const RecipePage = ({ id }: { id: string }) => {
     return null; // No recipe to render, fallback handled above
   }
 
-  const recipeData = JSON.parse(recipe.recipeData);
-  const nutrientData = JSON.parse(recipe.nutrientData);
-  const yanContribution = JSON.parse(recipe.yanContribution);
-  const getSelectedSchedule = (schedule: string) => {
-    switch (schedule) {
-      case "tbe":
-        return ["Fermaid O", "Fermaid K", "DAP"]; // Fermaid O, K, and DAP
-      case "oAndk":
-        return ["Fermaid O", "Fermaid K"]; // Fermaid O & K
-      case "oAndDap":
-        return ["Fermaid O", "DAP"]; // Fermaid O & DAP
-      case "kAndDap":
-        return ["Fermaid K", "DAP"]; // Fermaid K & DAP
-      case "tosna":
-        return ["Fermaid O"]; // Fermaid O Only
-      case "justK":
-        return ["Fermaid K"]; // Fermaid K Only
-      case "dap":
-        return ["DAP"]; // DAP Only
-      case "other":
-      default:
-        return ["Other"]; // Default case is "Other"
-    }
-  };
+  const { recipeData, nutrientData, getSelectedSchedule, yanContribution } =
+    parseRecipeData(recipe);
 
   return (
     <SavedRecipeProvider

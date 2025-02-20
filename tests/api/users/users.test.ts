@@ -1,13 +1,13 @@
 import { GET } from "@/app/api/users/route";
 import { getAllUsers } from "@/lib/db/users";
-import { requireAdmin, verifyUser } from "@/lib/middleware";
+import { requireAdmin, verifyUser } from "@/lib/userAccessFunctions";
 import { createRequest, createResponse } from "node-mocks-http";
 
 jest.mock("@/lib/db/users", () => ({
   getAllUsers: jest.fn(),
 }));
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
   requireAdmin: jest.fn(),
 }));

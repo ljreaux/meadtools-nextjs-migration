@@ -18,3 +18,7 @@ export function temperatureCorrection(
 export function toFahrenheit(currentTemp: number) {
   return currentTemp * (9 / 5) + 32;
 }
+
+export function toCelsius(currentTemp: number) {
+  return (currentTemp - 32) * (5 / 9);
+}

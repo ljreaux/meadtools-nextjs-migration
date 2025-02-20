@@ -54,6 +54,10 @@ export const extraCalculatorLinks = [
     path: "/extra-calcs/blending",
     label: "calculators.extraCalcs.blending",
   },
+  {
+    path: "/extra-calcs/priming-sugar",
+    label: "primingSugarHeading",
+  },
 ];
 
 export const extraLinks = [

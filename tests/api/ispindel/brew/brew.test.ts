@@ -1,10 +1,10 @@
 import { GET, POST, PATCH } from "@/app/api/ispindel/brew/route";
-import { verifyUser } from "@/lib/middleware";
+import { verifyUser } from "@/lib/userAccessFunctions";
 import { getBrews, startBrew, endBrew, setBrewName } from "@/lib/db/iSpindel";
 import { createRequest } from "node-mocks-http";
 import { NextResponse } from "next/server";
 
-jest.mock("@/lib/middleware", () => ({
+jest.mock("@/lib/userAccessFunctions", () => ({
   verifyUser: jest.fn(),
 }));
 

@@ -1,10 +1,10 @@
 import { DELETE, PATCH } from "@/app/api/ingredients/[id]/route";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 import { deleteIngredient, updateIngredient } from "@/lib/db/ingredients";
 import { createRequest, createResponse } from "node-mocks-http";
 import { NextResponse } from "next/server";
 
-jest.mock("@/lib/middleware");
+jest.mock("@/lib/userAccessFunctions");
 jest.mock("@/lib/db/ingredients");
 
 describe("/api/ingredients/[id]", () => {

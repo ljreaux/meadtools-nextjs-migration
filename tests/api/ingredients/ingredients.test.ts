@@ -6,11 +6,11 @@ import {
   getIngredientByName,
   createIngredient,
 } from "@/lib/db/ingredients";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 import { NextResponse } from "next/server";
 
 jest.mock("@/lib/db/ingredients");
-jest.mock("@/lib/middleware");
+jest.mock("@/lib/userAccessFunctions");
 
 describe("/api/ingredients", () => {
   describe("GET", () => {

@@ -42,7 +42,7 @@ function SupportDialog() {
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-      <AlertDialogContent className="z-[1000] overflow-y-scroll max-h-screen">
+      <AlertDialogContent className="z-[1010] overflow-y-scroll max-h-screen">
         <AlertDialogHeader>
           <AlertDialogTitle>{t("donate.dialog.title")}</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-2">

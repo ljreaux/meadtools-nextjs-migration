@@ -1,10 +1,10 @@
 import { GET, PATCH, DELETE } from "@/app/api/yeasts/[id]/route";
 import { getYeastById, updateYeast, deleteYeast } from "@/lib/db/yeasts";
-import { verifyAdmin } from "@/lib/middleware";
+import { verifyAdmin } from "@/lib/userAccessFunctions";
 import { NextRequest, NextResponse } from "next/server";
 
 jest.mock("@/lib/db/yeasts");
-jest.mock("@/lib/middleware");
+jest.mock("@/lib/userAccessFunctions");
 
 describe("/api/yeasts/:id", () => {
   afterEach(() => {
