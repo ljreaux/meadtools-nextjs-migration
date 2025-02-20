@@ -15,7 +15,9 @@ import {
   Rainbow,
   Pipette,
   Atom,
+  Hexagon,
 } from "lucide-react";
+import { extraCalculatorLinks } from "@/lib/navigation";
 
 function ExtraCalcsSideBar() {
   const { t } = useTranslation();
@@ -23,49 +25,24 @@ function ExtraCalcsSideBar() {
 
   const toggleSidebar = () => setIsOpen((prev) => !prev);
 
-  const links = [
-    { path: "/extra-calcs/", icon: <Beer />, label: t("sideNav.abv") },
-    {
-      path: "/extra-calcs/brix",
-      icon: <Percent />,
-      label: t("sideNav.brix"),
-    },
-    {
-      path: "/extra-calcs/estimated-og",
-      icon: <Scale />,
-      label: t("sideNav.estOG"),
-    },
-    {
-      path: "/extra-calcs/bench-trials",
-      icon: <FlaskConical />,
-      label: t("sideNav.benchTrials"),
-    },
-    {
-      path: "/extra-calcs/sulfite",
-      icon: <Atom />,
-      label: t("sulfiteHeading"),
-    },
-    {
-      path: "/extra-calcs/sorbate",
-      icon: <Pipette />,
-      label: t("sorbateHeading"),
-    },
-    {
-      path: "/extra-calcs/refractometer-correction",
-      icon: <Rainbow />,
-      label: t("sideNav.refractometer"),
-    },
-    {
-      path: "/extra-calcs/temperature-correction",
-      icon: <Thermometer />,
-      label: t("sideNav.tempCorrection"),
-    },
-    {
-      path: "/extra-calcs/blending",
-      icon: <Blend />,
-      label: t("sideNav.blending"),
-    },
+  const icons = [
+    <Beer key="beer" />,
+    <Percent key="percent" />,
+    <Scale key="scale" />,
+    <FlaskConical key="flask" />,
+    <Atom key="atom" />,
+    <Pipette key="pipette" />,
+    <Rainbow key="rainbow" />,
+    <Thermometer key="thermometer" />,
+    <Blend key="blend" />,
+    <Hexagon key="hex" />,
   ];
+
+  const links = extraCalculatorLinks.map((link, i) => ({
+    ...link,
+    icon: icons[i],
+    label: t(link.label),
+  }));
 
   return (
     <div

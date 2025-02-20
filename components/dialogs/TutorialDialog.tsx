@@ -41,7 +41,7 @@ function TutorialDialog() {
 
   return (
     <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-      <AlertDialogContent className="z-[1000] max-h-screen">
+      <AlertDialogContent className="z-[1010] max-h-screen">
         <AlertDialogHeader>
           <AlertDialogTitle>{t("tutorial.dialog.title")}</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-2">
