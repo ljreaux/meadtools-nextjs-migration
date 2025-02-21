@@ -11,6 +11,7 @@ MeadTools is an all-in-one mead, wine, and cider recipe-building calculator. It 
   - [Tech Stack](#tech-stack)
   - [Contributing](#contributing)
     - [Contribution Guidelines](#contribution-guidelines)
+      - [German Only pages](#german-only-pages)
   - [License](#license)
   - [Community \& Support](#community--support)
 
@@ -160,6 +161,14 @@ MeadTools welcome contributions! To contribute:
 - Follow the existing code style (I use the default Prettier config to maintain consistency).
 - Ensure all new features are documented.
 - Test your changes before submitting a pull request.
+
+#### German Only pages
+
+- Any `.mdx` files places in the `germanOnlyPages` folder will be automatically added as a page only accessible on the german locale `/de`.
+- The name of any page added in this folder will be the name of the route. This includes any nested folders, but be sure that the file name is set to what you want the route to be called.
+  - example `germanOnlyPages/welcome/example.mdx` will be displayed at `/de/welcome/example`.
+  - **Note:** Any files that with names that conflict with already existing routes will not overwrite existing routes.
+- `.mdx` files support standard GitHub-flavored Markdown with additional functionality for rendering React components. They will be displayed as HTML with styling consistent with the rest of the application.
 
 ## License
 
