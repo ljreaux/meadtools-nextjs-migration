@@ -67,41 +67,4 @@
     @apply bg-background text-foreground;
     font-family: "Libre Baskerville", serif;
   }
-} /* Kofi Widget General Styling */
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f *,
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f {
-  all: unset !important;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f {
-  position: fixed !important;
-  bottom: 20px !important; /* Adjust button position */
-  right: 20px !important; /* Adjust button position */
-  z-index: 10000 !important;
-}
-
-/* Kofi Widget Donate Button */
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f
-  .floatingchat-container-wrap,
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f
-  .floatingchat-container-wrap-mobi {
-  background: transparent !important;
-}
-
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f iframe {
-  display: block !important;
-  background: transparent !important;
-  width: auto !important;
-  height: auto !important;
-}
-
-/* Optional: Improve hover styles */
-#kofi-widget-overlay-f93a7604-6c79-485a-9894-d480831f622f:hover {
-  opacity: 0.9 !important;
-  transform: scale(1.05) !important;
 }
