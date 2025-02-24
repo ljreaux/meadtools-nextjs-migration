@@ -41,7 +41,7 @@ function Stabilizers({ useRecipe }: { useRecipe: () => Recipe }) {
                 <Input
                   value={phReading}
                   onChange={(e) => updatePhReading(e.target.value)}
-                  inputMode="numeric"
+                  inputMode="decimal"
                   onFocus={(e) => e.target.select()}
                 />
               </label>

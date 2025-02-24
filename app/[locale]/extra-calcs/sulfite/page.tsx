@@ -63,7 +63,7 @@ function Sulfite() {
           <TableCell>{t("batchSize")} </TableCell>
           <TableCell>
             <Input
-              inputMode="numeric"
+              inputMode="decimal"
               id="batchSize"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
@@ -92,7 +92,7 @@ function Sulfite() {
           <TableCell>{t("desiredPpm")} </TableCell>
           <TableCell colSpan={2}>
             <Input
-              inputMode="numeric"
+              inputMode="decimal"
               name="ppm"
               id="ppm"
               onChange={handleChange}

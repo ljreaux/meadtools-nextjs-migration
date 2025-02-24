@@ -122,7 +122,7 @@ const AdditiveLine = ({
         onChange={(e) => {
           if (isValidNumber(e.target.value)) changeAmount(e.target.value);
         }}
-        inputMode="numeric"
+        inputMode="decimal"
         onFocus={(e) => e.target.select()}
         className="col-span-2"
       />

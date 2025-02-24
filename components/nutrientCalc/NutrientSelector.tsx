@@ -180,7 +180,7 @@ const SettingsDialog = ({
                   <Input
                     {...yanContribution}
                     onFocus={(e) => e.target.select()}
-                    inputMode="numeric"
+                    inputMode="decimal"
                   />
                   <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
                     PPM YAN
@@ -195,7 +195,7 @@ const SettingsDialog = ({
                   <Input
                     {...maxGpl}
                     onFocus={(e) => e.target.select()}
-                    inputMode="numeric"
+                    inputMode="decimal"
                   />
                   <span className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
                     g/L
@@ -215,7 +215,7 @@ const SettingsDialog = ({
                   <Input
                     {...providedYan}
                     onFocus={(e) => e.target.select()}
-                    inputMode="numeric"
+                    inputMode="decimal"
                     disabled={!adjustAllowed}
                   />
                   <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">

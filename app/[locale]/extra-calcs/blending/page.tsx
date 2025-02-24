@@ -55,7 +55,7 @@ function Blending() {
                   {t(`val${rowIndex + 1}`)}
 
                   <Input
-                    inputMode="numeric"
+                    inputMode="decimal"
                     value={val}
                     onChange={(e) => handleChange(e, rowIndex, 0)}
                     onFocus={(e) => e.target.select()}
@@ -67,7 +67,7 @@ function Blending() {
                   {t(`vol${rowIndex + 1}`)}
 
                   <Input
-                    inputMode="numeric"
+                    inputMode="decimal"
                     value={vol}
                     onChange={(e) => handleChange(e, rowIndex, 1)}
                     onFocus={(e) => e.target.select()}

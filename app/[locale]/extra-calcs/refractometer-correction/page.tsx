@@ -16,11 +16,19 @@ import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 
 function RefractometerCorrection() {
-  const { t } = useTranslation();
-  const { refrac, handleChange, handleUnitChange } = useRefrac();
-  const abv = useAbv(refrac.og.toString(), refrac.fg.toString());
+  const { t, i18n } = useTranslation();
+  const currentLocale = i18n.resolvedLanguage;
+  const {
+    correctionFactorProps,
+    ogProps,
+    ogUnitProps,
+    fgProps,
+    correctedFg,
+    correctedBrix,
+  } = useRefrac();
+  const abv = useAbv(ogProps.value, correctedFg.toString());
 
-  const warn = refrac.cf !== "1";
+  const warn = correctionFactorProps.value !== "1";
 
   return (
     <>
@@ -41,11 +49,10 @@ function RefractometerCorrection() {
             </TableCell>
             <TableCell colSpan={2}>
               <Input
-                inputMode="numeric"
+                inputMode="decimal"
                 name="cf"
                 id="cf"
-                value={refrac.cf}
-                onChange={handleChange}
+                {...correctionFactorProps}
                 onFocus={(e) => e.target.select()}
               />
             </TableCell>
@@ -53,11 +60,7 @@ function RefractometerCorrection() {
           <TableRow>
             <TableCell>{t("ogLabel")} </TableCell>
             <TableCell className="p-1 md:p-4">
-              <Select
-                name="units"
-                value={refrac.units}
-                onValueChange={handleUnitChange}
-              >
+              <Select name="units" {...ogUnitProps}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -69,11 +72,10 @@ function RefractometerCorrection() {
             </TableCell>
             <TableCell className="p-1 md:p-4">
               <Input
-                inputMode="numeric"
+                inputMode="decimal"
                 name="og"
                 id="og"
-                value={refrac.og}
-                onChange={handleChange}
+                {...ogProps}
                 onFocus={(e) => e.target.select()}
               />
             </TableCell>
@@ -83,18 +85,24 @@ function RefractometerCorrection() {
             <TableCell colSpan={2}>
               <span className="flex">
                 <Input
-                  inputMode="numeric"
+                  inputMode="decimal"
                   name="fgInBrix"
                   id="fg"
-                  value={refrac.fgInBrix}
-                  onChange={handleChange}
+                  {...fgProps}
                   onFocus={(e) => e.target.select()}
                 />
                 <span className=" sm:flex grid items-center gap-1 justify-center text-center min-w-fit mx-1">
-                  <p>{refrac.calcSg}</p>
-                  <p className="min-w-fit">{`${refrac.calcBrix} ${t(
-                    "BRIX"
-                  )}`}</p>
+                  <p>
+                    {correctedFg.toLocaleString(currentLocale, {
+                      maximumFractionDigits: 3,
+                    })}
+                  </p>
+                  <p className="min-w-fit">{`${correctedBrix.toLocaleString(
+                    currentLocale,
+                    {
+                      maximumFractionDigits: 2,
+                    }
+                  )} ${t("BRIX")}`}</p>
                 </span>
               </span>
             </TableCell>

@@ -34,7 +34,7 @@ export default function AbvCalculator() {
             >
               <label htmlFor={label}>{t(`${label.toLowerCase()}Label`)}</label>
               <Input
-                inputMode="numeric"
+                inputMode="decimal"
                 id={label}
                 step="0.001"
                 value={inputValues[index]}

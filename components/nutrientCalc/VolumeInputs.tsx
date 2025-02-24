@@ -44,7 +44,7 @@ function VolumeInputs({
           <Input
             {...inputs.volume}
             disabled={disabled}
-            inputMode="numeric"
+            inputMode="decimal"
             onFocus={(e) => e.target.select()}
           />
         </label>
@@ -75,7 +75,7 @@ function VolumeInputs({
           <Input
             {...inputs.sg}
             disabled={disabled}
-            inputMode="numeric"
+            inputMode="decimal"
             onFocus={(e) => e.target.select()}
           />
         </label>
@@ -91,7 +91,7 @@ function VolumeInputs({
           </span>
           <Input
             {...inputs.offset}
-            inputMode="numeric"
+            inputMode="decimal"
             onFocus={(e) => e.target.select()}
           />
         </label>

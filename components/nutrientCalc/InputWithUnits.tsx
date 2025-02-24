@@ -22,7 +22,7 @@ const InputWithUnits = ({
         value={value}
         readOnly={disabled}
         onChange={handleChange}
-        inputMode="numeric"
+        inputMode="decimal"
         onFocus={(e) => e.target.select()}
       />
       <p className="absolute top-1/2 -translate-y-1/2 right-2 text-muted-foreground">
