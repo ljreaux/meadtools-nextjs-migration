@@ -30,7 +30,7 @@ function Brix() {
       <label htmlFor="gravity">{t("gravityLabel")}</label>
 
       <Input
-        inputMode="numeric"
+        inputMode="decimal"
         id="gravity"
         onFocus={(e) => e.target.select()}
         value={gravity}

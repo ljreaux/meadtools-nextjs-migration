@@ -78,7 +78,7 @@ function StockVolumeRow({
             </label>
             <Input
               id={`stockVolume-${index}`}
-              inputMode="numeric"
+              inputMode="decimal"
               value={volume}
               onChange={(e) => {
                 if (isValidNumber(e.target.value))

@@ -63,7 +63,7 @@ function Results({ useRecipe }: { useRecipe: () => Recipe }) {
         <Input
           value={FG}
           onChange={(e) => updateFG(e.target.value)}
-          inputMode="numeric"
+          inputMode="decimal"
           onFocus={(e) => e.target.select()}
         />
       </label>

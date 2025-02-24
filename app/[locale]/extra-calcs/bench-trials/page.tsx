@@ -47,7 +47,7 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="batchSize"
-                inputMode="numeric"
+                inputMode="decimal"
                 value={batchDetails.batchSize}
                 onFocus={(e) => e.target.select()}
                 onChange={setInput}
@@ -77,7 +77,7 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="sampleSize"
-                inputMode="numeric"
+                inputMode="decimal"
                 value={batchDetails.sampleSize}
                 onFocus={(e) => e.target.select()}
                 onChange={setInput}
@@ -89,7 +89,7 @@ function BenchTrials() {
             <TableCell>
               <Input
                 id="stockSolutionConcentration"
-                inputMode="numeric"
+                inputMode="decimal"
                 value={batchDetails.stockSolutionConcentration}
                 onFocus={(e) => e.target.select()}
                 onChange={setInput}

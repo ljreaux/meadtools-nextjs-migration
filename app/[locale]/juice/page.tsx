@@ -43,7 +43,7 @@ function Juice() {
               <TableCell>
                 <Input
                   className="min-w-16"
-                  inputMode="numeric"
+                  inputMode="decimal"
                   onFocus={(e) => e.target.select()}
                   value={sugar}
                   onChange={(e) => {
@@ -68,7 +68,7 @@ function Juice() {
               <TableCell>
                 <Input
                   className="min-w-16"
-                  inputMode="numeric"
+                  inputMode="decimal"
                   onFocus={(e) => e.target.select()}
                   value={servingSize}
                   onChange={(e) => {
@@ -96,7 +96,7 @@ function Juice() {
               <TableCell>{t("perContainer")}</TableCell>
               <TableCell colSpan={2}>
                 <Input
-                  inputMode="numeric"
+                  inputMode="decimal"
                   onFocus={(e) => e.target.select()}
                   value={servings}
                   onChange={(e) => {

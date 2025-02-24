@@ -37,7 +37,7 @@ function TempCorrection() {
             <TableCell>
               <Input
                 onFocus={(e) => e.target.select()}
-                inputMode="numeric"
+                inputMode="decimal"
                 id="measured"
                 value={tempObj.measured}
                 onChange={handleChange}
@@ -56,7 +56,7 @@ function TempCorrection() {
             <TableCell>
               <Input
                 onFocus={(e) => e.target.select()}
-                inputMode="numeric"
+                inputMode="decimal"
                 id="curTemp"
                 value={tempObj.curTemp}
                 onChange={handleChange}
@@ -83,7 +83,7 @@ function TempCorrection() {
             <TableCell colSpan={2}>
               <Input
                 onFocus={(e) => e.target.select()}
-                inputMode="numeric"
+                inputMode="decimal"
                 id="calTemp"
                 value={tempObj.calTemp}
                 onChange={handleChange}

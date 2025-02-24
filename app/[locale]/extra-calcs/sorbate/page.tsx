@@ -59,7 +59,7 @@ function Sorbate() {
           <TableCell>{t("batchSize")} </TableCell>
           <TableCell>
             <Input
-              inputMode="numeric"
+              inputMode="decimal"
               id="batchSize"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
@@ -90,7 +90,7 @@ function Sorbate() {
           <TableCell colSpan={2}>
             <Input
               id="abv"
-              inputMode="numeric"
+              inputMode="decimal"
               onFocus={(e) => e.target.select()}
               onChange={handleChange}
               value={sorbate.abv}

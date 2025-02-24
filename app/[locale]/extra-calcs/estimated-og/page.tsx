@@ -48,7 +48,7 @@ function EstimatedOG() {
               if (isValidNumber(e.target.value))
                 setGravity((prev) => ({ ...prev, fgh: e.target.value }));
             }}
-            inputMode="numeric"
+            inputMode="decimal"
             id="hydrometerFG"
             onFocus={(e) => e.target.select()}
           />
@@ -64,7 +64,7 @@ function EstimatedOG() {
               if (isValidNumber(e.target.value))
                 setGravity((prev) => ({ ...prev, fgr: e.target.value }));
             }}
-            inputMode="numeric"
+            inputMode="decimal"
             id="refractometerFG"
             onFocus={(e) => e.target.select()}
           />

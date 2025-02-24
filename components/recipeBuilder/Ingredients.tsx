@@ -133,7 +133,7 @@ const IngredientLine = ({
         {t("BRIX")}
         <Input
           value={ing.brix}
-          inputMode="numeric"
+          inputMode="decimal"
           onFocus={(e) => e.target.select()}
           onChange={(e) => updateBrix(e.target.value)}
         />
