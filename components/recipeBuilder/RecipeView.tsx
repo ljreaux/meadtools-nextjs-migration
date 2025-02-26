@@ -29,7 +29,7 @@ function RecipeView({
     notes,
     volume,
     OG,
-    FG,
+    backsweetenedFG,
     ABV,
     delle,
     sorbate,
@@ -144,6 +144,7 @@ function RecipeView({
                   <p>
                     {OG.toLocaleString(currentLocale, {
                       maximumFractionDigits: 3,
+                      minimumFractionDigits: 3,
                     })}
                   </p>
                   <p>
@@ -154,13 +155,20 @@ function RecipeView({
                 </td>
                 <td>
                   <p>
-                    {parseNumber(FG).toLocaleString(currentLocale, {
-                      maximumFractionDigits: 3,
-                    })}
+                    {parseNumber(backsweetenedFG).toLocaleString(
+                      currentLocale,
+                      {
+                        maximumFractionDigits: 3,
+                        minimumFractionDigits: 3,
+                      }
+                    )}
                   </p>
-                  <p>{`${toBrix(parseNumber(FG)).toLocaleString(currentLocale, {
-                    maximumFractionDigits: 3,
-                  })} ${t("BRIX")}`}</p>
+                  <p>{`${toBrix(parseNumber(backsweetenedFG)).toLocaleString(
+                    currentLocale,
+                    {
+                      maximumFractionDigits: 2,
+                    }
+                  )} ${t("BRIX")}`}</p>
                 </td>
                 <td>
                   <p>{`${selected?.yeastDetails.tolerance}%`}</p>

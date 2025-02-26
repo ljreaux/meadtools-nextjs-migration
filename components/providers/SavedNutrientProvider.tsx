@@ -44,7 +44,9 @@ export const SavedNutrientProvider = ({
     maxGpl.tosna.value as string[]
   );
   const [nuteArr, setNuteArr] = useState<string[]>([]);
-  const [yeastAmount, setYeastAmount] = useState("0");
+  const [yeastAmount, setYeastAmount] = useState(
+    storedFullData.outputs.yeastAmount.toString()
+  );
   const [goFerm, setGoFerm] = useState({
     type: "Go-Ferm" as GoFermType,
     amount: 0,
@@ -136,6 +138,15 @@ export const SavedNutrientProvider = ({
     const value = e.target.value;
     if (isValidNumber(value)) {
       setYeastAmount(value);
+      const yeastAmount = parseNumber(value);
+
+      setFullData((prev) => ({
+        ...prev,
+        outputs: {
+          ...prev.outputs,
+          yeastAmount: yeastAmount,
+        },
+      }));
     }
   };
 
@@ -302,32 +313,41 @@ export const SavedNutrientProvider = ({
 
   // determine yeast and go-ferm amounts
   useEffect(() => {
-    const units = fullData.selected.volumeUnits;
-    const volume = parseNumber(fullData.inputs.volume);
-    const sg = parseNumber(fullData.inputs.sg);
+    if (adjustAllowed) {
+      const units = fullData.selected.volumeUnits;
+      const volume = parseNumber(fullData.inputs.volume);
+      const sg = parseNumber(fullData.inputs.sg);
 
-    let multiplier = 1;
-    if (units === "liter") {
-      multiplier /= 3.78541;
+      let multiplier = 1;
+      if (units === "liter") {
+        multiplier /= 3.78541;
+      }
+
+      if (sg >= 1.125) {
+        multiplier *= 4;
+      } else if (sg > 1.1 && sg < 1.125) {
+        multiplier *= 3;
+      } else {
+        multiplier *= 2;
+      }
+
+      const yeastAmount = Math.round(volume * multiplier * 100) / 100;
+      const gf = calculateGoFerm(goFerm.type, yeastAmount);
+
+      setGoFerm((prev) => ({ ...prev, ...gf }));
+      setYeastAmount(
+        yeastAmount.toLocaleString(currentLocale, {
+          maximumFractionDigits: 2,
+        })
+      );
+      setFullData((prev) => ({
+        ...prev,
+        outputs: {
+          ...prev.outputs,
+          yeastAmount: yeastAmount,
+        },
+      }));
     }
-
-    if (sg >= 1.125) {
-      multiplier *= 4;
-    } else if (sg > 1.1 && sg < 1.125) {
-      multiplier *= 3;
-    } else {
-      multiplier *= 2;
-    }
-
-    const yeastAmount = Math.round(volume * multiplier * 100) / 100;
-    const gf = calculateGoFerm(goFerm.type, yeastAmount);
-
-    setGoFerm((prev) => ({ ...prev, ...gf }));
-    setYeastAmount(
-      yeastAmount.toLocaleString(currentLocale, {
-        maximumFractionDigits: 2,
-      })
-    ); //
   }, [
     fullData.inputs.volume,
     fullData.inputs.sg,
@@ -501,6 +521,8 @@ export const SavedNutrientProvider = ({
     yanContributions,
     nuteArr,
   ]);
+
+  useEffect(() => console.log(yeastAmount), [yeastAmount]);
 
   // Expose only the necessary state to the UI
   const uiState = {

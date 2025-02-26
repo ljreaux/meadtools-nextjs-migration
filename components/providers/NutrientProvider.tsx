@@ -146,6 +146,15 @@ export const NutrientProvider = ({
     const value = e.target.value;
     if (isValidNumber(value)) {
       setYeastAmount(value);
+      const amount = parseNumber(value);
+
+      setFullData((prev) => ({
+        ...prev,
+        outputs: {
+          ...prev.outputs,
+          yeastAmount: amount,
+        },
+      }));
     }
   };
 
@@ -366,6 +375,13 @@ export const NutrientProvider = ({
         maximumFractionDigits: 2,
       })
     );
+    setFullData((prev) => ({
+      ...prev,
+      outputs: {
+        ...prev.outputs,
+        yeastAmount: yeastAmount,
+      },
+    }));
   }, [
     fullData.inputs.volume,
     fullData.inputs.sg,
