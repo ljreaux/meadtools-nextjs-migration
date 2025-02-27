@@ -40,7 +40,7 @@ function NutrientSelector({
   } = useNutrients();
   // Handle the change of selected nutrients
   const handleNutrientChange = (nutrient: string) => {
-    const prevSelected = selected.selectedNutrients;
+    const prevSelected = selected.selectedNutrients || [];
 
     if (prevSelected.includes(nutrient)) {
       // If the nutrient is already selected, remove it
