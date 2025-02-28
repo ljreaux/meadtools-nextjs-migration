@@ -40,13 +40,6 @@ function RecipeView({
     public_username,
   } = recipeData;
 
-  const nuteNames = [
-    "g Fermaid O",
-    "g Fermaid K",
-    "g DAP",
-    `g ${otherNutrientName.value}`,
-  ];
-
   const { t, i18n } = useTranslation();
   const currentLocale = i18n.resolvedLanguage;
   const isMetric = units?.weight === "kg" || units?.volume === "liter";
@@ -79,6 +72,21 @@ function RecipeView({
   const showPageTwo =
     secondary.length > 0 || secondaryNotesExist || filteredAdditives.length > 0;
 
+  const nuteNames = [
+    "g Fermaid O",
+    "g Fermaid K",
+    "g DAP",
+    `g ${otherNutrientName.value}`,
+  ];
+  const goFermKeys = {
+    "Go-Ferm": "nuteResults.gfTypes.gf",
+    protect: "nuteResults.gfTypes.gfProtect",
+    "sterol-flash": "nuteResults.gfTypes.gfSterol",
+    none: "nuteResults.gfTypes.none",
+  };
+
+  const goFermLabel = t(goFermKeys[goFermType.value]) || t(goFermType.value);
+
   return (
     <div className="pdf-page">
       <div className="page-one">
@@ -109,7 +117,7 @@ function RecipeView({
                   </p>
                   <p>
                     {goFerm.amount > 0 &&
-                      `${goFerm.amount}g ${goFermType.value || "Go-Ferm"} ${t(
+                      `${goFerm.amount}g ${goFermLabel} ${t(
                         "PDF.with"
                       )} ${goFerm.water}ml ${t("water")}`}
                   </p>

@@ -47,11 +47,14 @@ export const SavedNutrientProvider = ({
   const [yeastAmount, setYeastAmount] = useState(
     storedFullData.outputs.yeastAmount.toString()
   );
-  const [goFerm, setGoFerm] = useState({
+
+  const initialGoFerm = storedFullData.outputs.goFerm ?? {
     type: "Go-Ferm" as GoFermType,
     amount: 0,
     water: 0,
-  });
+  };
+
+  const [goFerm, setGoFerm] = useState(initialGoFerm);
   const [targetYAN, setTargetYAN] = useState(0);
   const [nutrientAdditions, setNutrientAdditions] = useState<{
     totalGrams: number[];
@@ -91,6 +94,17 @@ export const SavedNutrientProvider = ({
   };
   const changeGfType = (type: GoFermType) => {
     setGoFerm((prev) => ({ ...prev, type }));
+    setFullData((prev) => ({
+      ...prev,
+      outputs: {
+        ...prev.outputs,
+        goFerm: {
+          water: prev.outputs.goFerm?.water || 0,
+          amount: prev.outputs.goFerm?.amount || 0,
+          type,
+        },
+      },
+    }));
   };
 
   // Setters for handling input change
@@ -332,7 +346,7 @@ export const SavedNutrientProvider = ({
       }
 
       const yeastAmount = Math.round(volume * multiplier * 100) / 100;
-      const gf = calculateGoFerm(goFerm.type, yeastAmount);
+      const gf = calculateGoFerm(goFerm.type as GoFermType, yeastAmount);
 
       setGoFerm((prev) => ({ ...prev, ...gf }));
       setYeastAmount(
@@ -345,6 +359,10 @@ export const SavedNutrientProvider = ({
         outputs: {
           ...prev.outputs,
           yeastAmount: yeastAmount,
+          goFerm: {
+            type: prev.outputs.goFerm?.type || "Go-Ferm",
+            ...gf,
+          },
         },
       }));
     }
@@ -354,9 +372,22 @@ export const SavedNutrientProvider = ({
     fullData.selected.volumeUnits,
   ]);
   useEffect(() => {
-    const gf = calculateGoFerm(goFerm.type, parseNumber(yeastAmount));
+    const gf = calculateGoFerm(
+      goFerm.type as GoFermType,
+      parseNumber(yeastAmount)
+    );
 
     setGoFerm((prev) => ({ ...prev, ...gf }));
+    setFullData((prev) => ({
+      ...prev,
+      outputs: {
+        ...prev.outputs,
+        goFerm: {
+          type: prev.outputs.goFerm?.type || "Go-Ferm",
+          ...gf,
+        },
+      },
+    }));
   }, [yeastAmount, goFerm.type]);
 
   // Calculate target YAN

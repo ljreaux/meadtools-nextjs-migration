@@ -99,6 +99,17 @@ export const NutrientProvider = ({
   };
   const changeGfType = (type: GoFermType) => {
     setGoFerm((prev) => ({ ...prev, type }));
+    setFullData((prev) => ({
+      ...prev,
+      outputs: {
+        ...prev.outputs,
+        goFerm: {
+          water: prev.outputs.goFerm?.water || 0,
+          amount: prev.outputs.goFerm?.amount || 0,
+          type,
+        },
+      },
+    }));
   };
 
   // Setters for handling input change
@@ -308,6 +319,9 @@ export const NutrientProvider = ({
       const parsedData = JSON.parse(storedData);
       if (parsedData) {
         setFullData(parsedData);
+        if (parsedData?.outputs?.goFerm) {
+          setGoFerm(parsedData.outputs.goFerm);
+        }
       }
 
       const storedYan = localStorage.getItem("yanContribution") || "false";
@@ -380,6 +394,10 @@ export const NutrientProvider = ({
       outputs: {
         ...prev.outputs,
         yeastAmount: yeastAmount,
+        goFerm: {
+          type: prev.outputs.goFerm?.type || "Go-Ferm",
+          ...gf,
+        },
       },
     }));
   }, [
@@ -391,6 +409,16 @@ export const NutrientProvider = ({
     const gf = calculateGoFerm(goFerm.type, parseNumber(yeastAmount));
 
     setGoFerm((prev) => ({ ...prev, ...gf }));
+    setFullData((prev) => ({
+      ...prev,
+      outputs: {
+        ...prev.outputs,
+        goFerm: {
+          type: prev.outputs.goFerm?.type || "Go-Ferm",
+          ...gf,
+        },
+      },
+    }));
   }, [yeastAmount, goFerm.type]);
 
   // Calculate target YAN
