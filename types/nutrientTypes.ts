@@ -53,6 +53,7 @@ export type FullNutrientData = {
   outputs: {
     targetYan: number;
     yeastAmount: number;
+    goFerm?: { type: GoFermType; amount: number; water: number };
   };
 };
 
