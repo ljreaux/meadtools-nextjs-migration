@@ -42,7 +42,7 @@ function NutrientSelector({
   const handleNutrientChange = (nutrient: string) => {
     const prevSelected = selected?.selectedNutrients || [];
 
-    if (prevSelected.includes(nutrient)) {
+    if (prevSelected?.includes(nutrient)) {
       // If the nutrient is already selected, remove it
       setSelectedNutrients(prevSelected.filter((item) => item !== nutrient));
     } else {
@@ -262,11 +262,11 @@ const LabeledCheckbox = ({
     setAdjustAllowed,
   } = useNutrients();
   const handleNutrientChange = (nutrient: string) => {
-    const prevSelected = selected.selectedNutrients;
+    const prevSelected = selected?.selectedNutrients || [];
 
-    if (prevSelected.includes(nutrient)) {
+    if (prevSelected?.includes(nutrient)) {
       // If the nutrient is already selected, remove it
-      setSelectedNutrients(prevSelected.filter((item) => item !== nutrient));
+      setSelectedNutrients(prevSelected?.filter((item) => item !== nutrient));
     } else {
       // If the nutrient is not selected, add it
       setSelectedNutrients([...prevSelected, nutrient]);
