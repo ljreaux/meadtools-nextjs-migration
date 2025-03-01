@@ -67,7 +67,8 @@ function RecipeView({
 
   const secondaryNotesExist =
     notes.secondary.length > 0 &&
-    (notes.secondary[0][0].length > 0 || notes.secondary[0][1].length > 0);
+    (notes.secondary[0].content[0].length > 0 ||
+      notes.secondary[0].content[1].length > 0);
 
   const showPageTwo =
     secondary.length > 0 || secondaryNotesExist || filteredAdditives.length > 0;
@@ -309,28 +310,34 @@ function RecipeView({
           </table>
         </section>
         <section style={{ pageBreakAfter: "always" }}>
-          {notes.primary.length > 0 && notes.primary[0][0].length > 0 && (
-            <table>
-              <thead>
-                <tr>
-                  <td>{t("PDF.primaryNotes")}</td>
-                  <td> {t("PDF.details")}</td>
-                </tr>
-              </thead>
-              <tbody>
-                {notes.primary.map((note, i) => {
-                  return (
-                    <tr key={"primary note #" + i}>
-                      <td>
-                        {i + 1}. {note[0]}
-                      </td>
-                      <td>{note[1]}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+          {notes.primary.length > 0 &&
+            notes.primary[0].content[0].length > 0 && (
+              <table>
+                <thead>
+                  <tr>
+                    <td>{t("PDF.primaryNotes")}</td>
+                    <td> {t("PDF.details")}</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {notes.primary.map((note, i) => {
+                    console.log(note.content[0].includes("\n"));
+                    return (
+                      <tr key={note.id}>
+                        <td>
+                          <p>
+                            {i + 1}. {note.content[0]}
+                          </p>
+                        </td>
+                        <td>
+                          <p>{note.content[1]}</p>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
         </section>
       </div>
       {showPageTwo && (
@@ -412,11 +419,16 @@ function RecipeView({
               <tbody>
                 {notes.secondary.map((note, i) => {
                   return (
-                    <tr key={"secondary note #" + i}>
+                    <tr key={note.id}>
                       <td>
-                        {i + 1}. {note[0]}
+                        <p>
+                          {" "}
+                          {i + 1}. {note.content[0]}
+                        </p>
                       </td>
-                      <td>{note[1]}</td>
+                      <td>
+                        <p>{note.content[1]}</p>
+                      </td>
                     </tr>
                   );
                 })}

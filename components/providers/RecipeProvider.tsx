@@ -9,9 +9,11 @@ import {
 import { NutrientProvider } from "./NutrientProvider";
 import {
   Additive,
+  AdditiveType,
   blankAdditive,
   blankIngredient,
   blankNote,
+  genRandomId,
   Ingredient,
   IngredientDetails,
   initialData,
@@ -132,7 +134,14 @@ export default function RecipeProvider({
     }
   };
 
-  const changeAdditive = (index: number, name: string) => {
+  const updateAdditives = (additives: AdditiveType[]) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives,
+    }));
+  };
+
+  const changeAdditive = (id: string, name: string) => {
     const multiplier = recipeData.units.volume === "liter" ? 0.264172 : 1;
     const translatedName = t(lodash.camelCase(name));
 
@@ -149,19 +158,18 @@ export default function RecipeProvider({
           maximumFractionDigits: 3,
         }),
         unit: foundAdd.unit,
+        id,
       };
 
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) =>
-          i === index ? changed : add
-        ),
+        additives: prev.additives.map((add) => (add.id == id ? changed : add)),
       }));
     } else {
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) => {
-          if (i === index) {
+        additives: prev.additives.map((add) => {
+          if (add.id == id) {
             return {
               ...add,
               name, // Use the translated name
@@ -173,20 +181,20 @@ export default function RecipeProvider({
     }
   };
 
-  const changeAdditiveUnits = (index: number, unit: string) => {
+  const changeAdditiveUnits = (id: string, unit: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, unit } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, unit } : add
       ),
     }));
   };
 
-  const changeAdditiveAmount = (index: number, amount: string) => {
+  const changeAdditiveAmount = (id: string, amount: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, amount } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, amount } : add
       ),
     }));
   };
@@ -195,15 +203,15 @@ export default function RecipeProvider({
     setRecipeData((prev) => {
       return {
         ...prev,
-        additives: [...prev.additives, blankAdditive],
+        additives: [...prev.additives, { ...blankAdditive, id: genRandomId() }],
       };
     });
   };
 
-  const removeAdditive = (index: number) => {
+  const removeAdditive = (id: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.filter((_, i) => i !== index),
+      additives: prev.additives.filter((item) => item.id !== id),
     }));
   };
 
@@ -398,65 +406,113 @@ export default function RecipeProvider({
     });
   };
 
-  const editPrimaryNoteText = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editPrimaryNoteText = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editPrimaryNoteDetails = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editPrimaryNoteDetails = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addPrimaryNote = () => {
-    setPrimaryNotes((prev) => [...prev, blankNote]);
+    setPrimaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
 
-  const removePrimaryNote = (index: number) => {
-    setPrimaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removePrimaryNote = (id: string) => {
+    setPrimaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
-  const editSecondaryNoteText = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editSecondaryNoteText = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editSecondaryNoteDetails = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editSecondaryNoteDetails = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addSecondaryNote = () => {
-    setSecondaryNotes((prev) => [...prev, blankNote]);
+    setSecondaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
-  const removeSecondaryNote = (index: number) => {
-    setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removeSecondaryNote = (id: string) => {
+    setSecondaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
   const retrieveStoredData = () => {
     // get recipe Data
     const storedData = localStorage.getItem("recipeData") || "false";
     const parsed = JSON.parse(storedData) as RecipeData | false;
-    if (parsed) setRecipeData(parsed);
+
+    if (parsed) {
+      const parsedWithAdditiveIds = {
+        ...parsed,
+        additives: parsed.additives.map((add) => ({
+          ...add,
+          id: genRandomId(),
+        })),
+      };
+      setRecipeData(parsedWithAdditiveIds);
+    }
 
     // get notes data
     const primaryNotes = localStorage.getItem("primaryNotes") || "false";
     const secondaryNotes = localStorage.getItem("secondaryNotes") || "false";
     const parsedPrimaryNotes = JSON.parse(primaryNotes) as
       | [string, string][]
+      | { id: string; content: [string, string] }[]
       | false;
     if (parsedPrimaryNotes) {
-      setPrimaryNotes(parsedPrimaryNotes);
+      setPrimaryNotes(
+        parsedPrimaryNotes.map((note) => {
+          const content = "content" in note ? note.content : note;
+          const id = "id" in note ? note.id : genRandomId();
+          return { id, content };
+        })
+      );
     }
     const parsedSecondaryNotes = JSON.parse(secondaryNotes) as
       | [string, string][]
+      | { id: string; content: [string, string] }[]
       | false;
     if (parsedSecondaryNotes) {
-      setSecondaryNotes(parsedSecondaryNotes);
+      setSecondaryNotes(
+        parsedSecondaryNotes.map((note) => {
+          const content = "content" in note ? note.content : note;
+          const id = "id" in note ? note.id : genRandomId();
+          return { id, content };
+        })
+      );
     }
 
     // get stabilizers data
@@ -838,6 +894,7 @@ export default function RecipeProvider({
         toggleTakingPh,
         phReading,
         updatePhReading,
+        updateAdditives,
         additiveList,
         loadingAdditives,
         changeAdditive,
@@ -845,6 +902,8 @@ export default function RecipeProvider({
         changeAdditiveAmount,
         addAdditive,
         removeAdditive,
+        setPrimaryNotes,
+        setSecondaryNotes,
         notes: {
           primary: primaryNotes,
           secondary: secondaryNotes,

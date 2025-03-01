@@ -3,6 +3,7 @@ import { Textarea } from "../ui/textarea";
 import { Button } from "../ui/button";
 import { useTranslation } from "react-i18next";
 import { Recipe } from "@/types/recipeDataTypes";
+import DragList from "../ui/DragList";
 
 type TextAreaProps = {
   value: string;
@@ -19,6 +20,8 @@ function Notes({ useRecipe }: { useRecipe: () => Recipe }) {
     removeSecondaryNote,
     addPrimaryNote,
     addSecondaryNote,
+    setPrimaryNotes,
+    setSecondaryNotes,
   } = useRecipe();
   return (
     <div>
@@ -27,23 +30,28 @@ function Notes({ useRecipe }: { useRecipe: () => Recipe }) {
 
         {notes.primary.length > 0 ? (
           <>
-            {notes.primary.map((note, i) => {
-              return (
-                <Note
-                  key={i + "PrimaryNote"}
-                  number={i + 1}
-                  remove={() => removePrimaryNote(i)}
-                  noteProps={{
-                    value: note[0],
-                    onChange: (e) => editPrimaryNote.text(i, e.target.value),
-                  }}
-                  detailProps={{
-                    value: note[1],
-                    onChange: (e) => editPrimaryNote.details(i, e.target.value),
-                  }}
-                />
-              );
-            })}
+            <DragList
+              items={notes.primary}
+              setItems={setPrimaryNotes}
+              renderItem={(note) => {
+                return (
+                  <Note
+                    key={note.id}
+                    remove={() => removePrimaryNote(note.id)}
+                    noteProps={{
+                      value: note.content[0],
+                      onChange: (e) =>
+                        editPrimaryNote.text(note.id, e.target.value),
+                    }}
+                    detailProps={{
+                      value: note.content[1],
+                      onChange: (e) =>
+                        editPrimaryNote.details(note.id, e.target.value),
+                    }}
+                  />
+                );
+              }}
+            />
           </>
         ) : (
           <p className="py-6">Press the button below to add a Note.</p>
@@ -60,24 +68,28 @@ function Notes({ useRecipe }: { useRecipe: () => Recipe }) {
         <h2>{t("notes.subtitleTwo")}</h2>
         {notes.secondary.length > 0 ? (
           <>
-            {notes.secondary.map((note, i) => {
-              return (
-                <Note
-                  key={i + "SecondaryNote"}
-                  number={i + 1}
-                  remove={() => removeSecondaryNote(i)}
-                  noteProps={{
-                    value: note[0],
-                    onChange: (e) => editSecondaryNote.text(i, e.target.value),
-                  }}
-                  detailProps={{
-                    value: note[1],
-                    onChange: (e) =>
-                      editSecondaryNote.details(i, e.target.value),
-                  }}
-                />
-              );
-            })}
+            <DragList
+              items={notes.secondary}
+              setItems={setSecondaryNotes}
+              renderItem={(note) => {
+                return (
+                  <Note
+                    key={note.id}
+                    remove={() => removeSecondaryNote(note.id)}
+                    noteProps={{
+                      value: note.content[0],
+                      onChange: (e) =>
+                        editSecondaryNote.text(note.id, e.target.value),
+                    }}
+                    detailProps={{
+                      value: note.content[1],
+                      onChange: (e) =>
+                        editSecondaryNote.details(note.id, e.target.value),
+                    }}
+                  />
+                );
+              }}
+            />
           </>
         ) : (
           <p className="py-6">Press the button below to add a Note.</p>
@@ -99,18 +111,16 @@ export default Notes;
 const Note = ({
   noteProps,
   detailProps,
-  number,
+
   remove,
 }: {
   noteProps: TextAreaProps;
   detailProps: TextAreaProps;
   remove: () => void;
-  number: number;
 }) => {
   const { t } = useTranslation();
   return (
-    <div className="grid sm:grid-cols-12 grid-cols-6 gap-4 py-4 relative items-center">
-      <p className="absolute -left-6 top-4">{number}.</p>
+    <div className="grid sm:grid-cols-12 grid-cols-6 gap-4 py-4 relative items-center w-full">
       <label className="sm:col-span-5 col-span-full">
         Note
         <Textarea {...noteProps} placeholder={t("notes.placeholder")} />

@@ -8,9 +8,11 @@ import {
 } from "react";
 import {
   Additive,
+  AdditiveType,
   blankAdditive,
   blankIngredient,
   blankNote,
+  genRandomId,
   Ingredient,
   IngredientDetails,
   initialData,
@@ -51,15 +53,35 @@ export default function SavedRecipeProvider({
   const currentLocale = i18n.resolvedLanguage;
   const [firstMount, setFirstMount] = useState(true);
 
+  const parsedRecipeDataWithIds = {
+    ...recipe.recipeData,
+    additives: recipe.recipeData.additives.map((add) => ({
+      ...add,
+      id: genRandomId(),
+    })),
+  };
+
   const [recipeData, setRecipeData] = useState(
-    recipe.recipeData || initialData
+    parsedRecipeDataWithIds || initialData
   );
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [additiveList, setAdditiveList] = useState<Additive[]>([]);
   const [loadingAdditives, setLoadingAdditives] = useState(true);
-  const [primaryNotes, setPrimaryNotes] = useState(recipe.primaryNotes);
-  const [secondaryNotes, setSecondaryNotes] = useState(recipe.secondaryNotes);
+  const [primaryNotes, setPrimaryNotes] = useState(
+    recipe.primaryNotes.map((note) => {
+      const content = note;
+      const id = genRandomId();
+      return { id, content };
+    })
+  );
+  const [secondaryNotes, setSecondaryNotes] = useState(
+    recipe.secondaryNotes.map((note) => {
+      const content = note;
+      const id = genRandomId();
+      return { id, content };
+    })
+  );
 
   const [backsweetenedFG, setBacksweetenedFG] = useState(1);
   const [totalVolume, setTotalVolume] = useState(0);
@@ -143,8 +165,13 @@ export default function SavedRecipeProvider({
       }));
     }
   };
-
-  const changeAdditive = (index: number, name: string) => {
+  const updateAdditives = (additives: AdditiveType[]) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives,
+    }));
+  };
+  const changeAdditive = (id: string, name: string) => {
     const multiplier = recipeData.units.volume === "liter" ? 0.264172 : 1;
     const translatedName = t(lodash.camelCase(name));
 
@@ -157,21 +184,22 @@ export default function SavedRecipeProvider({
           parseNumber(foundAdd.dosage) *
           multiplier *
           totalVolume
-        ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+        ).toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
         unit: foundAdd.unit,
+        id,
       };
 
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) =>
-          i === index ? changed : add
-        ),
+        additives: prev.additives.map((add) => (add.id == id ? changed : add)),
       }));
     } else {
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) => {
-          if (i === index) {
+        additives: prev.additives.map((add) => {
+          if (add.id == id) {
             return {
               ...add,
               name, // Use the translated name
@@ -183,20 +211,20 @@ export default function SavedRecipeProvider({
     }
   };
 
-  const changeAdditiveUnits = (index: number, unit: string) => {
+  const changeAdditiveUnits = (id: string, unit: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, unit } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, unit } : add
       ),
     }));
   };
 
-  const changeAdditiveAmount = (index: number, amount: string) => {
+  const changeAdditiveAmount = (id: string, amount: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, amount } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, amount } : add
       ),
     }));
   };
@@ -205,18 +233,17 @@ export default function SavedRecipeProvider({
     setRecipeData((prev) => {
       return {
         ...prev,
-        additives: [...prev.additives, blankAdditive],
+        additives: [...prev.additives, { ...blankAdditive, id: genRandomId() }],
       };
     });
   };
 
-  const removeAdditive = (index: number) => {
+  const removeAdditive = (id: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.filter((_, i) => i !== index),
+      additives: prev.additives.filter((item) => item.id !== id),
     }));
   };
-
   const changeVolumeUnits = (unit: string) => {
     setRecipeData((prev) => ({
       ...prev,
@@ -400,43 +427,67 @@ export default function SavedRecipeProvider({
     });
   };
 
-  const editPrimaryNoteText = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editPrimaryNoteText = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editPrimaryNoteDetails = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editPrimaryNoteDetails = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addPrimaryNote = () => {
-    setPrimaryNotes((prev) => [...prev, blankNote]);
+    setPrimaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
 
-  const removePrimaryNote = (index: number) => {
-    setPrimaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removePrimaryNote = (id: string) => {
+    setPrimaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
-  const editSecondaryNoteText = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editSecondaryNoteText = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editSecondaryNoteDetails = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editSecondaryNoteDetails = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addSecondaryNote = () => {
-    setSecondaryNotes((prev) => [...prev, blankNote]);
+    setSecondaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
-  const removeSecondaryNote = (index: number) => {
-    setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removeSecondaryNote = (id: string) => {
+    setSecondaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
   // fetch initial ingredient data
@@ -752,11 +803,14 @@ export default function SavedRecipeProvider({
         updatePhReading,
         additiveList,
         loadingAdditives,
+        updateAdditives,
         changeAdditive,
         changeAdditiveUnits,
         changeAdditiveAmount,
         addAdditive,
         removeAdditive,
+        setPrimaryNotes,
+        setSecondaryNotes,
         notes: {
           primary: primaryNotes,
           secondary: secondaryNotes,
