@@ -553,8 +553,6 @@ export const SavedNutrientProvider = ({
     nuteArr,
   ]);
 
-  useEffect(() => console.log(yeastAmount), [yeastAmount]);
-
   // Expose only the necessary state to the UI
   const uiState = {
     inputs: {

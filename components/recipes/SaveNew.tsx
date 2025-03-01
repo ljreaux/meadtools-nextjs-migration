@@ -38,6 +38,7 @@ function SaveNew() {
     sulfite,
     campden,
     notes,
+    stabilizers,
   } = useRecipe();
 
   const { fullData, yanContributions } = useNutrients();
@@ -64,6 +65,7 @@ function SaveNew() {
       sorbate,
       sulfite,
       campden,
+      stabilizers,
     });
     const nutrientData = JSON.stringify(fullData);
     const yanContribution = JSON.stringify(yanContributions);

@@ -45,6 +45,11 @@ export interface RecipeData {
   sorbate: number;
   sulfite: number;
   campden: number;
+  stabilizers?: {
+    adding?: boolean;
+    pH?: boolean;
+    phReading?: string;
+  };
 }
 
 export type NotesType = [string, string][];
@@ -87,6 +92,11 @@ export const initialData: RecipeData = {
   sorbate: 0,
   sulfite: 0,
   campden: 0,
+  stabilizers: {
+    adding: false,
+    pH: false,
+    phReading: "3.6",
+  },
 };
 
 export interface Recipe extends RecipeData {

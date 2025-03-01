@@ -67,10 +67,14 @@ export default function SavedRecipeProvider({
   const [delle, setDelle] = useState(0);
 
   const [addingStabilizers, setAddingStabilizers] = useState(
-    recipeData.sorbate > 0 || recipeData.sulfite > 0
+    recipe.recipeData?.stabilizers?.adding ?? false
   );
-  const [takingPh, setTakingPh] = useState(false);
-  const [phReading, setPhReading] = useState("3.6");
+  const [takingPh, setTakingPh] = useState(
+    recipe.recipeData?.stabilizers?.pH ?? false
+  );
+  const [phReading, setPhReading] = useState(
+    recipe.recipeData?.stabilizers?.phReading ?? "3.6"
+  );
   const [recipeName, setRecipeName] = useState(recipe.name || "");
 
   const addIngredient = () => {
@@ -339,15 +343,36 @@ export default function SavedRecipeProvider({
 
   const toggleStabilizers = (val: boolean) => {
     setAddingStabilizers(val);
+    setRecipeData((prev) => ({
+      ...prev,
+      stabilizers: {
+        ...prev.stabilizers,
+        adding: val,
+      },
+    }));
   };
 
   const toggleTakingPh = (val: boolean) => {
     setTakingPh(val);
+    setRecipeData((prev) => ({
+      ...prev,
+      stabilizers: {
+        ...prev.stabilizers,
+        pH: val,
+      },
+    }));
   };
 
   const updatePhReading = (ph: string) => {
     if (isValidNumber(ph)) {
       setPhReading(ph);
+      setRecipeData((prev) => ({
+        ...prev,
+        stabilizers: {
+          ...prev.stabilizers,
+          phReading: ph,
+        },
+      }));
     }
   };
 

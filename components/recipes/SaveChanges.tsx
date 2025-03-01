@@ -41,6 +41,7 @@ function SaveChanges() {
     campden,
     notes,
     recipeNameProps,
+    stabilizers,
   } = useRecipe();
 
   const { fullData, yanContributions } = useNutrients();
@@ -74,6 +75,7 @@ function SaveChanges() {
       sorbate,
       sulfite,
       campden,
+      stabilizers,
     });
     const nutrientData = JSON.stringify(fullData);
     const yanContribution = JSON.stringify(yanContributions);
