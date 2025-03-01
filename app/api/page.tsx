@@ -1,4 +1,5 @@
 import ApiNav from "@/components/docs/ApiNav";
+import AuthInfoCard from "@/components/docs/AuthInfoCard";
 import EndpointCard from "@/components/docs/EndpointCard";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import TranslationsProvider from "@/components/providers/TranslationsProvider";
@@ -56,6 +57,8 @@ export default async function APIDocs({
                 {docData.description}
               </p>
             </section>
+
+            <AuthInfoCard cardInfo={docData.authentication} />
 
             {/* API Categories & Endpoints */}
             {Object.entries(docData.endpoints).map(

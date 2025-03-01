@@ -4,8 +4,8 @@
   "description": "Welcome to the MeadTools API. Below are the available endpoints.",
   "authentication": {
     "type": "JWT",
-    "header": "Authorization: Bearer <your_token_here>",
-    "description": "All protected routes require a valid JWT token. Obtain a token via the login route."
+    "header": "\"Authorization\": \"Bearer <your_token_here>\"",
+    "description": "All protected routes require a valid JWT token. Obtain a token via the login route. Include the token in your HTTP requests using the Authorization header with the Bearer scheme."
   },
   "endpoints": {
     "Authentication": [
