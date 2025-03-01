@@ -52,9 +52,15 @@ export default function RecipeProvider({
   const [totalForAbv, setTotalForAbv] = useState(1);
   const [delle, setDelle] = useState(0);
 
-  const [addingStabilizers, setAddingStabilizers] = useState(false);
-  const [takingPh, setTakingPh] = useState(false);
-  const [phReading, setPhReading] = useState("3.6");
+  const [addingStabilizers, setAddingStabilizers] = useState(
+    initialData?.stabilizers?.adding ?? false
+  );
+  const [takingPh, setTakingPh] = useState(
+    initialData?.stabilizers?.pH ?? false
+  );
+  const [phReading, setPhReading] = useState(
+    initialData?.stabilizers?.phReading ?? "3.6"
+  );
   const [recipeName, setRecipeName] = useState(providedName || "");
 
   const addIngredient = () => {
@@ -333,15 +339,36 @@ export default function RecipeProvider({
 
   const toggleStabilizers = (val: boolean) => {
     setAddingStabilizers(val);
+    setRecipeData((prev) => ({
+      ...prev,
+      stabilizers: {
+        ...prev.stabilizers,
+        adding: val,
+      },
+    }));
   };
 
   const toggleTakingPh = (val: boolean) => {
     setTakingPh(val);
+    setRecipeData((prev) => ({
+      ...prev,
+      stabilizers: {
+        ...prev.stabilizers,
+        pH: val,
+      },
+    }));
   };
 
   const updatePhReading = (ph: string) => {
     if (isValidNumber(ph)) {
       setPhReading(ph);
+      setRecipeData((prev) => ({
+        ...prev,
+        stabilizers: {
+          ...prev.stabilizers,
+          phReading: ph,
+        },
+      }));
     }
   };
 
@@ -436,12 +463,12 @@ export default function RecipeProvider({
     const storedStabilizers =
       localStorage.getItem("addingStabilizers") || "false";
     const parsedStabilizers = JSON.parse(storedStabilizers) as
-      | { adding: boolean; pH: boolean; pHReading: string }
+      | { adding: boolean; pH: boolean; phReading: string }
       | false;
     if (parsedStabilizers) {
       setAddingStabilizers(parsedStabilizers.adding);
       setTakingPh(parsedStabilizers.pH);
-      setPhReading(parsedStabilizers.pHReading);
+      setPhReading(parsedStabilizers.phReading);
     }
     const storedName = localStorage.getItem("recipeName");
     if (storedName) {
@@ -772,7 +799,7 @@ export default function RecipeProvider({
       JSON.stringify({
         adding: addingStabilizers,
         pH: takingPh,
-        pHReading: phReading,
+        phReading,
       })
     );
   }, [
