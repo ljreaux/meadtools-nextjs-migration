@@ -37,7 +37,7 @@ export default function SortableItem({
         className="grid items-center justify-center bg-secondary hover:bg-secondary mr-2 rounded-l-sm"
         style={{ touchAction: "none" }}
       >
-        <GripVertical className="w-4 h-4 sm:w-6 sm:h-6" />
+        <GripVertical className="w-6 h-6" />
       </div>
       <div className="mr-2 flex-1">{children}</div>
     </div>
