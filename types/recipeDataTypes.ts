@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 export const genRandomId = () => nanoid(8);
 
 export type IngredientDetails = {
-  id: number;
+  id: string;
   name: string;
   brix: string;
   details: [string, string];
@@ -12,7 +12,7 @@ export type IngredientDetails = {
 };
 
 export type Ingredient = {
-  id: number;
+  id: string;
   name: string;
   sugar_content: string;
   water_content: string;
@@ -69,7 +69,7 @@ export const blankAdditive: AdditiveType = {
 export const initialData: RecipeData = {
   ingredients: [
     {
-      id: 4,
+      id: genRandomId(),
       name: "Water",
       brix: "0.00",
       details: ["0", "0.000"],
@@ -77,7 +77,7 @@ export const initialData: RecipeData = {
       category: "water",
     },
     {
-      id: 1,
+      id: genRandomId(),
       name: "Honey",
       brix: "79.60",
       details: ["0", "0.000"],
@@ -106,25 +106,35 @@ export const initialData: RecipeData = {
 };
 
 export interface Recipe extends RecipeData {
+  setIngredients: (
+    ingredients: {
+      id: string;
+      name: string;
+      brix: string;
+      details: [string, string];
+      secondary: boolean;
+      category: string;
+    }[]
+  ) => void;
   addIngredient: () => void;
-  removeIngredient: (i: number) => void;
+  removeIngredient: (id: string) => void;
   ingredientList: Ingredient[];
   loadingIngredients: boolean;
-  changeIngredient: (index: number, name: string) => void;
+  changeIngredient: (ing: IngredientDetails, i: number, name: string) => void;
   changeVolumeUnits: (unit: string) => void;
   changeWeightUnits: (unit: string) => void;
   updateIngredientVolume: (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     volume: string
   ) => void;
   updateIngredientWeight: (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     weight: string
   ) => void;
-  updateBrix: (brix: string, index: number) => void;
-  toggleSecondaryChecked: (i: number, b: boolean) => void;
+  updateBrix: (brix: string, id: string) => void;
+  toggleSecondaryChecked: (id: string, b: boolean) => void;
   updateFG: (FG: string) => void;
   backsweetenedFG: number;
   totalVolume: number;
@@ -168,11 +178,11 @@ export interface Recipe extends RecipeData {
   };
   public_username?: string | null;
   setIngredientsToTarget: (og: number, volume: number) => void;
-  fillToNearest: (i: number) => void;
+  fillToNearest: (id: string) => void;
 }
 
 export const blankIngredient: IngredientDetails = {
-  id: 1,
+  id: genRandomId(),
   name: "Honey",
   brix: "79.6",
   details: ["0", "0"],

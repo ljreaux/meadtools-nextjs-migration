@@ -41,7 +41,13 @@ export default function RecipeProvider({
   const [firstMount, setFirstMount] = useState(true);
   const [preferredUnits, setPreferredUnits] = useState("US");
 
-  const [recipeData, setRecipeData] = useState(initialData);
+  const [recipeData, setRecipeData] = useState({
+    ...initialData,
+    ingredients: initialData.ingredients.map((ing) => ({
+      ...ing,
+      id: genRandomId(),
+    })),
+  });
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [additiveList, setAdditiveList] = useState<Additive[]>([]);
@@ -68,27 +74,34 @@ export default function RecipeProvider({
   const addIngredient = () => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: [...prev.ingredients, blankIngredient],
+      ingredients: [
+        ...prev.ingredients,
+        { ...blankIngredient, id: genRandomId() },
+      ],
     }));
   };
 
-  const removeIngredient = (index: number) => {
+  const removeIngredient = (id: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.filter((_, i) => {
-        return i !== index;
+      ingredients: prev.ingredients.filter((ing) => {
+        return id !== ing.id;
       }),
     }));
   };
 
-  const changeIngredient = (index: number, name: string) => {
+  const changeIngredient = (
+    ing: IngredientDetails,
+    index: number,
+    name: string
+  ) => {
     const translatedName = t(lodash.camelCase(name));
 
     const foundIng = ingredientList.find((ing) => ing.name === name);
 
     if (foundIng) {
       const changed = {
-        id: foundIng.id,
+        id: ing.id,
         name: translatedName, // Use the translated name
         brix:
           parseNumber(foundIng.sugar_content).toLocaleString(currentLocale, {
@@ -101,7 +114,7 @@ export default function RecipeProvider({
       setRecipeData((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing, i) => {
-          if (i === index) {
+          if (index === i) {
             return {
               ...changed,
               details: [
@@ -122,7 +135,7 @@ export default function RecipeProvider({
       setRecipeData((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing, i) => {
-          if (i === index) {
+          if (index === i) {
             return {
               ...ing,
               name, // Use the translated name
@@ -253,7 +266,7 @@ export default function RecipeProvider({
 
   const updateIngredientWeight = (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     weight: string
   ) => {
     if (isValidNumber(weight)) {
@@ -271,8 +284,8 @@ export default function RecipeProvider({
       };
       setRecipeData((prev) => ({
         ...prev,
-        ingredients: prev.ingredients.map((ing, i) =>
-          i === index ? updatedIngredient : ing
+        ingredients: prev.ingredients.map((ing) =>
+          id === ing.id ? updatedIngredient : ing
         ),
       }));
     }
@@ -280,7 +293,7 @@ export default function RecipeProvider({
 
   const updateIngredientVolume = (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     volume: string
   ) => {
     if (isValidNumber(volume)) {
@@ -298,18 +311,18 @@ export default function RecipeProvider({
       };
       setRecipeData((prev) => ({
         ...prev,
-        ingredients: prev.ingredients.map((ing, i) =>
-          i === index ? updatedIngredient : ing
+        ingredients: prev.ingredients.map((ing) =>
+          id === ing.id ? updatedIngredient : ing
         ),
       }));
     }
   };
 
-  const updateBrix = (brix: string, index: number) => {
+  const updateBrix = (brix: string, id: string) => {
     if (isValidNumber(brix)) {
       setRecipeData((prev) => {
-        const ingredients = prev.ingredients.map((ing, i) =>
-          i === index
+        const ingredients = prev.ingredients.map((ing) =>
+          id === ing.id
             ? {
                 ...ing,
                 brix: brix,
@@ -330,11 +343,11 @@ export default function RecipeProvider({
     }
   };
 
-  const toggleSecondaryChecked = (index: number, isChecked: boolean) => {
+  const toggleSecondaryChecked = (id: string, isChecked: boolean) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.map((ing, i) =>
-        i === index ? { ...ing, secondary: isChecked } : ing
+      ingredients: prev.ingredients.map((ing) =>
+        ing.id === id ? { ...ing, secondary: isChecked } : ing
       ),
     }));
   };
@@ -571,7 +584,7 @@ export default function RecipeProvider({
       ] as [string, string],
     };
     const water = {
-      id: 4,
+      id: genRandomId(),
       name: "Water",
       brix: "0",
       secondary: false,
@@ -589,17 +602,17 @@ export default function RecipeProvider({
       ingredients: [water, honey],
     }));
   };
-  const fillToNearest = (i: number) => {
-    const ingredient = recipeData.ingredients[i];
-    const currentIngredientVolume = parseNumber(ingredient.details[1]);
+  const fillToNearest = (id: string) => {
+    const ingredient = recipeData.ingredients.find((ing) => id === ing.id);
+    const currentIngredientVolume = parseNumber(ingredient?.details[1] || "");
     const targetVolume = Math.ceil(totalVolume);
 
     // Calculate the additional volume needed, accounting for the current ingredient's contribution
     const targetIngredientVolume =
       targetVolume - (totalVolume - currentIngredientVolume);
 
-    if (targetIngredientVolume > 0) {
-      updateIngredientVolume(ingredient, i, targetIngredientVolume.toFixed(3));
+    if (targetIngredientVolume > 0 && ingredient) {
+      updateIngredientVolume(ingredient, id, targetIngredientVolume.toFixed(3));
     }
   };
 
@@ -872,6 +885,9 @@ export default function RecipeProvider({
     <RecipeContext.Provider
       value={{
         ...recipeData,
+        setIngredients: (ing) => {
+          setRecipeData((prev) => ({ ...prev, ingredients: ing }));
+        },
         addIngredient,
         removeIngredient,
         changeIngredient,
