@@ -15,7 +15,7 @@ export default function DragList<T extends { id: string }>({
 }: {
   items: T[];
   setItems: (arr: T[]) => void;
-  renderItem?: (item: T) => React.ReactNode;
+  renderItem?: (item: T, i: number) => React.ReactNode;
 }) {
   const handleDragEnd = (event: any) => {
     const { active, over } = event;
@@ -34,9 +34,9 @@ export default function DragList<T extends { id: string }>({
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
-        {items.map((item) => (
+        {items.map((item, i) => (
           <SortableItem key={item.id} id={item.id}>
-            {renderItem ? renderItem(item) : String(item.id)}
+            {renderItem ? renderItem(item, i) : String(item.id)}
           </SortableItem>
         ))}
       </SortableContext>

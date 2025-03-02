@@ -18,7 +18,9 @@ export default function SortableItem({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id });
+  } = useSortable({
+    id,
+  });
 
   return (
     <div
@@ -27,18 +29,16 @@ export default function SortableItem({
         transform: CSS.Transform.toString(transform),
         transition,
       }}
-      className={`flex my-2 ${isDragging ? "border border-muted-foreground" : "border-0"} border-collapse rounded-md overflow-clip bg-background`}
+      className={`flex my-2 ${isDragging ? "outline outline-secondary" : "outline-none"} border-collapse rounded-sm bg-background `}
     >
-      {/* Drag handle */}
       <div
         {...attributes}
         {...listeners}
-        className="grid items-center justify-center bg-muted-foreground mr-2 "
+        className="grid items-center justify-center bg-secondary hover:bg-secondary mr-2 rounded-l-sm"
         style={{ touchAction: "none" }}
       >
         <GripVertical className="w-4 h-4 sm:w-6 sm:h-6" />
       </div>
-      {/* Item content */}
       <div className="mr-2 flex-1">{children}</div>
     </div>
   );
