@@ -38,7 +38,7 @@ export default function SortableItem({
         {...attributes}
         {...listeners}
         className="grid items-center justify-center bg-secondary hover:bg-secondary mr-2 rounded-l-sm cursor-grab active:cursor-grabbing"
-        style={{ touchAction: "manipulation" }}
+        style={{ touchAction: "none" }}
         tabIndex={0}
         aria-label={`Drag handle for item ${id}`}
         aria-describedby={`drag-instructions-${id}`}
