@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
@@ -9,7 +8,6 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
 } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -28,39 +26,15 @@ export default function DragList<T extends { id: string }>({
   setItems: (arr: T[]) => void;
   renderItem?: (item: T, i: number) => React.ReactNode;
 }) {
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  // Detect touch device on mount
-  useEffect(() => {
-    setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
-  }, []);
-
-  // Configure appropriate sensors based on device type
   const sensors = useSensors(
-    // For desktop: regular pointer sensor with no delay
-    useSensor(PointerSensor, {
-      // Only activate for non-touch interactions (mouse)
-      activationConstraint: isTouchDevice
-        ? {
-            distance: 10, // Requires some movement to distinguish from clicks
-          }
-        : undefined,
-    }),
-    // For mobile/touch: dedicated touch sensor with delay
-    useSensor(TouchSensor, {
-      // Only activate for touch interactions with delay
-      activationConstraint: {
-        delay: 350, // 250ms delay before dragging starts
-        tolerance: 8, // Allow slight movement for better scrolling
-      },
-    }),
-    // Keyboard sensor for accessibility
+    useSensor(PointerSensor),
+    useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = (event: any) => {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
