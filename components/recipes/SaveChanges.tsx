@@ -80,8 +80,8 @@ function SaveChanges() {
     const nutrientData = JSON.stringify(fullData);
     const yanContribution = JSON.stringify(yanContributions);
 
-    const primaryNotes = notes.primary.flat();
-    const secondaryNotes = notes.secondary.flat();
+    const primaryNotes = notes.primary.map((note) => note.content).flat();
+    const secondaryNotes = notes.secondary.map((note) => note.content).flat();
     const advanced = false;
 
     const body = {

@@ -8,9 +8,11 @@ import {
 } from "react";
 import {
   Additive,
+  AdditiveType,
   blankAdditive,
   blankIngredient,
   blankNote,
+  genRandomId,
   Ingredient,
   IngredientDetails,
   initialData,
@@ -51,15 +53,45 @@ export default function SavedRecipeProvider({
   const currentLocale = i18n.resolvedLanguage;
   const [firstMount, setFirstMount] = useState(true);
 
+  const parsedRecipeDataWithIds = {
+    ...recipe.recipeData,
+    additives: recipe.recipeData.additives.map((add) => ({
+      ...add,
+      id: genRandomId(),
+    })),
+    ingredients: recipe.recipeData.ingredients.map((ing) => ({
+      ...ing,
+      id: genRandomId(),
+    })),
+  };
+
   const [recipeData, setRecipeData] = useState(
-    recipe.recipeData || initialData
+    parsedRecipeDataWithIds || {
+      ...initialData,
+      ingredients: initialData.ingredients.map((ing) => ({
+        ...ing,
+        id: genRandomId(),
+      })),
+    }
   );
   const [ingredientList, setIngredientList] = useState<Ingredient[]>([]);
   const [loadingIngredients, setLoadingIngredients] = useState(true);
   const [additiveList, setAdditiveList] = useState<Additive[]>([]);
   const [loadingAdditives, setLoadingAdditives] = useState(true);
-  const [primaryNotes, setPrimaryNotes] = useState(recipe.primaryNotes);
-  const [secondaryNotes, setSecondaryNotes] = useState(recipe.secondaryNotes);
+  const [primaryNotes, setPrimaryNotes] = useState(
+    recipe.primaryNotes.map((note) => {
+      const content = note;
+      const id = genRandomId();
+      return { id, content };
+    })
+  );
+  const [secondaryNotes, setSecondaryNotes] = useState(
+    recipe.secondaryNotes.map((note) => {
+      const content = note;
+      const id = genRandomId();
+      return { id, content };
+    })
+  );
 
   const [backsweetenedFG, setBacksweetenedFG] = useState(1);
   const [totalVolume, setTotalVolume] = useState(0);
@@ -84,23 +116,27 @@ export default function SavedRecipeProvider({
     }));
   };
 
-  const removeIngredient = (index: number) => {
+  const removeIngredient = (id: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.filter((_, i) => {
-        return i !== index;
+      ingredients: prev.ingredients.filter((ing) => {
+        return id !== ing.id;
       }),
     }));
   };
 
-  const changeIngredient = (index: number, name: string) => {
+  const changeIngredient = (
+    ing: IngredientDetails,
+    index: number,
+    name: string
+  ) => {
     const translatedName = t(lodash.camelCase(name));
 
     const foundIng = ingredientList.find((ing) => ing.name === name);
 
     if (foundIng) {
       const changed = {
-        id: foundIng.id,
+        id: ing.id,
         name: translatedName, // Use the translated name
         brix:
           parseNumber(foundIng.sugar_content).toLocaleString(currentLocale, {
@@ -113,7 +149,7 @@ export default function SavedRecipeProvider({
       setRecipeData((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing, i) => {
-          if (i === index) {
+          if (index === i) {
             return {
               ...changed,
               details: [
@@ -121,7 +157,9 @@ export default function SavedRecipeProvider({
                 weightToVolume(
                   parseNumber(ing.details[0]),
                   parseNumber(changed.brix)
-                ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+                ).toLocaleString(currentLocale, {
+                  maximumFractionDigits: 3,
+                }),
               ],
             };
           }
@@ -132,7 +170,7 @@ export default function SavedRecipeProvider({
       setRecipeData((prev) => ({
         ...prev,
         ingredients: prev.ingredients.map((ing, i) => {
-          if (i === index) {
+          if (index === i) {
             return {
               ...ing,
               name, // Use the translated name
@@ -143,8 +181,13 @@ export default function SavedRecipeProvider({
       }));
     }
   };
-
-  const changeAdditive = (index: number, name: string) => {
+  const updateAdditives = (additives: AdditiveType[]) => {
+    setRecipeData((prev) => ({
+      ...prev,
+      additives,
+    }));
+  };
+  const changeAdditive = (id: string, name: string) => {
     const multiplier = recipeData.units.volume === "liter" ? 0.264172 : 1;
     const translatedName = t(lodash.camelCase(name));
 
@@ -157,21 +200,22 @@ export default function SavedRecipeProvider({
           parseNumber(foundAdd.dosage) *
           multiplier *
           totalVolume
-        ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+        ).toLocaleString(currentLocale, {
+          maximumFractionDigits: 3,
+        }),
         unit: foundAdd.unit,
+        id,
       };
 
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) =>
-          i === index ? changed : add
-        ),
+        additives: prev.additives.map((add) => (add.id == id ? changed : add)),
       }));
     } else {
       setRecipeData((prev) => ({
         ...prev,
-        additives: prev.additives.map((add, i) => {
-          if (i === index) {
+        additives: prev.additives.map((add) => {
+          if (add.id == id) {
             return {
               ...add,
               name, // Use the translated name
@@ -183,20 +227,20 @@ export default function SavedRecipeProvider({
     }
   };
 
-  const changeAdditiveUnits = (index: number, unit: string) => {
+  const changeAdditiveUnits = (id: string, unit: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, unit } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, unit } : add
       ),
     }));
   };
 
-  const changeAdditiveAmount = (index: number, amount: string) => {
+  const changeAdditiveAmount = (id: string, amount: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.map((add, i) =>
-        i === index ? { ...add, amount } : add
+      additives: prev.additives.map((add) =>
+        add.id === id ? { ...add, amount } : add
       ),
     }));
   };
@@ -205,18 +249,17 @@ export default function SavedRecipeProvider({
     setRecipeData((prev) => {
       return {
         ...prev,
-        additives: [...prev.additives, blankAdditive],
+        additives: [...prev.additives, { ...blankAdditive, id: genRandomId() }],
       };
     });
   };
 
-  const removeAdditive = (index: number) => {
+  const removeAdditive = (id: string) => {
     setRecipeData((prev) => ({
       ...prev,
-      additives: prev.additives.filter((_, i) => i !== index),
+      additives: prev.additives.filter((item) => item.id !== id),
     }));
   };
-
   const changeVolumeUnits = (unit: string) => {
     setRecipeData((prev) => ({
       ...prev,
@@ -255,7 +298,7 @@ export default function SavedRecipeProvider({
 
   const updateIngredientWeight = (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     weight: string
   ) => {
     if (isValidNumber(weight)) {
@@ -266,13 +309,15 @@ export default function SavedRecipeProvider({
           weightToVolume(
             parseNumber(weight),
             parseNumber(ing.brix)
-          ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+          ).toLocaleString(currentLocale, {
+            maximumFractionDigits: 3,
+          }),
         ] as [string, string],
       };
       setRecipeData((prev) => ({
         ...prev,
-        ingredients: prev.ingredients.map((ing, i) =>
-          i === index ? updatedIngredient : ing
+        ingredients: prev.ingredients.map((ing) =>
+          id === ing.id ? updatedIngredient : ing
         ),
       }));
     }
@@ -280,7 +325,7 @@ export default function SavedRecipeProvider({
 
   const updateIngredientVolume = (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     volume: string
   ) => {
     if (isValidNumber(volume)) {
@@ -290,24 +335,26 @@ export default function SavedRecipeProvider({
           volumeToWeight(
             parseNumber(volume),
             parseNumber(ing.brix)
-          ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+          ).toLocaleString(currentLocale, {
+            maximumFractionDigits: 3,
+          }),
           volume,
         ] as [string, string],
       };
       setRecipeData((prev) => ({
         ...prev,
-        ingredients: prev.ingredients.map((ing, i) =>
-          i === index ? updatedIngredient : ing
+        ingredients: prev.ingredients.map((ing) =>
+          id === ing.id ? updatedIngredient : ing
         ),
       }));
     }
   };
 
-  const updateBrix = (brix: string, index: number) => {
+  const updateBrix = (brix: string, id: string) => {
     if (isValidNumber(brix)) {
       setRecipeData((prev) => {
-        const ingredients = prev.ingredients.map((ing, i) =>
-          i === index
+        const ingredients = prev.ingredients.map((ing) =>
+          id === ing.id
             ? {
                 ...ing,
                 brix: brix,
@@ -316,7 +363,9 @@ export default function SavedRecipeProvider({
                   weightToVolume(
                     parseNumber(ing.details[0]),
                     parseNumber(brix)
-                  ).toLocaleString(currentLocale, { maximumFractionDigits: 3 }),
+                  ).toLocaleString(currentLocale, {
+                    maximumFractionDigits: 3,
+                  }),
                 ] as [string, string],
               }
             : ing
@@ -326,11 +375,11 @@ export default function SavedRecipeProvider({
     }
   };
 
-  const toggleSecondaryChecked = (index: number, isChecked: boolean) => {
+  const toggleSecondaryChecked = (id: string, isChecked: boolean) => {
     setRecipeData((prev) => ({
       ...prev,
-      ingredients: prev.ingredients.map((ing, i) =>
-        i === index ? { ...ing, secondary: isChecked } : ing
+      ingredients: prev.ingredients.map((ing) =>
+        ing.id === id ? { ...ing, secondary: isChecked } : ing
       ),
     }));
   };
@@ -400,43 +449,67 @@ export default function SavedRecipeProvider({
     });
   };
 
-  const editPrimaryNoteText = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editPrimaryNoteText = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editPrimaryNoteDetails = (index: number, text: string) => {
-    setPrimaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editPrimaryNoteDetails = (id: string, text: string) => {
+    setPrimaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addPrimaryNote = () => {
-    setPrimaryNotes((prev) => [...prev, blankNote]);
+    setPrimaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
 
-  const removePrimaryNote = (index: number) => {
-    setPrimaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removePrimaryNote = (id: string) => {
+    setPrimaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
-  const editSecondaryNoteText = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [text, note[1]] : note))
-    );
+  const editSecondaryNoteText = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [text, note.content[1]] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
-  const editSecondaryNoteDetails = (index: number, text: string) => {
-    setSecondaryNotes((prev) =>
-      prev.map((note, i) => (i === index ? [note[0], text] : note))
-    );
+  const editSecondaryNoteDetails = (id: string, text: string) => {
+    setSecondaryNotes((prev) => {
+      return prev.map((note) => {
+        if (note.id === id) {
+          return { ...note, content: [note.content[0], text] };
+        } else {
+          return note;
+        }
+      });
+    });
   };
 
   const addSecondaryNote = () => {
-    setSecondaryNotes((prev) => [...prev, blankNote]);
+    setSecondaryNotes((prev) => [...prev, { ...blankNote, id: genRandomId() }]);
   };
-  const removeSecondaryNote = (index: number) => {
-    setSecondaryNotes((prev) => prev.filter((_, i) => i !== index));
+  const removeSecondaryNote = (id: string) => {
+    setSecondaryNotes((prev) => prev.filter((note) => note.id !== id));
   };
 
   // fetch initial ingredient data
@@ -692,7 +765,7 @@ export default function SavedRecipeProvider({
       ] as [string, string],
     };
     const water = {
-      id: 4,
+      id: genRandomId(),
       name: "Water",
       brix: "0",
       secondary: false,
@@ -710,17 +783,17 @@ export default function SavedRecipeProvider({
       ingredients: [water, honey],
     }));
   };
-  const fillToNearest = (i: number) => {
-    const ingredient = recipeData.ingredients[i];
-    const currentIngredientVolume = parseNumber(ingredient.details[1]);
+  const fillToNearest = (id: string) => {
+    const ingredient = recipeData.ingredients.find((ing) => id === ing.id);
+    const currentIngredientVolume = parseNumber(ingredient?.details[1] || "");
     const targetVolume = Math.ceil(totalVolume);
 
     // Calculate the additional volume needed, accounting for the current ingredient's contribution
     const targetIngredientVolume =
       targetVolume - (totalVolume - currentIngredientVolume);
 
-    if (targetIngredientVolume > 0) {
-      updateIngredientVolume(ingredient, i, targetIngredientVolume.toFixed(3));
+    if (targetIngredientVolume > 0 && ingredient) {
+      updateIngredientVolume(ingredient, id, targetIngredientVolume.toFixed(3));
     }
   };
 
@@ -728,6 +801,9 @@ export default function SavedRecipeProvider({
     <RecipeContext.Provider
       value={{
         ...recipeData,
+        setIngredients: (ing) => {
+          setRecipeData((prev) => ({ ...prev, ingredients: ing }));
+        },
         addIngredient,
         removeIngredient,
         changeIngredient,
@@ -752,11 +828,14 @@ export default function SavedRecipeProvider({
         updatePhReading,
         additiveList,
         loadingAdditives,
+        updateAdditives,
         changeAdditive,
         changeAdditiveUnits,
         changeAdditiveAmount,
         addAdditive,
         removeAdditive,
+        setPrimaryNotes,
+        setSecondaryNotes,
         notes: {
           primary: primaryNotes,
           secondary: secondaryNotes,

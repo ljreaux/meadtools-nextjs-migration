@@ -6,6 +6,7 @@ import Loading from "../loading";
 import SearchableInput from "../ui/SearchableInput";
 import { useTranslation } from "react-i18next";
 import InputWithUnits from "../nutrientCalc/InputWithUnits";
+import DragList from "../ui/DragList";
 
 function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
     ingredientList,
     units,
     fillToNearest,
+    setIngredients,
   } = useRecipe();
 
   if (loadingIngredients) {
@@ -32,42 +34,37 @@ function Ingredients({ useRecipe }: { useRecipe: () => Recipe }) {
     <div className="grid gap-4 items-center border-b border-muted-foreground py-6">
       <h3> {t("recipeBuilder.labels.ingredients")}</h3>
       <span>
-        {ingredients.length === 0
-          ? "Add Some Ingredients to Continue Building your Recipe."
-          : ingredients.map((ing, i) => {
-              return (
-                <div
-                  className={`${
-                    i !== ingredients.length - 1
-                      ? "border-b border-dotted "
-                      : ""
-                  }`}
-                  key={i}
-                >
-                  <IngredientLine
-                    units={units}
-                    ingredientList={ingredientList}
-                    ing={ing}
-                    deleteFn={() => removeIngredient(i)}
-                    changeIng={(val) => changeIngredient(i, val)}
-                    updateWeight={(val) => {
-                      updateIngredientWeight(ing, i, val);
-                    }}
-                    updateVolume={(val) => {
-                      updateIngredientVolume(ing, i, val);
-                    }}
-                    updateBrix={(val) => {
-                      updateBrix(val, i);
-                    }}
-                    toggleChecked={(val) => {
-                      toggleSecondaryChecked(i, val);
-                    }}
-                    fillToNearest={() => fillToNearest(i)}
-                    index={i}
-                  />
-                </div>
-              );
-            })}
+        {ingredients.length === 0 ? (
+          "Add Some Ingredients to Continue Building your Recipe."
+        ) : (
+          <DragList
+            items={ingredients}
+            setItems={setIngredients}
+            renderItem={(ing, i) => (
+              <IngredientLine
+                units={units}
+                ingredientList={ingredientList}
+                ing={ing}
+                deleteFn={() => removeIngredient(ing.id)}
+                changeIng={(val) => changeIngredient(ing, i, val)}
+                updateWeight={(val) => {
+                  updateIngredientWeight(ing, ing.id, val);
+                }}
+                updateVolume={(val) => {
+                  updateIngredientVolume(ing, ing.id, val);
+                }}
+                updateBrix={(val) => {
+                  updateBrix(val, ing.id);
+                }}
+                toggleChecked={(val) => {
+                  toggleSecondaryChecked(ing.id, val);
+                }}
+                fillToNearest={() => fillToNearest(ing.id)}
+                index={i}
+              />
+            )}
+          />
+        )}
       </span>
       <Button
         onClick={addIngredient}
@@ -117,6 +114,7 @@ const IngredientLine = ({
     <div
       className={`joyride-ingredient-${index + 1} grid grid-cols-2 gap-2 py-6`}
     >
+      {" "}
       <label>
         {t("ingredient")}
         <SearchableInput
@@ -127,7 +125,6 @@ const IngredientLine = ({
           onSelect={handleIngredientSelect}
         />
       </label>
-
       {/* Other fields */}
       <label>
         {t("BRIX")}
@@ -137,8 +134,7 @@ const IngredientLine = ({
           onFocus={(e) => e.target.select()}
           onChange={(e) => updateBrix(e.target.value)}
         />
-      </label>
-
+      </label>{" "}
       <label>
         {t("recipeBuilder.labels.weight")}
         <InputWithUnits
@@ -147,7 +143,6 @@ const IngredientLine = ({
           text={units.weight}
         />
       </label>
-
       <label>
         {t("recipeBuilder.labels.volume")}
         <InputWithUnits
@@ -156,14 +151,12 @@ const IngredientLine = ({
           text={units.volume}
         />
       </label>
-
       <label
         className={`joyride-secondary-${index + 1} flex gap-1 flex-col sm:flex-row items-center justify-center`}
       >
         {t("recipeBuilder.labels.secondary")}
         <Switch checked={ing.secondary} onCheckedChange={toggleChecked} />
       </label>
-
       <Button onClick={deleteFn} variant="destructive">
         {t("desktop.delete")}
       </Button>

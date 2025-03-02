@@ -1,5 +1,9 @@
+import { nanoid } from "nanoid";
+
+export const genRandomId = () => nanoid(8);
+
 export type IngredientDetails = {
-  id: number;
+  id: string;
   name: string;
   brix: string;
   details: [string, string];
@@ -8,7 +12,7 @@ export type IngredientDetails = {
 };
 
 export type Ingredient = {
-  id: number;
+  id: string;
   name: string;
   sugar_content: string;
   water_content: string;
@@ -25,6 +29,7 @@ export type AdditiveType = {
   name: string;
   amount: string;
   unit: string;
+  id: string;
 };
 
 export type Additive = {
@@ -52,18 +57,19 @@ export interface RecipeData {
   };
 }
 
-export type NotesType = [string, string][];
+export type NotesType = { id: string; content: [string, string] }[];
 
 export const blankAdditive: AdditiveType = {
   name: "",
   amount: "",
   unit: "g",
+  id: genRandomId(),
 };
 
 export const initialData: RecipeData = {
   ingredients: [
     {
-      id: 4,
+      id: genRandomId(),
       name: "Water",
       brix: "0.00",
       details: ["0", "0.000"],
@@ -71,7 +77,7 @@ export const initialData: RecipeData = {
       category: "water",
     },
     {
-      id: 1,
+      id: genRandomId(),
       name: "Honey",
       brix: "79.60",
       details: ["0", "0.000"],
@@ -100,25 +106,35 @@ export const initialData: RecipeData = {
 };
 
 export interface Recipe extends RecipeData {
+  setIngredients: (
+    ingredients: {
+      id: string;
+      name: string;
+      brix: string;
+      details: [string, string];
+      secondary: boolean;
+      category: string;
+    }[]
+  ) => void;
   addIngredient: () => void;
-  removeIngredient: (i: number) => void;
+  removeIngredient: (id: string) => void;
   ingredientList: Ingredient[];
   loadingIngredients: boolean;
-  changeIngredient: (index: number, name: string) => void;
+  changeIngredient: (ing: IngredientDetails, i: number, name: string) => void;
   changeVolumeUnits: (unit: string) => void;
   changeWeightUnits: (unit: string) => void;
   updateIngredientVolume: (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     volume: string
   ) => void;
   updateIngredientWeight: (
     ing: IngredientDetails,
-    index: number,
+    id: string,
     weight: string
   ) => void;
-  updateBrix: (brix: string, index: number) => void;
-  toggleSecondaryChecked: (i: number, b: boolean) => void;
+  updateBrix: (brix: string, id: string) => void;
+  toggleSecondaryChecked: (id: string, b: boolean) => void;
   updateFG: (FG: string) => void;
   backsweetenedFG: number;
   totalVolume: number;
@@ -130,40 +146,43 @@ export interface Recipe extends RecipeData {
   toggleTakingPh: (val: boolean) => void;
   phReading: string;
   updatePhReading: (val: string) => void;
+  updateAdditives: (add: AdditiveType[]) => void;
   additiveList: Additive[];
   loadingAdditives: boolean;
-  changeAdditive: (index: number, name: string) => void;
-  changeAdditiveUnits: (index: number, unit: string) => void;
-  changeAdditiveAmount: (index: number, amount: string) => void;
+  changeAdditive: (id: string, name: string) => void;
+  changeAdditiveUnits: (id: string, unit: string) => void;
+  changeAdditiveAmount: (id: string, amount: string) => void;
   addAdditive: () => void;
-  removeAdditive: (i: number) => void;
+  removeAdditive: (id: string) => void;
+  setPrimaryNotes: (notes: NotesType) => void;
+  setSecondaryNotes: (notes: NotesType) => void;
   notes: {
     primary: NotesType;
     secondary: NotesType;
   };
   editPrimaryNote: {
-    text: (index: number, note: string) => void;
-    details: (index: number, note: string) => void;
+    text: (id: string, note: string) => void;
+    details: (id: string, note: string) => void;
   };
   addPrimaryNote: () => void;
-  removePrimaryNote: (i: number) => void;
+  removePrimaryNote: (id: string) => void;
   editSecondaryNote: {
-    text: (index: number, note: string) => void;
-    details: (index: number, note: string) => void;
+    text: (id: string, note: string) => void;
+    details: (id: string, note: string) => void;
   };
   addSecondaryNote: () => void;
-  removeSecondaryNote: (i: number) => void;
+  removeSecondaryNote: (id: string) => void;
   recipeNameProps: {
     value: string;
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   };
   public_username?: string | null;
   setIngredientsToTarget: (og: number, volume: number) => void;
-  fillToNearest: (i: number) => void;
+  fillToNearest: (id: string) => void;
 }
 
 export const blankIngredient: IngredientDetails = {
-  id: 1,
+  id: genRandomId(),
   name: "Honey",
   brix: "79.6",
   details: ["0", "0"],
@@ -171,4 +190,7 @@ export const blankIngredient: IngredientDetails = {
   category: "sugar",
 };
 
-export const blankNote: [string, string] = ["", ""];
+export const blankNote: { id: string; content: [string, string] } = {
+  id: genRandomId(),
+  content: ["", ""],
+};

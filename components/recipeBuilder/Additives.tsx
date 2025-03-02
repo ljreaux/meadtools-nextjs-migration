@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { isValidNumber } from "@/lib/utils/validateInput";
+import DragList from "../ui/DragList";
 
 const units = [
   { value: "g", label: "G" },
@@ -29,6 +30,7 @@ const units = [
 ];
 
 function Additives({ useRecipe }: { useRecipe: () => Recipe }) {
+  const { t } = useTranslation();
   const {
     additives,
     changeAdditive,
@@ -37,40 +39,41 @@ function Additives({ useRecipe }: { useRecipe: () => Recipe }) {
     addAdditive,
     removeAdditive,
     additiveList,
+    updateAdditives,
   } = useRecipe();
-  const { t } = useTranslation();
+
   return (
     <div>
       <span>
-        {additives.length === 0
-          ? "Add Some Ingredients to Continue Building your Recipe."
-          : additives.map((add, i) => {
+        {additives.length === 0 ? (
+          "Add Some Ingredients to Continue Building your Recipe."
+        ) : (
+          <DragList
+            items={additives}
+            setItems={updateAdditives}
+            renderItem={(add) => {
+              const id = additives.find((item) => item.id === add.id)?.id || "";
               return (
-                <div
-                  className={`${
-                    i !== additives.length - 1
-                      ? "border-b border-dotted joyride-additiveLine"
-                      : "joyride-additiveLine"
-                  }`}
-                  key={i}
-                >
-                  <AdditiveLine
-                    additiveList={additiveList}
-                    add={add}
-                    changeAdditive={(add) => {
-                      changeAdditive(i, add);
-                    }}
-                    changeUnit={(unit) => {
-                      changeAdditiveUnits(i, unit);
-                    }}
-                    changeAmount={(amount) => {
-                      changeAdditiveAmount(i, amount);
-                    }}
-                    remove={() => removeAdditive(i)}
-                  />
-                </div>
+                <AdditiveLine
+                  additiveList={additiveList}
+                  add={add}
+                  changeAdditive={(value) => {
+                    changeAdditive(id, value);
+                  }}
+                  changeUnit={(unit) => {
+                    changeAdditiveUnits(id, unit);
+                  }}
+                  changeAmount={(amount) => {
+                    changeAdditiveAmount(id, amount);
+                  }}
+                  remove={() => {
+                    removeAdditive(id);
+                  }}
+                />
               );
-            })}
+            }}
+          />
+        )}
       </span>
       <Button
         onClick={addAdditive}
@@ -107,8 +110,9 @@ const AdditiveLine = ({
     changeAdditive(selectedIngredient.name);
   };
   return (
-    <div className="grid sm:grid-cols-6 grid-cols-3 gap-2 py-6">
-      <span className="col-span-2">
+    <div className="joyride-additiveLine grid sm:grid-cols-6 grid-cols-3 gap-2 py-4 items-center justify-center">
+      <label className="sm:col-span-2 col-span-full">
+        {t("name")}
         <SearchableInput
           items={additiveList}
           query={add.name}
@@ -116,29 +120,35 @@ const AdditiveLine = ({
           keyName="name"
           onSelect={handleAdditiveSelect}
         />
-      </span>
-      <Input
-        value={add.amount}
-        onChange={(e) => {
-          if (isValidNumber(e.target.value)) changeAmount(e.target.value);
-        }}
-        inputMode="decimal"
-        onFocus={(e) => e.target.select()}
-        className="col-span-2"
-      />
-      <Select value={add.unit} onValueChange={changeUnit}>
-        <SelectTrigger>
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          {units.map((unit) => (
-            <SelectItem key={unit.value} value={unit.value}>
-              {t(unit.label)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button onClick={remove} variant={"destructive"}>
+      </label>
+      <label className="col-span-2">
+        {t("PDF.addAmount")}
+        <Input
+          value={add.amount}
+          onChange={(e) => {
+            if (isValidNumber(e.target.value)) changeAmount(e.target.value);
+          }}
+          inputMode="decimal"
+          onFocus={(e) => e.target.select()}
+        />
+      </label>
+      <label>
+        {t("UNITS")}
+        <Select value={add.unit} onValueChange={changeUnit}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {units.map((unit) => (
+              <SelectItem key={unit.value} value={unit.value}>
+                {t(unit.label)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </label>
+
+      <Button onClick={remove} variant={"destructive"} className="mt-auto">
         Remove
       </Button>
     </div>
