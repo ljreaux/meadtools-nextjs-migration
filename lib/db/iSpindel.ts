@@ -105,12 +105,12 @@ export async function createLog(log: LogType) {
   const data = {
     brew_id: log.brew_id,
     device_id: log.device_id,
-    angle: log.angle,
+    angle: log.angle || 0,
     temperature: log.temperature,
     temp_units: log.temp_units,
     battery: log.battery,
     gravity: log.gravity,
-    interval: log.interval,
+    interval: log.interval || 0,
     calculated_gravity: log.calculated_gravity,
   };
 
@@ -270,6 +270,15 @@ export async function startBrew(
   brew_name: string
 ) {
   try {
+    const currentDevice = await prisma.devices.findFirst({
+      where: { id: device_id },
+    });
+    const hasActiveBrew = typeof currentDevice?.brew_id === "string";
+
+    if (hasActiveBrew) {
+      throw new Error("A brew is already in progress.");
+    }
+
     const brew = await prisma.brews.create({
       data: {
         user_id,
@@ -286,7 +295,7 @@ export async function startBrew(
     return [brew, device];
   } catch (error) {
     console.error(error);
-    throw new Error("Error starting brew.");
+    throw error;
   }
 }
 
